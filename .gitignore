@@ -1,0 +1,150 @@
+# Created by .ignore support plugin (hsz.mobi)
+### C++ template
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+### CFWheels template
+# unpacked plugin folders
+plugins/**/*
+
+# files directory where uploads go
+files
+
+# DBMigrate plugin: generated SQL
+db/sql
+
+# AssetBundler plugin: generated bundles
+javascripts/bundles
+stylesheets/bundles
+
+将删除 .idea/.gitignore
+将删除 .idea/.name
+将删除 .idea/C++14.iml
+将删除 .idea/dictionaries/
+将删除 .idea/encodings.xml
+将删除 .idea/misc.xml
+将删除 .idea/modules.xml
+将删除 .idea/vcs.xml
+将删除 CMakeLists.txt
+将删除 ComplexDefinite.cpp
+将删除 ComplexDefinite.h
+将删除 ComplexValue.cpp
+将删除 ComplexValue.h
+将删除 a
+将删除 a.cpp
+将删除 a.h
+将删除 b.cpp
+将删除 cmake-build-debug/CMakeCache.txt
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CMakeCCompiler.cmake
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CMakeCXXCompiler.cmake
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CMakeDetermineCompilerABI_C.bin
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CMakeDetermineCompilerABI_CXX.bin
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CMakeSystem.cmake
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CompilerIdC/CMakeCCompilerId.c
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CompilerIdC/tmp/
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CompilerIdCXX/CMakeCXXCompilerId.cpp
+将删除 cmake-build-debug/CMakeFiles/3.15.3/CompilerIdCXX/tmp/
+将删除 cmake-build-debug/CMakeFiles/CMakeDirectoryInformation.cmake
+将删除 cmake-build-debug/CMakeFiles/CMakeError.log
+将删除 cmake-build-debug/CMakeFiles/CMakeOutput.log
+将删除 cmake-build-debug/CMakeFiles/CMakeTmp/
+将删除 cmake-build-debug/CMakeFiles/Makefile.cmake
+将删除 cmake-build-debug/CMakeFiles/Makefile2
+将删除 cmake-build-debug/CMakeFiles/T1.dir/CXX.includecache
+将删除 cmake-build-debug/CMakeFiles/T1.dir/DependInfo.cmake
+将删除 cmake-build-debug/CMakeFiles/T1.dir/build.make
+将删除 cmake-build-debug/CMakeFiles/T1.dir/cmake_clean.cmake
+将删除 cmake-build-debug/CMakeFiles/T1.dir/depend.internal
+将删除 cmake-build-debug/CMakeFiles/T1.dir/depend.make
+将删除 cmake-build-debug/CMakeFiles/T1.dir/flags.make
+将删除 cmake-build-debug/CMakeFiles/T1.dir/link.txt
+将删除 cmake-build-debug/CMakeFiles/T1.dir/progress.make
+将删除 cmake-build-debug/CMakeFiles/T2.dir/CXX.includecache
+将删除 cmake-build-debug/CMakeFiles/T2.dir/DependInfo.cmake
+将删除 cmake-build-debug/CMakeFiles/T2.dir/build.make
+将删除 cmake-build-debug/CMakeFiles/T2.dir/cmake_clean.cmake
+将删除 cmake-build-debug/CMakeFiles/T2.dir/depend.internal
+将删除 cmake-build-debug/CMakeFiles/T2.dir/depend.make
+将删除 cmake-build-debug/CMakeFiles/T2.dir/flags.make
+将删除 cmake-build-debug/CMakeFiles/T2.dir/link.txt
+将删除 cmake-build-debug/CMakeFiles/T2.dir/progress.make
+将删除 cmake-build-debug/CMakeFiles/T3.dir/
+将删除 cmake-build-debug/CMakeFiles/TargetDirectories.txt
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/CXX.includecache
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/DependInfo.cmake
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/build.make
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/cmake_clean.cmake
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/depend.internal
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/depend.make
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/flags.make
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/link.txt
+将删除 cmake-build-debug/CMakeFiles/a.cpp.dir/progress.make
+将删除 cmake-build-debug/CMakeFiles/a.dir/CXX.includecache
+将删除 cmake-build-debug/CMakeFiles/a.dir/DependInfo.cmake
+将删除 cmake-build-debug/CMakeFiles/a.dir/build.make
+将删除 cmake-build-debug/CMakeFiles/a.dir/cmake_clean.cmake
+将删除 cmake-build-debug/CMakeFiles/a.dir/depend.internal
+将删除 cmake-build-debug/CMakeFiles/a.dir/depend.make
+将删除 cmake-build-debug/CMakeFiles/a.dir/flags.make
+将删除 cmake-build-debug/CMakeFiles/a.dir/link.txt
+将删除 cmake-build-debug/CMakeFiles/a.dir/progress.make
+将删除 cmake-build-debug/CMakeFiles/clion-environment.txt
+将删除 cmake-build-debug/CMakeFiles/clion-log.txt
+将删除 cmake-build-debug/CMakeFiles/cmake.check_cache
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/CXX.includecache
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/DependInfo.cmake
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/build.make
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/cmake_clean.cmake
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/depend.internal
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/depend.make
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/flags.make
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/link.txt
+将删除 cmake-build-debug/CMakeFiles/fourierSeries..dir/progress.make
+将删除 cmake-build-debug/CMakeFiles/progress.marks
+将删除 cmake-build-debug/Makefile
+将删除 cmake-build-debug/Project.cbp
+将删除 cmake-build-debug/T1
+将删除 cmake-build-debug/T2
+将删除 cmake-build-debug/a
+将删除 cmake-build-debug/cmake_install.cmake
+将删除 cmake-build-debug/cpp.cbp
+将删除 cmake-build-debug/fourierSeries.
+将删除 fourierSeries.cpp
+将删除 p/T1.cpp
+将删除 p/T1.h
+将删除 p/T2.cpp
+将删除 p/T2.h
+将删除 p/T3.c
+将删除 p/T3.h
+将删除 zhc.cpp
+将删除 zhc.h
