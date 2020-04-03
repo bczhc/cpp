@@ -55,6 +55,11 @@ public:
     ComplexValue &setValue(double _re, double _im);
 };
 
-typedef void (*OneVariableComplexFunction_t)(ComplexValue &, _Float64);
+typedef void (*OneVariableComplexFunction_t)(ComplexValue &, double);
+
+class ComplexFunctionInterface {
+public:
+    virtual void x(ComplexValue &dest, double t) = 0;
+};
 
 #endif //CPP_COMPLEXVALUE_H

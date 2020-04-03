@@ -5,7 +5,7 @@
 #include "ComplexValue.h"
 
 double ComplexValue::getComplexModule() {
-    return sqrtf64(powf64(re, 2) + powf64(im, 2));
+    return sqrt(pow(re, 2) + pow(im, 2));
 }
 
 ComplexValue ComplexValue::add(ComplexValue &cv) {
@@ -72,26 +72,26 @@ ComplexValue &ComplexValue::selfMultiply(double _re, double _im) {
 }
 
 ComplexValue ComplexValue::divide(ComplexValue cv) {
-    _Float64 a = powf64(cv.re, 2) + powf64(cv.im, 2);
+    double a = pow(cv.re, 2) + pow(cv.im, 2);
     ComplexValue r((this->re * cv.re + this->im * cv.im) / a, (cv.re * this->im - this->re * cv.im) / a);
     return r;
 }
 
 ComplexValue ComplexValue::divide(double _re, double _im) {
-    _Float64 a = powf64(re, 2) + powf64(im, 2);
+    double a = pow(re, 2) + pow(im, 2);
     ComplexValue r((this->re * _re + this->im * _im) / a, (_re * this->im - this->re * _im) / a);
     return r;
 }
 
 ComplexValue &ComplexValue::selfDivide(ComplexValue cv) {
-    _Float64 a = powf64(cv.re, 2) + powf64(cv.im, 2);
+    double a = pow(cv.re, 2) + pow(cv.im, 2);
     this->re = (this->re * cv.re + this->im * cv.im) / a;
     this->im = (cv.re * this->im - this->re * cv.im) / a;
     return *this;
 }
 
 ComplexValue &ComplexValue::selfDivide(double _re, double _im) {
-    _Float64 a = powf64(_re, 2) + powf64(_im, 2);
+    double a = pow(_re, 2) + pow(_im, 2);
     this->re = (this->re * _re + this->im * _im) / a;
     this->im = (_re * this->im - this->re * _im) / a;
     return *this;

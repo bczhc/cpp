@@ -2,20 +2,23 @@
 // Created by root on 2020/3/27.
 //
 
-#include "T2.h"
-#include "../zhc.h"
+class A {
+    virtual double f(double x) = 0;
+};
+
+class B : A {
+public:
+    double f(double x) override {
+        return x + 1;
+    }
+};
 
 int main() {
-    char s[] = " ";
-    char **dest = nullptr;
-    int i = Split(&dest, s, -1, "", -1);
-    for (int j = 0; j < i; ++j) {
-        cout << dest[j] << endl;
-    }
-    string s2 = "aa";
-    char str[s2.size() + 1];
-    str[s2.size()] = 0;
-    s2.copy(str, s2.size(), 0);
-    cout << str << endl;
+    int a = 1;
+    class C : A {
+        double f(double x) override {
+            return a;
+        }
+    };
     return 0;
 }

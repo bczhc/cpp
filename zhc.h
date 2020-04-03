@@ -162,7 +162,7 @@ template<typename T>
 class List {
 private:
     T *arr{};
-    int32_t len{};
+    int32_t lastIndex{};
     int32_t pSize{};
 public:
     List();
@@ -213,15 +213,15 @@ public:
 template<typename T>
 List<T>::List() {
     arr = nullptr;
-    len = 0;
+    lastIndex = 0;
     pSize = sizeof(T);
 }
 
 template<typename T>
 void List<T>::add(int32_t index, T a) {
-    ++len;
-    arr = (T *) realloc(arr, (size_t) (pSize * len));
-    for (int32_t i = len - 1; i > index; --i) {
+    ++lastIndex;
+    arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
+    for (int32_t i = lastIndex - 1; i > index; --i) {
         arr[i] = arr[i - 1];
     }
     arr[index] = a;
@@ -229,20 +229,20 @@ void List<T>::add(int32_t index, T a) {
 
 template<typename T>
 void List<T>::add(T a) {
-    ++len;
-    arr = (T *) realloc(arr, (size_t) (pSize * len));
-    arr[len - 1] = a;
+    ++lastIndex;
+    arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
+    arr[lastIndex - 1] = a;
 }
 
 template<typename T>
 bool List<T>::addAll(int32_t index, List<T> &list) {
     int32_t listLength = list.length();
     if (!listLength) return false;
-    len += listLength;
-    arr = (T *) realloc(arr, (size_t) (pSize * len));
+    lastIndex += listLength;
+    arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
     int32_t i;
     int32_t t = index + listLength;
-    for (i = len - 1; i >= t; --i) {
+    for (i = lastIndex - 1; i >= t; --i) {
         arr[i] = arr[i - listLength];
     }
     for (i = 0; i < listLength; ++i) {
@@ -258,7 +258,7 @@ T List<T>::get(int32_t index) {
 
 template<typename T>
 int32_t List<T>::indexOf(T a) {
-    for (int32_t i = 0; i < len; ++i) {
+    for (int32_t i = 0; i < lastIndex; ++i) {
         if (arr[i] == a) return i;
     }
     return -1;
@@ -267,11 +267,11 @@ int32_t List<T>::indexOf(T a) {
 template<typename T>
 T List<T>::remove(int32_t index) {
     T r = arr[index];
-    for (int32_t i = index; i < len; ++i) {
+    for (int32_t i = index; i < lastIndex; ++i) {
         arr[i] = arr[i - 1];
     }
-    --len;
-    arr = (T *) realloc(arr, (size_t) (pSize * len));
+    --lastIndex;
+    arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
     return r;
 }
 
@@ -293,7 +293,7 @@ List<T> List<T>::subList(int32_t fromIndex, int32_t toIndex) {
 
 template<typename T>
 int32_t List<T>::length() {
-    return this->len;
+    return this->lastIndex;
 }
 
 template<typename T>

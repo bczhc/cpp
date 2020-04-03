@@ -13,7 +13,7 @@ public:
 
     //梯形法求定积分
     ComplexValue
-    getDefiniteIntegralByTrapezium(_Float64 x0, _Float64 xn, OneVariableComplexFunction_t complexFunctionInterface);
+    getDefiniteIntegralByTrapezium(double x0, double xn, ComplexFunctionInterface &complexFunctionInterface);
 };
 
 #endif //CPP_COMPLEXDEFINITE_H

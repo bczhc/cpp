@@ -9,12 +9,12 @@
 
 class Epicycle {
 public:
-    _Float64 n{};
+    double n{};
     ComplexValue c{};
 
     Epicycle();
 
-    Epicycle(_Float64 n, const ComplexValue &c);
+    Epicycle(double n, const ComplexValue &c);
 };
 
 #endif //CPP_EPICYCLE_H
