@@ -5,17 +5,12 @@
 #include "ComplexIntegral.h"
 
 ComplexValue ComplexIntegral::getDefiniteIntegralByTrapezium(double x0, double xn,
-                                                             ComplexFunctionInterface &complexFunctionInterface) {
+                                                             ComplexFunctionInterface &f) {
     double d = (xn - x0) / n;
-    ComplexValue sum(0, 0);
-    ComplexValue cv1(0, 0);
-    ComplexValue cv2(2, 0);
-    ComplexValue dComplex(d, 0);
-    ComplexValue v{}, v2{};
-    for (double i = x0; i <= xn; i += d) { // NOLINT(cert-flp30-c)
-        complexFunctionInterface.x(v, i);
-        complexFunctionInterface.x(v2, i + d);
-        sum.selfAdd(cv1.setValue(v).add(v2).multiply(dComplex).selfDivide(cv2));
+    ComplexValue sum(0, 0), left(0, 0), right(0, 0);
+    for (double t = 0; t <= xn; t += d) { // NOLINT(cert-flp30-c)
+        f.x(left, t), f.x(right, t + d);
+        sum.selfAdd(left.selfAdd(right).selfMultiply(d, 0).selfDivide(2, 0));
     }
     return sum;
 }
