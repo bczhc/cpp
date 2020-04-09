@@ -3,7 +3,7 @@
 //
 
 #include "./ComplexValue.h"
-#include "./ComplexDefinite.h"
+#include "ComplexIntegral.h"
 #include <iostream>
 #include <thread>
 #include "./Epicycle.h"
@@ -22,13 +22,10 @@ private:
     double T{};
     ComplexFunctionInterface &f;
     int32_t epicyclesCount{};
-
-    void tempFunction(ComplexValue &cv, double t, double n);
-
 public:
     FourierSeries(ComplexFunctionInterface &functionInterface, int32_t _epicyclesCount, int32_t period);
 
-    void calc(List<Epicycle> &list);
+    void calc(ArrayList<Epicycle> &list);
 
     void calc(FourierSeriesCallback &callback);
 };

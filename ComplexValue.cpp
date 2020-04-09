@@ -5,47 +5,47 @@
 #include "ComplexValue.h"
 
 double ComplexValue::getComplexModule() {
-    return sqrt(pow(re, 2) + pow(im, 2));
+    return sqrt(pow(this->re, 2) + pow(this->im, 2));
 }
 
 ComplexValue ComplexValue::add(ComplexValue &cv) {
-    ComplexValue r(re + cv.re, im + cv.im);
+    ComplexValue r(this->re + cv.re, this->im + cv.im);
     return r;
 }
 
 ComplexValue::ComplexValue(double re, double im) : re(re), im(im) {}
 
 ComplexValue ComplexValue::add(double _re, double _im) {
-    ComplexValue r(re + _re, im + _im);
+    ComplexValue r(this->re + _re, this->im + _im);
     return r;
 }
 
 ComplexValue &ComplexValue::selfAdd(ComplexValue &cv) {
-    re += cv.re;
-    im += cv.im;
+    this->re += cv.re;
+    this->im += cv.im;
     return *this;
 }
 
 ComplexValue &ComplexValue::selfAdd(double _re, double _im) {
-    re += re;
-    im += im;
+    this->re += _re;
+    this->im += _im;
     return *this;
 }
 
 ComplexValue ComplexValue::subtract(double _re, double _im) {
-    ComplexValue r(re - _re, im - _im);
+    ComplexValue r(this->re - _re, this->im - _im);
     return r;
 }
 
 ComplexValue &ComplexValue::selfSubtract(ComplexValue cv) {
-    re -= cv.re;
-    im -= cv.im;
+    this->re -= cv.re;
+    this->im -= cv.im;
     return *this;
 }
 
 ComplexValue &ComplexValue::selfSubtract(double _re, double _im) {
-    re -= re;
-    im -= im;
+    this->re -= _re;
+    this->im -= _im;
     return *this;
 }
 
@@ -66,8 +66,8 @@ ComplexValue &ComplexValue::selfMultiply(ComplexValue cv) {
 }
 
 ComplexValue &ComplexValue::selfMultiply(double _re, double _im) {
-    this->re = this->re * re - this->im * im;
-    this->im = this->re * im + re * this->im;
+    this->re = this->re * _re - this->im * _im;
+    this->im = this->re * _im + _re * this->im;
     return *this;
 }
 
@@ -78,7 +78,7 @@ ComplexValue ComplexValue::divide(ComplexValue cv) {
 }
 
 ComplexValue ComplexValue::divide(double _re, double _im) {
-    double a = pow(re, 2) + pow(im, 2);
+    double a = pow(this->re, 2) + pow(this->im, 2);
     ComplexValue r((this->re * _re + this->im * _im) / a, (_re * this->im - this->re * _im) / a);
     return r;
 }
@@ -110,6 +110,6 @@ ComplexValue &ComplexValue::setValue(double _re, double _im) {
 }
 
 ComplexValue ComplexValue::subtract(ComplexValue cv) {
-    ComplexValue r(re - cv.re, im - cv.im);
+    ComplexValue r(this->re - cv.re, im - cv.im);
     return r;
 }

@@ -13,7 +13,7 @@ public:
 };
 
 template<typename T>
-class List {
+class ArrayList {
 private:
     Node<T> *head;
     int32_t lastIndex;
@@ -27,12 +27,12 @@ private:
     }
 
 public:
-    List() {
+    ArrayList() {
         head = nullptr;
         lastIndex = 0;
     }
 
-    List &add(T a) {
+    ArrayList &add(T a) {
         if (head == nullptr) {
             head = new Node<T>;
             head->next = nullptr;
@@ -69,7 +69,7 @@ public:
 };
 
 int main() {
-    List<int> list;
+    ArrayList<int> list;
     list.add(2)
             .add(3)
             .add(4);

@@ -2,9 +2,9 @@
 // Created by root on 2020/4/2.
 //
 
-#include "ComplexDefinite.h"
+#include "ComplexIntegral.h"
 
-ComplexValue ComplexDefinite::getDefiniteIntegralByTrapezium(double x0, double xn,
+ComplexValue ComplexIntegral::getDefiniteIntegralByTrapezium(double x0, double xn,
                                                              ComplexFunctionInterface &complexFunctionInterface) {
     double d = (xn - x0) / n;
     ComplexValue sum(0, 0);

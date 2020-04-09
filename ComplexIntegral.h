@@ -2,12 +2,12 @@
 // Created by root on 2020/4/2.
 //
 
-#ifndef CPP_COMPLEXDEFINITE_H
-#define CPP_COMPLEXDEFINITE_H
+#ifndef CPP_COMPLEXINTEGRAL_H
+#define CPP_COMPLEXINTEGRAL_H
 
 #include "./ComplexValue.h"
 
-class ComplexDefinite {
+class ComplexIntegral {
 public:
     int n = 100000;
 
@@ -16,4 +16,4 @@ public:
     getDefiniteIntegralByTrapezium(double x0, double xn, ComplexFunctionInterface &complexFunctionInterface);
 };
 
-#endif //CPP_COMPLEXDEFINITE_H
+#endif //CPP_COMPLEXINTEGRAL_H

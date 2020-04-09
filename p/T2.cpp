@@ -2,23 +2,25 @@
 // Created by root on 2020/3/27.
 //
 
-class A {
-    virtual double f(double x) = 0;
-};
-
-class B : A {
-public:
-    double f(double x) override {
-        return x + 1;
-    }
-};
+#include "../zhc.h"
+#include "../FourierSeries.h"
+#include <iostream>
+using namespace std;
 
 int main() {
-    int a = 1;
-    class C : A {
-        double f(double x) override {
-            return a;
+    class Callback : public FourierSeriesCallback {
+    public:
+        void callback(double n, double re, double im) override {
+            cout << "n: " << n << " re: " << re << " im: " << im << endl;
         }
-    };
-    return 0;
+    } callback;
+
+    class F : public ComplexFunctionInterface {
+    public:
+        void x(ComplexValue &dest, double t) override {
+            dest.setValue(10, 10);
+        }
+    } f;
+    FourierSeries fs(f, 100, 1);
+    fs.calc(callback);
 }

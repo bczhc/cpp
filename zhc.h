@@ -159,19 +159,19 @@ int Split(char ***dst, const char *s, int s_length, const char *separatorString,
 using namespace std;
 
 template<typename T>
-class List {
+class ArrayList {
 private:
     T *arr{};
     int32_t lastIndex{};
     int32_t pSize{};
 public:
-    List();
+    ArrayList();
 
     void add(int32_t index, T a);
 
     void add(T a);
 
-    bool addAll(int32_t index, List<T> &list);
+    bool addAll(int32_t index, ArrayList<T> &list);
 
     T get(int32_t index);
 
@@ -181,12 +181,13 @@ public:
 
     T set(int32_t index, T a);
 
-    List<T> subList(int32_t fromIndex, int32_t toIndex);
+    ArrayList<T> subList(int32_t fromIndex, int32_t toIndex);
 
     int32_t length();
 
     void release();
 };
+
 
 template<typename T>
 class Stack {
@@ -211,14 +212,14 @@ public:
 };
 
 template<typename T>
-List<T>::List() {
+ArrayList<T>::ArrayList() {
     arr = nullptr;
     lastIndex = 0;
     pSize = sizeof(T);
 }
 
 template<typename T>
-void List<T>::add(int32_t index, T a) {
+void ArrayList<T>::add(int32_t index, T a) {
     ++lastIndex;
     arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
     for (int32_t i = lastIndex - 1; i > index; --i) {
@@ -228,14 +229,14 @@ void List<T>::add(int32_t index, T a) {
 }
 
 template<typename T>
-void List<T>::add(T a) {
+void ArrayList<T>::add(T a) {
     ++lastIndex;
     arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
     arr[lastIndex - 1] = a;
 }
 
 template<typename T>
-bool List<T>::addAll(int32_t index, List<T> &list) {
+bool ArrayList<T>::addAll(int32_t index, ArrayList<T> &list) {
     int32_t listLength = list.length();
     if (!listLength) return false;
     lastIndex += listLength;
@@ -252,12 +253,12 @@ bool List<T>::addAll(int32_t index, List<T> &list) {
 }
 
 template<typename T>
-T List<T>::get(int32_t index) {
+T ArrayList<T>::get(int32_t index) {
     return arr[index];
 }
 
 template<typename T>
-int32_t List<T>::indexOf(T a) {
+int32_t ArrayList<T>::indexOf(T a) {
     for (int32_t i = 0; i < lastIndex; ++i) {
         if (arr[i] == a) return i;
     }
@@ -265,7 +266,7 @@ int32_t List<T>::indexOf(T a) {
 }
 
 template<typename T>
-T List<T>::remove(int32_t index) {
+T ArrayList<T>::remove(int32_t index) {
     T r = arr[index];
     for (int32_t i = index; i < lastIndex; ++i) {
         arr[i] = arr[i - 1];
@@ -276,15 +277,15 @@ T List<T>::remove(int32_t index) {
 }
 
 template<typename T>
-T List<T>::set(int32_t index, T a) {
+T ArrayList<T>::set(int32_t index, T a) {
     T r = arr[index];
     arr[index] = a;
     return r;
 }
 
 template<typename T>
-List<T> List<T>::subList(int32_t fromIndex, int32_t toIndex) {
-    List<T> r{};
+ArrayList<T> ArrayList<T>::subList(int32_t fromIndex, int32_t toIndex) {
+    ArrayList<T> r{};
     for (int32_t i = fromIndex; i < toIndex; ++i) {
         r.add(arr[i]);
     }
@@ -292,12 +293,12 @@ List<T> List<T>::subList(int32_t fromIndex, int32_t toIndex) {
 }
 
 template<typename T>
-int32_t List<T>::length() {
+int32_t ArrayList<T>::length() {
     return this->lastIndex;
 }
 
 template<typename T>
-void List<T>::release() {
+void ArrayList<T>::release() {
     delete this->arr;
 }
 
@@ -350,6 +351,36 @@ class RPN {
 public:
 
 };
+
+template<typename T>
+class LinkedList {
+private:
+    class Node {
+    private:
+        T data;
+        Node *next;
+    };
+
+    Node root;
+    int32_t len;
+public:
+    void put(T a);
+
+    void put(int32_t index, T a);
+
+    T removeFirst();
+
+    T removeLast();
+
+    T get(int32_t index);
+
+    int32_t length();
+};
+
+template<typename T>
+void LinkedList<T>::put(T a) {
+
+}
 
 #endif //__cplusplus
 
