@@ -3,6 +3,7 @@
 //
 
 #include "ComplexValue.h"
+#include "./zhc.h"
 
 double ComplexValue::getComplexModule() {
     return sqrt(pow(this->re, 2) + pow(this->im, 2));
@@ -60,14 +61,18 @@ ComplexValue ComplexValue::multiply(double _re, double _im) {
 }
 
 ComplexValue &ComplexValue::selfMultiply(ComplexValue cv) {
-    this->re = this->re * cv.re - this->im * cv.im;
-    this->im = this->re * cv.im + cv.re * this->im;
+    double re1 = this->re * cv.re - this->im * cv.im;
+    double im1 = this->re * cv.im + cv.re * this->im;
+    this->re = re1;
+    this->im = im1;
     return *this;
 }
 
 ComplexValue &ComplexValue::selfMultiply(double _re, double _im) {
-    this->re = this->re * _re - this->im * _im;
-    this->im = this->re * _im + _re * this->im;
+    double re1 = this->re * _re - this->im * _im;
+    double im1 = this->re * _im + _re * this->im;
+    this->re = re1;
+    this->im = im1;
     return *this;
 }
 
@@ -85,15 +90,19 @@ ComplexValue ComplexValue::divide(double _re, double _im) {
 
 ComplexValue &ComplexValue::selfDivide(ComplexValue cv) {
     double a = pow(cv.re, 2) + pow(cv.im, 2);
-    this->re = (this->re * cv.re + this->im * cv.im) / a;
-    this->im = (cv.re * this->im - this->re * cv.im) / a;
+    double re1 = (this->re * cv.re + this->im * cv.im) / a;
+    double im1 = (cv.re * this->im - this->re * cv.im) / a;
+    this->re = re1;
+    this->im = im1;
     return *this;
 }
 
 ComplexValue &ComplexValue::selfDivide(double _re, double _im) {
     double a = pow(_re, 2) + pow(_im, 2);
-    this->re = (this->re * _re + this->im * _im) / a;
-    this->im = (_re * this->im - this->re * _im) / a;
+    double re1 = (this->re * _re + this->im * _im) / a;
+    double im1 = (_re * this->im - this->re * _im) / a;
+    this->re = re1;
+    this->im = im1;
     return *this;
 }
 
@@ -112,4 +121,31 @@ ComplexValue &ComplexValue::setValue(double _re, double _im) {
 ComplexValue ComplexValue::subtract(ComplexValue cv) {
     ComplexValue r(this->re - cv.re, im - cv.im);
     return r;
+}
+
+string ComplexValue::toString() {
+    if (re == 0 && im == 0) {
+        string s = "0";
+        return s;
+    } else if (re ==0) {
+        string s = to_string(re);
+        s.append("i");
+        return s;
+    } else if (im == 0) {
+        string s = to_string(re);
+        return s;
+    } else if (im > 0) {
+        string s = to_string(re);
+        s.append("+")
+                .append(to_string(im))
+                .append("i");
+        return s;
+    } else if (im < 0) {
+        string s = to_string(re);
+        s.append(to_string(im))
+                .append("i");
+        return s;
+    }
+    string s = "0";
+    return s;
 }

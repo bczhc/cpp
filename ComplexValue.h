@@ -7,6 +7,9 @@
 
 #include <cmath>
 #include <cstdint>
+#include <iostream>
+
+using namespace std;
 
 class ComplexValue {
 public:
@@ -53,6 +56,8 @@ public:
     ComplexValue &setValue(ComplexValue cv);
 
     ComplexValue &setValue(double _re, double _im);
+
+    string toString();
 };
 
 typedef void (*OneVariableComplexFunction_t)(ComplexValue &, double);
