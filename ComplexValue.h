@@ -58,6 +58,10 @@ public:
     ComplexValue &setValue(double _re, double _im);
 
     string toString();
+
+    static string toString(ComplexValue cv);
+
+    static string toString(double _re, double _im);
 };
 
 typedef void (*OneVariableComplexFunction_t)(ComplexValue &, double);

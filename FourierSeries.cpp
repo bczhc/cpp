@@ -13,7 +13,7 @@ FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface, int32_
 
 }*/
 
-void FourierSeries::calc(FourierSeriesCallback &callback) {
+void FourierSeries::calc(FourierSeriesCallback &callback, int integralD) {
     int32_t a = -epicyclesCount / 2;
     int32_t t = a + epicyclesCount;
     class FuncInIntegral : public ComplexFunctionInterface {
@@ -31,11 +31,18 @@ void FourierSeries::calc(FourierSeriesCallback &callback) {
             dest.selfMultiply(cos(-n * t * mOmega), sin(-n * t * mOmega));
         }
     } funcInIntegral(f, omega);
-    ComplexIntegral complexIntegral{.n = 10000};
+    ComplexIntegral complexIntegral{.n = integralD};
     for (int32_t n = a; n < t; ++n) {
         funcInIntegral.n = n;
         ComplexValue integralResult = complexIntegral.getDefiniteIntegralByTrapezium(0, T, funcInIntegral);
         integralResult.selfDivide(T, 0);
         callback.callback(n, integralResult.re, integralResult.im);
     }
+}
+
+
+
+int main() {
+
+    return 0;
 }

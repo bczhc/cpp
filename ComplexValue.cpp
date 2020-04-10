@@ -3,7 +3,6 @@
 //
 
 #include "ComplexValue.h"
-#include "./zhc.h"
 
 double ComplexValue::getComplexModule() {
     return sqrt(pow(this->re, 2) + pow(this->im, 2));
@@ -124,25 +123,33 @@ ComplexValue ComplexValue::subtract(ComplexValue cv) {
 }
 
 string ComplexValue::toString() {
-    if (re == 0 && im == 0) {
+    return ComplexValue::toString(this->re, this->im);
+}
+
+string ComplexValue::toString(ComplexValue cv) {
+    return ComplexValue::toString(cv.re, cv.im);
+}
+
+string ComplexValue::toString(double _re, double _im) {
+    if (_re == 0 && _im == 0) {
         string s = "0";
         return s;
-    } else if (re ==0) {
-        string s = to_string(re);
+    } else if (_re ==0) {
+        string s = to_string(_re);
         s.append("i");
         return s;
-    } else if (im == 0) {
-        string s = to_string(re);
+    } else if (_im == 0) {
+        string s = to_string(_re);
         return s;
-    } else if (im > 0) {
-        string s = to_string(re);
+    } else if (_im > 0) {
+        string s = to_string(_re);
         s.append("+")
-                .append(to_string(im))
+                .append(to_string(_im))
                 .append("i");
         return s;
-    } else if (im < 0) {
-        string s = to_string(re);
-        s.append(to_string(im))
+    } else if (_im < 0) {
+        string s = to_string(_re);
+        s.append(to_string(_im))
                 .append("i");
         return s;
     }

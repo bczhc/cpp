@@ -25,9 +25,21 @@ private:
 public:
     FourierSeries(ComplexFunctionInterface &functionInterface, int32_t _epicyclesCount, int32_t period);
 
-    void calc(ArrayList<Epicycle> &list);
+    void calc(ArrayList<Epicycle> &list, int integralD);
 
-    void calc(FourierSeriesCallback &callback);
+    void calc(FourierSeriesCallback &callback, int integralD);
+};
+
+class ComplexPointFunction {
+private:
+    ArrayList<ComplexValue> list;
+public:
+    ComplexValue get(int32_t index);
+
+    void put(ComplexValue &cv);
+
+    ComplexFunctionInterface getFunction();
+
 };
 
 void tF();
