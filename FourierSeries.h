@@ -25,9 +25,9 @@ private:
 public:
     FourierSeries(ComplexFunctionInterface &functionInterface, int32_t _epicyclesCount, int32_t period);
 
-    void calc(ArrayList<Epicycle> &list, int integralD);
+//    void calc(ArrayList<Epicycle> &list, int integralD);
 
-    void calc(FourierSeriesCallback &callback, int integralD);
+    void calc(FourierSeriesCallback &callback, int integralD, int threadNum);
 };
 
 class ComplexPointFunction {

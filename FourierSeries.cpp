@@ -13,7 +13,8 @@ FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface, int32_
 
 }*/
 
-void FourierSeries::calc(FourierSeriesCallback &callback, int integralD) {
+void FourierSeries::calc(FourierSeriesCallback &callback, int integralD, int threadNum) {
+    thread *threads[threadNum];
     int32_t a = -epicyclesCount / 2;
     int32_t t = a + epicyclesCount;
     class FuncInIntegral : public ComplexFunctionInterface {
@@ -38,8 +39,10 @@ void FourierSeries::calc(FourierSeriesCallback &callback, int integralD) {
         integralResult.selfDivide(T, 0);
         callback.callback(n, integralResult.re, integralResult.im);
     }
+    for (int i = 0; i < threadNum; ++i) {
+        delete threads[i];
+    }
 }
-
 
 
 int main() {

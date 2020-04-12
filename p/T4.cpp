@@ -3,14 +3,21 @@
 //
 
 #include <iostream>
+#include <unistd.h>
 #include "../zhc.h"
 
 using namespace std;
 
+class A {
+public:
+    A() {
+        cout << "constructing A" << endl;
+    }
+    ~A() {
+        cout << "destructing A" << endl;
+    }
+};
+
 int main() {
-    char *s = nullptr;
-    strcpyAndCat_auto(&s, "a", -1, "b", -1);
-    cout << s << endl;
-    delete s;
     return 0;
 }
