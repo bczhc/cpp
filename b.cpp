@@ -1,9 +1,8 @@
-//
-// Created by root on 2020/3/14.
-//
+#include "cstring"
+#include <cstring>
 
-#include "./a.h"
-
-int f() {
-    return A;
+int main() {
+	char *s = "";
+	strcpy(nullptr, s);
+	return 0;
 }

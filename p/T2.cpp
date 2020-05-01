@@ -5,8 +5,11 @@
 #include "../zhc.h"
 #include "../FourierSeries.h"
 #include <iostream>
-using namespace std;
+#include <bits/stdint-intn.h>
+#include <cstdio>
+#include <iostream>
 
+void fff(int );
 int main() {
     double T = 50, omega = 2 * M_PI / T;
     class F : public ComplexFunctionInterface {
@@ -24,5 +27,10 @@ int main() {
 
     ComplexIntegral integral{.n = 10000};
     ComplexValue r = integral.getDefiniteIntegralByTrapezium(0, T, f).selfDivide(T, 0);
-    cout << r.toString() << endl;
+	cout << r.toString() << endl;
+	FourierSeries fs(f, 3, 3);
+	class CB : public FourierSeriesCallback {
+		
+	} cb;
+	fs.calc(cb, 5, 5);
 }
