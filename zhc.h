@@ -6,6 +6,7 @@
 #ifndef C99_ZHC_H
 #define C99_ZHC_H
 #include <bits/stdint-uintn.h>
+#include <iterator>
 #ifndef __cplusplus
 #include <ctype.h>
 #include <stdio.h>
@@ -334,8 +335,10 @@ template <typename T> Node<T>::Node() { this->next = nullptr; }
 
 template <typename T> class LinkedList {
 private:
-  Node<T> *root;
+  // the head node, without any data.
+  Node<T> *head;
   int32_t len;
+  Node<T> *getNode(int32_t index);
 
 public:
   void put(T a);
@@ -354,81 +357,75 @@ public:
 
   ~LinkedList();
 };
+template <typename T> Node<T> *LinkedList<T>::getNode(int32_t index) {
+  if (index == -1)
+    return head;
+  Node<T> *t = head;
+  for (int32_t i = 0; i <= index; ++i) {
+    t = t->next;
+  }
+  return t;
+}
 
 template <typename T> LinkedList<T>::LinkedList() {
+  this->head = new Node<T>;
   this->len = 0;
-  this->root = nullptr;
 }
 
 template <typename T> void LinkedList<T>::put(T a) {
-  if (root == nullptr) {
-    Node<T> *initRoot = new Node<T>;
-    initRoot->data = a;
-    root = initRoot;
-  } else {
-    Node<T> *t = root;
-    for (int32_t i = 0; i < len - 1; ++i) {
-      // I made a mistake here: i wasn't initial the variable i and it has a
-      // dirty data, that caused the for loop not work, and... SHIT
-      t = t->next;
-    }
-    Node<T> *node = new Node<T>;
-    node->data = a;
-    t->next = node;
-  }
+  Node<T> *last = this->getNode(len - 1);
+  Node<T> *node = new Node<T>;
+  node->data = a;
+  last->next = node;
   ++len;
 }
 
 template <typename T> void LinkedList<T>::put(int32_t index, T a) {
-  if (index == 0 && root == nullptr) {
-    Node<T> initRoot = new Node<T>;
-    initRoot->data = a;
-  } else {
-    Node<T> *t = root;
-    for (int32_t i = 0; i < index; ++i) {
-      t = t->next;
+  Node<T> *t = head;
+  Node<T> *needed = nullptr;
+  for (int32_t i = 0; i <= index; ++i) {
+    if (t->next == nullptr) {
+      Node<T> *node = new Node<T>;
+      t->next = node;
+      ++len;
     }
-    Node<T> *node = new Node<T>;
-    node->data = a;
-    node->next = t->next;
-    t->next = node;
+    t = t->next;
+    if (i == index)
+      needed = t;
   }
+  Node<T> *next = needed->next;
+  Node<T> *newNode = new Node<T>;
+  newNode->data = a;
+  newNode->next = next;
+  needed->next = newNode;
+  ++len;
 }
 
 template <typename T> T LinkedList<T>::get(int32_t index) {
-  Node<T> *t = root;
-  for (int32_t i = 0; i < index; ++i) {
-    t = t->next;
-  }
-  return t->data;
+  return this->getNode(index)->data;
 }
-
 template <typename T> T LinkedList<T>::removeFirst() {
+  Node<T> *root = head->next;
   T removed = root->data;
-  Node<T> *theSecondData = root->next;
+  head->next = root->next;
   delete root;
   --len;
-  root = theSecondData;
   return removed;
 }
 
 template <typename T> T LinkedList<T>::removeLast() {
-  --len;
-  Node<T> *t = root;
-  for (int32_t i = 0; i < len; ++i) {
-    t = t->next;
-  }
-  T removed = t->next->data;
-  delete t->next;
-  t->next = nullptr;
+  Node<T> *lastPrev = this->getNode(len - 2);
+  T removed = lastPrev->next->data;
+  delete lastPrev->next;
+  lastPrev->next = nullptr;
   return removed;
 }
-
 template <typename T> int32_t LinkedList<T>::length() { return this->len; }
 template <typename T> LinkedList<T>::~LinkedList() {
-  Node<T> *t = root;
-  for (int32_t i = 0; i < len; ++i) {
-    Node<T> *next = t->next;
+  Node<T> *t = head, *next;
+  for (int32_t i = 0; i <= len; ++i) {
+    next = t->next;
+    t = next;
     delete t;
     t = next;
   }
@@ -438,6 +435,7 @@ class String {
 private:
   char *data;
   size_t len;
+  void init(const char *s, int32_t length);
 
 public:
   String(const char *s);
@@ -446,9 +444,10 @@ public:
   char *getData();
   String append(const char *s);
   String append(String &s);
-  ArrayList<String> split(const char *separator);
-  ArrayList<String> split(String &separator);
+  ArrayList<String *> split(const char *separator);
+  ArrayList<String *> split(String &separator);
   string toCppString();
+  String &operator=(const char *s);
 };
 
 #endif //__cplusplus

@@ -409,13 +409,18 @@ int Split(char ***dst, const char *s, int s_length, const char *separatorString,
   return dstI + 1;
 }
 
-String::String(const char *s) : String(s, strlen(s)) {}
-
-String::String(const char *s, size_t length) {
+void String::init(const char *s, int32_t length) {
   len = length;
   data = (char *)malloc((size_t)(length + 1));
   data[length] = '\0';
   strcpy(data, s);
+}
+
+
+String::String(const char *s) : String(s, strlen(s)) {}
+
+String::String(const char *s, size_t length) {
+	this->init(s, length);
 }
 
 String::~String() {
@@ -440,13 +445,13 @@ String String::append(String &s) {
   return this->append(sData);
 }
 
-ArrayList<String> String::split(const char *separator) {
+ArrayList<String *> String::split(const char *separator) {
   char **r = nullptr;
   char *sData = this->getData();
   int32_t arrLength = Split(&r, sData, -1, separator, -1);
-  ArrayList<String> list;
+  ArrayList<String *> list;
   for (int32_t i = 0; i < arrLength; ++i) {
-    String s(r[i]);
+    String *s = new String(r[i]);
     list.add(s);
     delete (r[i]);
   }
@@ -454,7 +459,7 @@ ArrayList<String> String::split(const char *separator) {
   return list;
 }
 
-ArrayList<String> String::split(String &separator) {
+ArrayList<String *> String::split(String &separator) {
   char *separatorData = separator.getData();
   return this->split(separatorData);
 }
@@ -463,4 +468,9 @@ ArrayList<String> String::split(String &separator) {
 string String::toCppString() {
 	string r(this->getData());
 	return r;
+}
+
+String &String::operator=(const char *s) {
+	this->init(s, strlen(s));
+	return *this;
 }

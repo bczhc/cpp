@@ -25,12 +25,22 @@ void pi(int64_t n) {
 }
 
 int main(int argc, char **argv) {
-  LinkedList<int> list;
+  /* LinkedList<int> list;
   for (int32_t i = 0; i < 10; ++i) {
     list.put(i, i);
   }
+  list.put(15, 15);
   for (int32_t i = 0; i < 10; ++i) {
-    cout << list.length() - 1 << " " << list.get(i) << endl;
+    cout << i << " " << list.get(i) << endl;
+  }*/
+  String s = "hello, world";
+  cout << s.getData() << endl;
+  ArrayList<String *> list = s.split(", ");
+  int32_t len = list.length();
+  for (int32_t i = 0; i < len; ++i) {
+	  String *s = list.get(i);
+	  cout << s->getData() << endl;
+	  delete s;
   }
   return 0;
 }
