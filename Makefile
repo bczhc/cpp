@@ -1,15 +1,20 @@
+CC=clang
 CXX=clang++
-objs=a.o \
-	zhc.o
+CFLAGS=-g
+CPPFLAGS=-g
+objs=snake.o \
+	 zhc.o
 objs2=FourierSeries.o \
-	ComplexValue.o \
-	ComplexIntegral.o \
-	Epicycle.o \
-	zhc.o
-a.out : $(objs) $(objs2)
-	$(CXX) $(objs) -o a.out
+	  ComplexValue.o \
+	  ComplexIntegral.o \
+	  Epicycle.o \
+	  zhc.o \
+	  test.o
+snake.out : $(objs) $(objs2)
+	$(CXX) -g $(objs) -o a.out
+	# $(CXX) -g $(objs2) -o test
 	./a.out
-a.o : ./zhc.h ./a.h
+snake.o : ./zhc.h
 zhc.o : ./zhc.h
 FourierSeries.o : ./FourierSeries.h
 ComplexValue.o : ./ComplexValue.h

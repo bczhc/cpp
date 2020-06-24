@@ -1,4 +1,6 @@
+#include "./FourierSeries.h"
 #include "./zhc.h"
+#include <pthread.h>
 
 void pi(int64_t n) {
   long a[2] = {956, 80}, b[2] = {57121, 25}, i = 0, j, k, p, q, r, s = 2, t, u,
@@ -24,21 +26,14 @@ void pi(int64_t n) {
   cout << endl;
 }
 
-void f() {
-
-}
-
-int main(int argc, char **argv) {
-	f();
-	return 0;
-  LinkedList<int> list;
-  for (int32_t i = 0; i < 10; ++i) {
-    list.put(i, i);
-  }
-  // list.put(10, 10);
-  cout << "len: " << list.length() << endl;
-  for (int32_t i = 0; i < 10; ++i) {
-    cout << i << " " << list.get(i) << endl;
-  }
+int main(int argc, char **argv, char **env) {
+	LinkedList<int> list{};
+	list.put(0);
+	list.put(1);
+	list.removeLast();
+	list.put(2);
+	for (int i = 0; i < list.length(); ++i) {
+		cout << list.get(i) << endl;
+	}
   return 0;
 }

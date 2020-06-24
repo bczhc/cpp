@@ -345,11 +345,15 @@ public:
 
   void put(int32_t index, T a);
 
+  void putFirst(T a);
+
   T removeFirst();
 
   T removeLast();
 
   T get(int32_t index);
+
+  void set(int32_t index, T a);
 
   int32_t length();
 
@@ -413,11 +417,27 @@ template <typename T> T LinkedList<T>::removeFirst() {
   return removed;
 }
 
+template<typename T>
+void LinkedList<T>::set(int32_t index, T a) {
+	Node<T> *t = head->next;
+	for (int32_t i = 0; i < index; ++i) t = t->next;
+	t->data = a;
+}
+
+template<typename T>
+void LinkedList<T>::putFirst(T a) {
+	Node<T> *newNode = new Node<T>;
+	newNode->data = a;
+	newNode->next = head->next;
+	head->next = newNode;
+	++len;
+}
 template <typename T> T LinkedList<T>::removeLast() {
   Node<T> *lastPrev = this->getNode(len - 2);
   T removed = lastPrev->next->data;
   delete lastPrev->next;
   lastPrev->next = nullptr;
+  --len;
   return removed;
 }
 template <typename T> int32_t LinkedList<T>::length() { return this->len; }

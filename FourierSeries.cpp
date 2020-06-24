@@ -49,4 +49,3 @@ void FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
   }
 }
 
-int main() { return 0; }
