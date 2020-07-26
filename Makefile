@@ -1,8 +1,8 @@
 CC=clang
 CXX=clang++
-CFLAGS=-g
-CPPFLAGS=-g
-objs=snake.o \
+CFLAGS=-g -pthread
+CXXFLAGS=-g -pthread
+objs=snake2.o \
 	 zhc.o
 objs2=FourierSeries.o \
 	  ComplexValue.o \
@@ -11,7 +11,7 @@ objs2=FourierSeries.o \
 	  zhc.o \
 	  test.o
 snake.out : $(objs) $(objs2)
-	$(CXX) -g $(objs) -o a.out
+	$(CXX) -g -pthread $(objs) -o a.out
 	# $(CXX) -g $(objs2) -o test
 	./a.out
 snake.o : ./zhc.h
