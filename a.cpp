@@ -1,33 +1,17 @@
-#include "./FourierSeries.h"
-#include "./zhc.h"
+#include <sqlite3.h>
 #include <iostream>
-#include <pthread.h>
 
-void pi(int64_t n) {
-	long a[2] = {956, 80}, b[2] = {57121, 25}, i = 0, j, k, p, q, r, s = 2, t, u,
-		 v, N, M = 10000;
-	N = n;
-	N = N / 4 + 3;
-	long *pi = new long[N], *e = new long[N];
-	while (i < N)
-		pi[i++] = 0;
-	while (--s + 1) {
-		for (*e = a[k = s], i = N; --i;)
-			e[i] = 0;
-		for (q = 1; j = i - 1, i < N; e[i] ? 0 : ++i, q += 2, k = !k)
-			for (r = v = 0; ++j < N; pi[j] += k ? u : -u)
-				u = (t = v * M + (e[j] = (p = r * M + e[j]) / b[s])) / q, r = p % b[s],
-				v = t % q;
-	}
-	while (--i)
-		(pi[i] = (t = pi[i] + s) % M) < 0 ? pi[i] += M, s = t / M - 1 : s = t / M;
-	for (cout << "3."; ++i < N - 2;)
-		cout << pi[i];
-	delete[] pi, delete[] e;
-	cout << endl;
+using namespace std;
+
+typedef int(*Callback)(void *arg, int colNum, char **content, char **colName);
+
+int checkIfExistCallback(void *arg, int colNum, char **content, char **colName) {
+    return 0;
 }
 
-int main(int argc, char **argv, char **env) {
-	::cout << "hello, world" << ::endl;
-	return 0;
+int main() {
+    sqlite3 *db = nullptr;
+    sqlite3_open("/home/zhc/doc.db", &db);
+    int a = sqlite3_exec(db, "select * from info", checkIfExistCallback, nullptr, nullptr);
+    sqlite3_close(db);
 }

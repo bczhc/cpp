@@ -336,7 +336,7 @@ template <typename T> class LinkedList {
 private:
   // the head node, without any data.
   Node<T> *head;
-  int32_t len;
+  int32_t len{};
   Node<T> *getNode(int32_t index);
 
 public:
@@ -377,7 +377,7 @@ template <typename T> LinkedList<T>::LinkedList() {
 
 template <typename T> void LinkedList<T>::put(T a) {
   Node<T> *last = this->getNode(len - 1);
-  Node<T> *node = new Node<T>;
+  auto *node = new Node<T>;
   node->data = a;
   last->next = node;
   ++len;
@@ -388,7 +388,7 @@ template <typename T> void LinkedList<T>::put(int32_t index, T a) {
   Node<T> *needed = nullptr;
   for (int32_t i = 0; i <= index; ++i) {
     if (t->next == nullptr) {
-      Node<T> *node = new Node<T>;
+      auto *node = new Node<T>;
       t->next = node;
       ++len;
     }
@@ -397,7 +397,7 @@ template <typename T> void LinkedList<T>::put(int32_t index, T a) {
       needed = t;
   }
   Node<T> *next = needed->next;
-  Node<T> *newNode = new Node<T>;
+  auto *newNode = new Node<T>;
   newNode->data = a;
   newNode->next = next;
   needed->next = newNode;
@@ -425,7 +425,7 @@ void LinkedList<T>::set(int32_t index, T a) {
 
 template<typename T>
 void LinkedList<T>::putFirst(T a) {
-	Node<T> *newNode = new Node<T>;
+	auto *newNode = new Node<T>;
 	newNode->data = a;
 	newNode->next = head->next;
 	head->next = newNode;
@@ -457,7 +457,7 @@ private:
   void init(const char *s, int32_t length);
 
 public:
-  String(const char *s);
+  explicit String(const char *s);
   String(const char *s, size_t len);
   ~String();
   char *getData();
