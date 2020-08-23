@@ -5,7 +5,6 @@
 
 #ifndef C99_ZHC_H
 #define C99_ZHC_H
-#include <bits/stdint-uintn.h>
 #include <iterator>
 #ifndef __cplusplus
 #include <ctype.h>

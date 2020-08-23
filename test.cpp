@@ -1,18 +1,21 @@
-#include "./FourierSeries.h"
-#include "ComplexValue.h"
+#include <cstring>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include "./zhc.h"
+
+using namespace std;
+
+typedef int(*F)(int, int);
+typedef int(*F2)(int, int(*)(int ,int));
 
 int main() {
-	class Callback : public FourierSeriesCallback {
-		public:
-			void callback(double n, double re, double im) override {
-				cout << n << " " << re << " " << im << endl;
-			}
-	} cb;
-	class FunctionImpl : public ComplexFunctionInterface {
-		void x(ComplexValue &dest, double t) override {
-			dest.setValue(t, t);
-		}
-	} f;
-	FourierSeries fs(f, 100, 50);
-	fs.calc(cb, 100000, 1);
+	 F2 f2 = [](int a, F f2) -> int {
+		return a * f2(2, 3);
+	};
+	int r = f2(2, [](int a, int b) {
+		return a + b;
+	});
+	::cout << r << ::endl;
+	return 0;
 }
