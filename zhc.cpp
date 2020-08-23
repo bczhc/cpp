@@ -3,6 +3,7 @@
 //
 
 #include "zhc.h"
+#include <cstring>
 
 char *ToUpperCase(char *Dest, const char *string) {
   char *p = Dest;
@@ -140,8 +141,8 @@ void strcpyAndCat_auto(char **Dest, const char *cpy_s, int cpy_s_length,
   int cat_s_len = cat_s_length;
   size_t size = cpy_s_len + cat_s_len + 1;
   *Dest = (char *)malloc(size);
-  strncpy(*Dest, cpy_s, cpy_s_length);
-  strncat(*Dest, cat_s, cat_s_length);
+  for (int i = 0; i < cpy_s_length; ++i) (*Dest)[i] = cpy_s[i];
+  for (int i = 0; i < cat_s_length; ++i) (*Dest)[cpy_s_length + i] = cat_s[i];
   (*Dest)[size - 1] = '\0';
 }
 
@@ -158,12 +159,6 @@ void strcat_auto(char **sourceDest, const char *cat_s) {
   strcpy(*sourceDest, cloneSource);
   strcat(*sourceDest, cat_s);
   (*sourceDest)[size - 1] = '\0';
-}
-
-void charToCharPtr(char **Dest, const char c) {
-  *Dest = NULL;
-  *Dest = (char *)malloc((size_t)2);
-  (*Dest)[0] = c;
 }
 
 /**
