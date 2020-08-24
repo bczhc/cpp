@@ -4,10 +4,13 @@
 #include <sqlite3.h>
 #include "utf8.h"
 #include "zhc.h"
+#include "third_party/json/single_include/nlohmann/json.hpp"
 
 using namespace std;
 using namespace bczhc;
 using namespace utf8;
+
+using json = nlohmann::json;
 
 CharacterCounter *counter;
 
@@ -34,7 +37,9 @@ int main() {
     auto it = counter->data->begin();
     char u8Char[5];
     sqlite3_exec(resultDatabase, "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
-    for (; it != counter->data->end(); it++) {
+    json j;
+    int64_t i = 0;
+    for (; it != counter->data->end(); it++, ++i) {
         int size = getUTF8Size(it->first);
         unicode2UTF8(u8Char, it->first), u8Char[size] = '\0';
         char *countNumStr = nullptr;
@@ -46,6 +51,10 @@ int main() {
         strcpyAndCat_auto(&cmd, cmd, -1, ");", -1, true);
         sqlite3_exec(resultDatabase, cmd, nullptr, nullptr, nullptr);
         delete cmd, delete countNumStr;
+        json arr;
+        arr[0] = u8Char, arr[1] = it->second;
+        ::cout << j.dump(4) << "mark" << i << ::endl;
+        j[i] = arr;
     }
     sqlite3_exec(resultDatabase, "COMMIT", nullptr, nullptr, nullptr);
     sqlite3_close(diaryDatabase);

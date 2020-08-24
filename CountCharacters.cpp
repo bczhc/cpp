@@ -20,11 +20,16 @@ CharacterCounter::~CharacterCounter() {
     delete data;
 }
 
+int c = 0;
+
 int CharacterCounter::countCharacters(const char *u8Bytes, int size) const {
     if (size == -1) size = strlen(u8Bytes);
     int offset = 0;
     bczhc::utf8::SolvedUTF8Properties solvedProperties{};
     while (offset < size) {
+        if (c == 40253) {
+            printf("a");
+        }
         bczhc::utf8::solveUTF8Bytes(solvedProperties, u8Bytes + offset);
         int codepoint = solvedProperties.codepoint;
         offset += solvedProperties.bytesLength;
@@ -33,6 +38,7 @@ int CharacterCounter::countCharacters(const char *u8Bytes, int size) const {
         } else {
             (*data)[codepoint] = data->find(codepoint)->second + 1;
         }
+        ++c;
     }
     return 0;
 }
