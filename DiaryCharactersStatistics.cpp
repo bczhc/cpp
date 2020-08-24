@@ -19,16 +19,20 @@ int callback(void *arg, int colNum, char **colVal, char **colName) {
     return 0;
 }
 
-int main() {
+int main(int argc, char **argv) {
+    if (argc < 3) {
+        ::cout << "cmd [diaryDatabasePath] [resultDatabasePath]" << ::endl;
+        return 0;
+    }
     sqlite3 *resultDatabase = nullptr;
-    if (sqlite3_open("/home/zhc/code/code/C++14/result.db", &resultDatabase)) {
+    if (sqlite3_open(argv[2], &resultDatabase)) {
         ::cout << "Open or create result database error." << ::endl;
         return 1;
     }
     sqlite3_exec(resultDatabase, "CREATE TABLE IF NOT EXISTS chars(character TEXT, count INTEGER);", nullptr,
-                 nullptr, nullptr);
+            nullptr, nullptr);
     sqlite3 *diaryDatabase = nullptr;
-    if (sqlite3_open("/home/zhc/code/code/C++14/diary.db", &diaryDatabase)) {
+    if (sqlite3_open(argv[1], &diaryDatabase)) {
         ::cout << "Open diary database failed." << ::endl;
         return 1;
     }
