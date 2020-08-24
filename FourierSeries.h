@@ -32,7 +32,7 @@ public:
 
 class ComplexPointFunction {
 private:
-    ArrayList<ComplexValue> list;
+    bczhc::ArrayList<ComplexValue> list;
 public:
     ComplexValue get(int32_t index);
 

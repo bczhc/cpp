@@ -9,6 +9,7 @@
 #include "CountCharacters.h"
 #include <iostream>
 #include "zhc.h"
+#include "utf8.h"
 
 //must be larger than 12
 #define BUFFER_SIZE 30
@@ -30,8 +31,8 @@ int CharacterCounter::countCharacters(const char *u8Bytes, int size) {
 	int64_t c = 0;
 	while (offset < size) {
 		bczhc::utf8::solveUTF8Bytes(solvedProperties, u8Bytes + offset);
-		offset += solvedProperties.bytesLength;
 		int codepoint = solvedProperties.codepoint;
+		offset += solvedProperties.bytesLength;
 		if (data->find(codepoint) == data->end()) {
 			(*data)[codepoint] = 1;
 		} else {

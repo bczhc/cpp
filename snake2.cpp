@@ -12,6 +12,8 @@
 #include <time.h>
 #include <unistd.h>
 
+using namespace bczhc;
+
 #define MAP(x, y) (map[(x) + (y)*col])
 #define RANDOM(a, b) (((double)rand() / RAND_MAX) * ((b) - (a)) + (a))
 #define UP 0
