@@ -19,6 +19,21 @@ int callback(void *arg, int colNum, char **colVal, char **colName) {
     return 0;
 }
 
+struct Data {
+    json *j;
+    int i;
+};
+
+
+int callback2(void *arg, int colNum, char **colVal, char **colName) {
+    json arr;
+    arr[0] = colVal[0], arr[1] = colVal[1];
+    Data *data = (Data *) arg;
+    (*data->j)[data->i] = arr;
+    ++data->i;
+    return 0;
+}
+
 int main(int argc, char **argv) {
     if (argc < 3) {
         ::cout << "cmd [diaryDatabasePath] [resultDatabasePath]" << ::endl;
@@ -41,9 +56,7 @@ int main(int argc, char **argv) {
     auto it = counter->data->begin();
     char u8Char[5];
     sqlite3_exec(resultDatabase, "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
-    json j;
-    int i = 0;
-    for (; it != counter->data->end(); it++, ++i) {
+    for (; it != counter->data->end(); it++) {
         int size = getUTF8Size(it->first);
         unicode2UTF8(u8Char, it->first), u8Char[size] = '\0';
         char *countNumStr = nullptr;
@@ -55,13 +68,15 @@ int main(int argc, char **argv) {
         strcpyAndCat_auto(&cmd, cmd, -1, ");", -1, true);
         sqlite3_exec(resultDatabase, cmd, nullptr, nullptr, nullptr);
         delete cmd, delete countNumStr;
-        json arr;
-        arr[0] = u8Char, arr[1] = it->second;
-        j[i] = arr;
     }
+    Data data;
+    data.i = 0;
+    data.j = new json;
+    sqlite3_exec(resultDatabase, "SELECT * FROM chars order by count", callback2, (void *) &data, nullptr);
     sqlite3_exec(resultDatabase, "COMMIT", nullptr, nullptr, nullptr);
     sqlite3_close(diaryDatabase);
     sqlite3_close(resultDatabase);
-    ::cout << j.dump() << ::endl;
+    cout << data.j->dump() << endl;
+    delete data.j;
     return 0;
 }
