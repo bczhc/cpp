@@ -12,12 +12,14 @@
 using namespace std;
 
 class CharacterCounter {
-	public:
-		map<int, int64_t> *data;
-		CharacterCounter();
+public:
+    map<int, int64_t> *data;
 
-		~CharacterCounter();
-		int countCharacters(const char *u8Bytes, int size);
+    CharacterCounter();
+
+    ~CharacterCounter();
+
+    int countCharacters(const char *u8Bytes, int size);
 };
 
 #endif //CPP_COUNTCHARACTERS_H

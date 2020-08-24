@@ -1,4 +1,5 @@
 #include <cstring>
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-pragmas"
 #pragma ide diagnostic ignored "hicpp-signed-bitwise"
@@ -17,31 +18,31 @@
 using namespace std;
 
 CharacterCounter::CharacterCounter() {
-	data = new map<int, int64_t>;
+    data = new map<int, int64_t>;
 }
 
 CharacterCounter::~CharacterCounter() {
-	delete data;
+    delete data;
 }
 
 int CharacterCounter::countCharacters(const char *u8Bytes, int size) {
-	if (size == -1) size = strlen(u8Bytes);
-	int offset = 0;
-	bczhc::utf8::SolvedUTF8Properties solvedProperties{};
-	int64_t c = 0;
-	while (offset < size) {
-		bczhc::utf8::solveUTF8Bytes(solvedProperties, u8Bytes + offset);
-		int codepoint = solvedProperties.codepoint;
-		offset += solvedProperties.bytesLength;
-		if (data->find(codepoint) == data->end()) {
-			(*data)[codepoint] = 1;
-		} else {
-			(*data)[codepoint] = data->find(codepoint)->second + 1;
-		}
-		++c;
-	}
-	::cout << c <<::endl;
-	return 0;
+    if (size == -1) size = strlen(u8Bytes);
+    int offset = 0;
+    bczhc::utf8::SolvedUTF8Properties solvedProperties{};
+    int64_t c = 0;
+    while (offset < size) {
+        bczhc::utf8::solveUTF8Bytes(solvedProperties, u8Bytes + offset);
+        int codepoint = solvedProperties.codepoint;
+        offset += solvedProperties.bytesLength;
+        if (data->find(codepoint) == data->end()) {
+            (*data)[codepoint] = 1;
+        } else {
+            (*data)[codepoint] = data->find(codepoint)->second + 1;
+        }
+        ++c;
+    }
+    ::cout << c << ::endl;
+    return 0;
 }
 
 #pragma clang diagnostic pop

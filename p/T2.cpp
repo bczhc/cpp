@@ -9,7 +9,8 @@
 #include <cstdio>
 #include <iostream>
 
-void fff(int );
+void fff(int);
+
 int main() {
     double T = 50, omega = 2 * M_PI / T;
     class F : public ComplexFunctionInterface {
@@ -17,6 +18,7 @@ int main() {
         F(double mT, double mOmega) : mT(mT), mOmega(mOmega) {}
 
         double mT, mOmega, n;
+
         void x(ComplexValue &dest, double t) override {
             dest.setValue(10, 10);
             dest.selfMultiply(cos(-n * mOmega * t), sin(-n * mOmega * t));
@@ -27,10 +29,10 @@ int main() {
 
     ComplexIntegral integral{.n = 10000};
     ComplexValue r = integral.getDefiniteIntegralByTrapezium(0, T, f).selfDivide(T, 0);
-	cout << r.toString() << endl;
-	FourierSeries fs(f, 3, 3);
-	class CB : public FourierSeriesCallback {
-		
-	} cb;
-	fs.calc(cb, 5, 5);
+    cout << r.toString() << endl;
+    FourierSeries fs(f, 3, 3);
+    class CB : public FourierSeriesCallback {
+
+    } cb;
+    fs.calc(cb, 5, 5);
 }

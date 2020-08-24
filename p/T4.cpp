@@ -13,6 +13,7 @@ public:
     A() {
         cout << "constructing A" << endl;
     }
+
     ~A() {
         cout << "destructing A" << endl;
     }

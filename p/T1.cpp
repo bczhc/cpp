@@ -19,7 +19,7 @@ private:
     int32_t lastIndex;
 
     Node<T> *getNode(int index) {
-        Node<T> * p = head;
+        Node<T> *p = head;
         for (int32_t i = 0; i < index; ++i) {
             p = p->next;
         }

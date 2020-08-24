@@ -134,7 +134,7 @@ string ComplexValue::toString(double _re, double _im) {
     if (_re == 0 && _im == 0) {
         string s = "0";
         return s;
-    } else if (_re ==0) {
+    } else if (_re == 0) {
         string s = to_string(_re);
         s.append("i");
         return s;

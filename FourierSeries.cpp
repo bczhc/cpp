@@ -6,8 +6,8 @@
 
 FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                              int32_t _epicyclesCount, int32_t period)
-    : f(functionInterface), T(period), epicyclesCount(_epicyclesCount) {
-  omega = M_PI * 2 / period;
+        : f(functionInterface), T(period), epicyclesCount(_epicyclesCount) {
+    omega = M_PI * 2 / period;
 }
 
 /*void FourierSeries::calc(ArrayList<Epicycle> &list) {
@@ -16,36 +16,36 @@ FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
 
 void FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                          int threadNum) {
-  thread *threads[threadNum];
-  int32_t a = -epicyclesCount / 2;
-  int32_t t = a + epicyclesCount;
-  class FuncInIntegral : public ComplexFunctionInterface {
-  private:
-    ComplexFunctionInterface &mF;
-    double &mOmega;
+    thread *threads[threadNum];
+    int32_t a = -epicyclesCount / 2;
+    int32_t t = a + epicyclesCount;
+    class FuncInIntegral : public ComplexFunctionInterface {
+    private:
+        ComplexFunctionInterface &mF;
+        double &mOmega;
 
-  public:
-    double n{};
+    public:
+        double n{};
 
-    FuncInIntegral(ComplexFunctionInterface &mF, double &mOmega)
-        : mF(mF), mOmega(mOmega) {}
+        FuncInIntegral(ComplexFunctionInterface &mF, double &mOmega)
+                : mF(mF), mOmega(mOmega) {}
 
-  private:
-    void x(ComplexValue &dest, double t) override {
-      mF.x(dest, t);
-      dest.selfMultiply(cos(-n * t * mOmega), sin(-n * t * mOmega));
+    private:
+        void x(ComplexValue &dest, double t) override {
+            mF.x(dest, t);
+            dest.selfMultiply(cos(-n * t * mOmega), sin(-n * t * mOmega));
+        }
+    } funcInIntegral(f, omega);
+    ComplexIntegral complexIntegral{.n = integralD};
+    for (int32_t n = a; n < t; ++n) {
+        funcInIntegral.n = n;
+        ComplexValue integralResult =
+                complexIntegral.getDefiniteIntegralByTrapezium(0, T, funcInIntegral);
+        integralResult.selfDivide(T, 0);
+        callback.callback(n, integralResult.re, integralResult.im);
     }
-  } funcInIntegral(f, omega);
-  ComplexIntegral complexIntegral{.n = integralD};
-  for (int32_t n = a; n < t; ++n) {
-    funcInIntegral.n = n;
-    ComplexValue integralResult =
-        complexIntegral.getDefiniteIntegralByTrapezium(0, T, funcInIntegral);
-    integralResult.selfDivide(T, 0);
-    callback.callback(n, integralResult.re, integralResult.im);
-  }
-  for (int i = 0; i < threadNum; ++i) {
-    delete threads[i];
-  }
+    for (int i = 0; i < threadNum; ++i) {
+        delete threads[i];
+    }
 }
 

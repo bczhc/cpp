@@ -2,7 +2,7 @@
 #include <cstring>
 
 int main() {
-	char *s = "";
-	strcpy(nullptr, s);
-	return 0;
+    char *s = "";
+    strcpy(nullptr, s);
+    return 0;
 }

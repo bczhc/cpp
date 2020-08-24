@@ -13,6 +13,7 @@ using namespace std;
 class T1 {
 public:
     int a;
+
     explicit T1(int initA);
 };
 
