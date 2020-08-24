@@ -6,7 +6,18 @@
 #define CPP_COUNTCHARACTERS_H
 
 #include <sqlite3.h>
+#include <map>
+#include <stdint.h>
 
-int countCharacters(const char *u8Bytes, int size, sqlite3 *resultDatabase);
+using namespace std;
+
+class CharacterCounter {
+	public:
+		map<int, int64_t> *data;
+		CharacterCounter();
+
+		~CharacterCounter();
+		int countCharacters(const char *u8Bytes, int size);
+};
 
 #endif //CPP_COUNTCHARACTERS_H

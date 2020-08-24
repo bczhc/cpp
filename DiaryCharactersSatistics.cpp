@@ -1,12 +1,15 @@
 #include <iostream>
 #include "CountCharacters.h"
 #include "zhc.h"
+#include <map>
 #include <sqlite3.h>
 
 using namespace std;
 
+CharacterCounter *counter;
+
 int callback(void *arg, int colNum, char **colVal, char **colName) {
-	countCharacters(colVal[0], -1, (sqlite3 *) arg);
+	counter->countCharacters(colVal[0], -1);
 	return 0;
 }
 
@@ -21,6 +24,11 @@ int main() {
 		::cout << "Open diary database failed." << ::endl;
 		return 1;
 	}
-	sqlite3_exec(diaryDatabase, "SELECT content FROM diary", callback, (void *) resultDatabase, nullptr);
+	counter = new CharacterCounter;
+	sqlite3_exec(diaryDatabase, "SELECT content FROM diary", callback, nullptr, nullptr);
+	map<int, int64_t>::iterator it = counter->data->begin();
+	for (; it != counter->data->end(); it++) {
+		::cout << it->first << "|" << it->second << ::endl;
+	}
 	return 0;
 }
