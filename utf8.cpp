@@ -18,7 +18,7 @@ int utf8::getUTF8Size(int codepoint) {
     return 0;
 }
 
-int utf8::unicode2UTF8(char *dest, long codepoint) {
+int utf8::unicode2UTF8(char *dest, int codepoint) {
     int utf8Size = utf8::getUTF8Size(codepoint);
     switch (utf8Size) {
         case 1:
@@ -45,7 +45,7 @@ int utf8::unicode2UTF8(char *dest, long codepoint) {
     return utf8Size;
 }
 
-int bczhc::utf8::getUTF8BytesLength(const char firstByte) {
+int bczhc::utf8::getUTF8BytesLength(const unsigned char firstByte) {
     if (firstByte >> 7 == 0) return 1;
     if (firstByte >> 5 == 0b110) return 2;
     if (firstByte >> 4 == 0b1110) return 3;
@@ -71,7 +71,7 @@ void bczhc::utf8::solveUTF8Bytes(utf8::SolvedUTF8Properties &solvedProperties, c
         case 4:
             solvedProperties.codepoint =
                     (bytes[3] & 0b00111111) | ((bytes[2] & 0b00111111) << 6) |
-                    ((bytes[1] & 0b00001111) << 12) | ((bytes[0] & 0b00000111) << 18);
+                    ((bytes[1] & 0b00111111) << 12) | ((bytes[0] & 0b00000111) << 18);
             break;
         default:
             break;

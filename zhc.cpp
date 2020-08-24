@@ -132,7 +132,7 @@ void bczhc::Scanf(char **Dest) {
 }
 
 void bczhc::strcpyAndCat_auto(char **Dest, const char *cpy_s, int cpy_s_length,
-                              const char *cat_s, int cat_s_length) {
+                              const char *cat_s, int cat_s_length, bool deleteOld) {
     *Dest = NULL;
     if (cpy_s_length == -1)
         cpy_s_length = strlen(cpy_s);

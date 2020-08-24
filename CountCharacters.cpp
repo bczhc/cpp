@@ -8,12 +8,7 @@
 //
 
 #include "CountCharacters.h"
-#include <iostream>
-#include "zhc.h"
 #include "utf8.h"
-
-//must be larger than 12
-#define BUFFER_SIZE 30
 
 using namespace std;
 
@@ -25,11 +20,10 @@ CharacterCounter::~CharacterCounter() {
     delete data;
 }
 
-int CharacterCounter::countCharacters(const char *u8Bytes, int size) {
+int CharacterCounter::countCharacters(const char *u8Bytes, int size) const {
     if (size == -1) size = strlen(u8Bytes);
     int offset = 0;
     bczhc::utf8::SolvedUTF8Properties solvedProperties{};
-    int64_t c = 0;
     while (offset < size) {
         bczhc::utf8::solveUTF8Bytes(solvedProperties, u8Bytes + offset);
         int codepoint = solvedProperties.codepoint;
@@ -39,9 +33,7 @@ int CharacterCounter::countCharacters(const char *u8Bytes, int size) {
         } else {
             (*data)[codepoint] = data->find(codepoint)->second + 1;
         }
-        ++c;
     }
-    ::cout << c << ::endl;
     return 0;
 }
 

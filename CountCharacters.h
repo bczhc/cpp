@@ -7,7 +7,7 @@
 
 #include <sqlite3.h>
 #include <map>
-#include <stdint.h>
+#include <cstdint>
 
 using namespace std;
 
@@ -19,7 +19,7 @@ public:
 
     ~CharacterCounter();
 
-    int countCharacters(const char *u8Bytes, int size);
+    int countCharacters(const char *u8Bytes, int size) const;
 };
 
 #endif //CPP_COUNTCHARACTERS_H

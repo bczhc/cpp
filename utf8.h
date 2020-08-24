@@ -8,13 +8,13 @@ namespace bczhc {
             int codepoint;
         };
 
-        int getUTF8BytesLength(const char firstByte);
+        int getUTF8BytesLength(unsigned char firstByte);
 
         void solveUTF8Bytes(SolvedUTF8Properties &solvedProperties, const char *bytes);
 
         int getUTF8Size(int codepoint);
 
-        int unicode2UTF8(char *dest, long codepoint);
+        int unicode2UTF8(char *dest, int codepoint);
     }
 }
 #endif //UTF8_H

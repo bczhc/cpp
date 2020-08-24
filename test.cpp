@@ -1,12 +1,8 @@
-#include <stdint.h>
+#include "zhc.h"
 
-namespace zhc {
-    void a() {
-        uint32_t a = 1;
-    }
-}
+using namespace bczhc;
+using namespace std;
 
 int main() {
-    zhc::a();
     return 0;
 }

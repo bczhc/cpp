@@ -13,7 +13,7 @@
 #else
 
 #include <iterator>
-#include <ctype.h>
+#include <cctype>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
@@ -58,7 +58,7 @@ namespace bczhc {
     void Scanf(char **Dest);
 
     void strcpyAndCat_auto(char **Dest, const char *cpy_s, int cpy_s_length,
-                           const char *cat_s, int cat_s_length);
+                           const char *cat_s, int cat_s_length, bool deleteOld);
 
     void strcat_auto(char **sourceDest, const char *cat_s);
 

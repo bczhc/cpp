@@ -6,7 +6,8 @@ add_executable(T3 p/T3.cpp ./zhc.cpp FourierSeries.h ComplexIntegral.cpp Complex
 add_executable(fourierSeries FourierSeries.h ComplexIntegral.cpp ComplexValue.cpp Epicycle.cpp FourierSeries.cpp)
 add_executable(T4 ./p/T4.cpp ./zhc.cpp)
 add_executable(diaryCharacterStatistics DiaryCharactersStatistics.cpp CountCharacters.cpp zhc.cpp utf8.cpp)
+add_executable(test test.cpp zhc.cpp)
 
 target_link_libraries(fourierSeries pthread)
 target_link_libraries(a sqlite3)
-target_link_libraries(countCharacters sqlite3)
+target_link_libraries(diaryCharacterStatistics sqlite3)
