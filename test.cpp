@@ -1,15 +1,20 @@
 #include "zhc.h"
-#include "third_party/json/single_include/nlohmann/json.hpp"
-
-using json = nlohmann::json;
+#include <cstdarg>
+#include <vector>
 
 using namespace bczhc;
 using namespace std;
 
 int main() {
-    json j;
-    char s[] = {-62, -96, 0};
-    j[0] = s;
-    cout << j.dump(4) << endl;
+    struct A {
+        int a;
+    };
+    A a;
+    a.a = 1;
+    vector<A> vec;
+    vec.push_back(a);
+    cout << vec[0].a << endl;
+    a.a = 2;
+    cout << vec[0].a << endl;
     return 0;
 }

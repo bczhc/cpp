@@ -1,7 +1,10 @@
+#include <algorithm>
 #include <iostream>
 #include "CountCharacters.h"
+#include <iterator>
 #include <map>
 #include <sqlite3.h>
+#include <vector>
 #include "utf8.h"
 #include "zhc.h"
 #include "third_party/json/single_include/nlohmann/json.hpp"
@@ -19,19 +22,8 @@ int callback(void *arg, int colNum, char **colVal, char **colName) {
     return 0;
 }
 
-struct Data {
-    json *j;
-    int i;
-};
-
-
-int callback2(void *arg, int colNum, char **colVal, char **colName) {
-    json arr;
-    arr[0] = colVal[0], arr[1] = colVal[1];
-    Data *data = (Data *) arg;
-    (*data->j)[data->i] = arr;
-    ++data->i;
-    return 0;
+bool cmp(pair<int, int64_t> &m1, pair<int, int64_t> &m2) {
+    return m1.second < m2.second;
 }
 
 int main(int argc, char **argv) {
@@ -53,30 +45,36 @@ int main(int argc, char **argv) {
     }
     counter = new CharacterCounter;
     sqlite3_exec(diaryDatabase, "SELECT content FROM diary", callback, nullptr, nullptr);
-    auto it = counter->data->begin();
+    map<int, int64_t> *data = counter->data;
+    vector<pair<int, int64_t>> *vec = new vector<pair<int, int64_t>>(data->begin(), data->end());
+    sort(vec->begin(), vec->end(), cmp);
+    int t = vec->size();
+    json *j = new json;
     char u8Char[5];
     sqlite3_exec(resultDatabase, "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
-    for (; it != counter->data->end(); it++) {
-        int size = getUTF8Size(it->first);
-        unicode2UTF8(u8Char, it->first), u8Char[size] = '\0';
+    for (int i = 0; i < t; ++i) {
+        vector<pair<int, int64_t>> &v = *vec;
+        int size = getUTF8Size(v[i].first);
+        unicode2UTF8(u8Char, v[i].first), u8Char[size] = '\0';
         char *countNumStr = nullptr;
         char *cmd = nullptr;
-        m_ltoa(&countNumStr, it->second);
+        m_ltoa(&countNumStr, v[i].second);
         strcpyAndCat_auto(&cmd, "INSERT INTO chars VALUES('", -1, u8Char, -1, false);
         strcpyAndCat_auto(&cmd, cmd, -1, "',", -1, true);
         strcpyAndCat_auto(&cmd, cmd, -1, countNumStr, -1, true);
         strcpyAndCat_auto(&cmd, cmd, -1, ");", -1, true);
         sqlite3_exec(resultDatabase, cmd, nullptr, nullptr, nullptr);
         delete cmd, delete countNumStr;
+        json arr;
+        arr[0] = u8Char, arr[1] = v[i].second;
+        (*j)[i] = arr;
     }
-    Data data;
-    data.i = 0;
-    data.j = new json;
-    sqlite3_exec(resultDatabase, "SELECT * FROM chars order by count", callback2, (void *) &data, nullptr);
     sqlite3_exec(resultDatabase, "COMMIT", nullptr, nullptr, nullptr);
     sqlite3_close(diaryDatabase);
     sqlite3_close(resultDatabase);
-    cout << data.j->dump() << endl;
-    delete data.j;
+    delete vec;
+    string jsonStr = j->dump();
+    delete j;
+    cout << jsonStr << endl;
     return 0;
 }
