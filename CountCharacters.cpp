@@ -27,9 +27,6 @@ int CharacterCounter::countCharacters(const char *u8Bytes, int size) const {
     int offset = 0;
     bczhc::utf8::SolvedUTF8Properties solvedProperties{};
     while (offset < size) {
-        if (c == 40253) {
-            printf("a");
-        }
         bczhc::utf8::solveUTF8Bytes(solvedProperties, u8Bytes + offset);
         int codepoint = solvedProperties.codepoint;
         offset += solvedProperties.bytesLength;

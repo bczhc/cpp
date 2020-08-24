@@ -38,7 +38,7 @@ int main() {
     char u8Char[5];
     sqlite3_exec(resultDatabase, "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
     json j;
-    int64_t i = 0;
+    int i = 0;
     for (; it != counter->data->end(); it++, ++i) {
         int size = getUTF8Size(it->first);
         unicode2UTF8(u8Char, it->first), u8Char[size] = '\0';
@@ -53,11 +53,11 @@ int main() {
         delete cmd, delete countNumStr;
         json arr;
         arr[0] = u8Char, arr[1] = it->second;
-        ::cout << j.dump(4) << "mark" << i << ::endl;
         j[i] = arr;
     }
     sqlite3_exec(resultDatabase, "COMMIT", nullptr, nullptr, nullptr);
     sqlite3_close(diaryDatabase);
     sqlite3_close(resultDatabase);
+    ::cout << j.dump() << ::endl;
     return 0;
 }

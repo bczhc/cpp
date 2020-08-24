@@ -25,7 +25,7 @@ int utf8::unicode2UTF8(char *dest, int codepoint) {
             dest[0] = codepoint & 0b01111111;
             break;
         case 2:
-            dest[1] = 0b1000000 | (codepoint & 0b00111111);
+            dest[1] = 0b10000000 | (codepoint & 0b00111111);
             dest[0] = 0b11000000 | ((codepoint >> 6) & 0b00111111);
             break;
         case 3:
