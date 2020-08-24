@@ -10,65 +10,65 @@
 #include <iostream>
 
 using namespace std;
+namespace bczhc {
+    class ComplexValue {
+        public:
+            double re{}, im{};
 
-class ComplexValue {
-public:
-    double re{}, im{};
+            ComplexValue(double re, double im);
 
-    ComplexValue(double re, double im);
+            ComplexValue() = default;
 
-    ComplexValue() = default;
+            double getComplexModule();
 
-    double getComplexModule();
+            ComplexValue add(ComplexValue &cv);
 
-    ComplexValue add(ComplexValue &cv);
+            ComplexValue add(double _re, double _im);
 
-    ComplexValue add(double _re, double _im);
+            ComplexValue &selfAdd(ComplexValue &cv);
 
-    ComplexValue &selfAdd(ComplexValue &cv);
+            ComplexValue &selfAdd(double _re, double _im);
 
-    ComplexValue &selfAdd(double _re, double _im);
+            ComplexValue subtract(ComplexValue cv);
 
-    ComplexValue subtract(ComplexValue cv);
+            ComplexValue subtract(double _re, double _im);
 
-    ComplexValue subtract(double _re, double _im);
+            ComplexValue &selfSubtract(ComplexValue cv);
 
-    ComplexValue &selfSubtract(ComplexValue cv);
+            ComplexValue &selfSubtract(double _re, double _im);
 
-    ComplexValue &selfSubtract(double _re, double _im);
+            ComplexValue multiply(ComplexValue cv);
 
-    ComplexValue multiply(ComplexValue cv);
+            ComplexValue multiply(double _re, double _im);
 
-    ComplexValue multiply(double _re, double _im);
+            ComplexValue &selfMultiply(ComplexValue cv);
 
-    ComplexValue &selfMultiply(ComplexValue cv);
+            ComplexValue &selfMultiply(double _re, double _im);
 
-    ComplexValue &selfMultiply(double _re, double _im);
+            ComplexValue divide(ComplexValue cv);
 
-    ComplexValue divide(ComplexValue cv);
+            ComplexValue divide(double _re, double _im);
 
-    ComplexValue divide(double _re, double _im);
+            ComplexValue &selfDivide(ComplexValue cv);
 
-    ComplexValue &selfDivide(ComplexValue cv);
+            ComplexValue &selfDivide(double _re, double _im);
 
-    ComplexValue &selfDivide(double _re, double _im);
+            ComplexValue &setValue(ComplexValue cv);
 
-    ComplexValue &setValue(ComplexValue cv);
+            ComplexValue &setValue(double _re, double _im);
 
-    ComplexValue &setValue(double _re, double _im);
+            string toString();
 
-    string toString();
+            static string toString(ComplexValue cv);
 
-    static string toString(ComplexValue cv);
+            static string toString(double _re, double _im);
+    };
 
-    static string toString(double _re, double _im);
-};
+    typedef void (*OneVariableComplexFunction_t)(ComplexValue &, double);
 
-typedef void (*OneVariableComplexFunction_t)(ComplexValue &, double);
-
-class ComplexFunctionInterface {
-public:
-    virtual void x(ComplexValue &dest, double t) = 0;
-};
-
+    class ComplexFunctionInterface {
+        public:
+            virtual void x(ComplexValue &dest, double t) = 0;
+    };
+}
 #endif //CPP_COMPLEXVALUE_H

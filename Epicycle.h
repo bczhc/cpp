@@ -7,14 +7,18 @@
 
 #include "./ComplexValue.h"
 
-class Epicycle {
-public:
-    double n{};
-    ComplexValue c{};
+namespace bczhc {
 
-    Epicycle();
+    class Epicycle {
+        public:
+            double n{};
+            ComplexValue c{};
 
-    Epicycle(double n, const ComplexValue &c);
-};
+            Epicycle();
+
+            Epicycle(double n, const ComplexValue &c);
+    };
+
+}
 
 #endif //CPP_EPICYCLE_H

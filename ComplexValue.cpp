@@ -4,62 +4,64 @@
 
 #include "ComplexValue.h"
 
-double ComplexValue::getComplexModule() {
+using namespace bczhc;
+
+double bczhc::ComplexValue::getComplexModule() {
     return sqrt(pow(this->re, 2) + pow(this->im, 2));
 }
 
-ComplexValue ComplexValue::add(ComplexValue &cv) {
+ComplexValue bczhc::ComplexValue::add(ComplexValue &cv) {
     ComplexValue r(this->re + cv.re, this->im + cv.im);
     return r;
 }
 
-ComplexValue::ComplexValue(double re, double im) : re(re), im(im) {}
+bczhc::ComplexValue::ComplexValue(double re, double im) : re(re), im(im) {}
 
-ComplexValue ComplexValue::add(double _re, double _im) {
+ComplexValue bczhc::ComplexValue::add(double _re, double _im) {
     ComplexValue r(this->re + _re, this->im + _im);
     return r;
 }
 
-ComplexValue &ComplexValue::selfAdd(ComplexValue &cv) {
+ComplexValue &bczhc::ComplexValue::selfAdd(ComplexValue &cv) {
     this->re += cv.re;
     this->im += cv.im;
     return *this;
 }
 
-ComplexValue &ComplexValue::selfAdd(double _re, double _im) {
+ComplexValue &bczhc::ComplexValue::selfAdd(double _re, double _im) {
     this->re += _re;
     this->im += _im;
     return *this;
 }
 
-ComplexValue ComplexValue::subtract(double _re, double _im) {
+ComplexValue bczhc::ComplexValue::subtract(double _re, double _im) {
     ComplexValue r(this->re - _re, this->im - _im);
     return r;
 }
 
-ComplexValue &ComplexValue::selfSubtract(ComplexValue cv) {
+ComplexValue &bczhc::ComplexValue::selfSubtract(ComplexValue cv) {
     this->re -= cv.re;
     this->im -= cv.im;
     return *this;
 }
 
-ComplexValue &ComplexValue::selfSubtract(double _re, double _im) {
+ComplexValue &bczhc::ComplexValue::selfSubtract(double _re, double _im) {
     this->re -= _re;
     this->im -= _im;
     return *this;
 }
 
-ComplexValue ComplexValue::multiply(ComplexValue cv) {
+ComplexValue bczhc::ComplexValue::multiply(ComplexValue cv) {
     ComplexValue r(this->re * cv.re - this->im * cv.im, this->re * cv.im + cv.re * this->im);
     return r;
 }
 
-ComplexValue ComplexValue::multiply(double _re, double _im) {
+ComplexValue bczhc::ComplexValue::multiply(double _re, double _im) {
     ComplexValue r(this->re * _re - this->im * _im, this->re * _im + _re * this->im);
     return r;
 }
 
-ComplexValue &ComplexValue::selfMultiply(ComplexValue cv) {
+ComplexValue &bczhc::ComplexValue::selfMultiply(ComplexValue cv) {
     double re1 = this->re * cv.re - this->im * cv.im;
     double im1 = this->re * cv.im + cv.re * this->im;
     this->re = re1;
@@ -67,7 +69,7 @@ ComplexValue &ComplexValue::selfMultiply(ComplexValue cv) {
     return *this;
 }
 
-ComplexValue &ComplexValue::selfMultiply(double _re, double _im) {
+ComplexValue &bczhc::ComplexValue::selfMultiply(double _re, double _im) {
     double re1 = this->re * _re - this->im * _im;
     double im1 = this->re * _im + _re * this->im;
     this->re = re1;
@@ -75,19 +77,19 @@ ComplexValue &ComplexValue::selfMultiply(double _re, double _im) {
     return *this;
 }
 
-ComplexValue ComplexValue::divide(ComplexValue cv) {
+ComplexValue bczhc::ComplexValue::divide(ComplexValue cv) {
     double a = pow(cv.re, 2) + pow(cv.im, 2);
     ComplexValue r((this->re * cv.re + this->im * cv.im) / a, (cv.re * this->im - this->re * cv.im) / a);
     return r;
 }
 
-ComplexValue ComplexValue::divide(double _re, double _im) {
+ComplexValue bczhc::ComplexValue::divide(double _re, double _im) {
     double a = pow(this->re, 2) + pow(this->im, 2);
     ComplexValue r((this->re * _re + this->im * _im) / a, (_re * this->im - this->re * _im) / a);
     return r;
 }
 
-ComplexValue &ComplexValue::selfDivide(ComplexValue cv) {
+ComplexValue &bczhc::ComplexValue::selfDivide(ComplexValue cv) {
     double a = pow(cv.re, 2) + pow(cv.im, 2);
     double re1 = (this->re * cv.re + this->im * cv.im) / a;
     double im1 = (cv.re * this->im - this->re * cv.im) / a;
@@ -96,7 +98,7 @@ ComplexValue &ComplexValue::selfDivide(ComplexValue cv) {
     return *this;
 }
 
-ComplexValue &ComplexValue::selfDivide(double _re, double _im) {
+ComplexValue &bczhc::ComplexValue::selfDivide(double _re, double _im) {
     double a = pow(_re, 2) + pow(_im, 2);
     double re1 = (this->re * _re + this->im * _im) / a;
     double im1 = (_re * this->im - this->re * _im) / a;
@@ -105,32 +107,32 @@ ComplexValue &ComplexValue::selfDivide(double _re, double _im) {
     return *this;
 }
 
-ComplexValue &ComplexValue::setValue(ComplexValue cv) {
+ComplexValue &bczhc::ComplexValue::setValue(ComplexValue cv) {
     this->re = cv.re;
     this->im = cv.im;
     return *this;
 }
 
-ComplexValue &ComplexValue::setValue(double _re, double _im) {
+ComplexValue &bczhc::ComplexValue::setValue(double _re, double _im) {
     this->re = _re;
     this->im = _im;
     return *this;
 }
 
-ComplexValue ComplexValue::subtract(ComplexValue cv) {
+ComplexValue bczhc::ComplexValue::subtract(ComplexValue cv) {
     ComplexValue r(this->re - cv.re, im - cv.im);
     return r;
 }
 
-string ComplexValue::toString() {
+string bczhc::ComplexValue::toString() {
     return ComplexValue::toString(this->re, this->im);
 }
 
-string ComplexValue::toString(ComplexValue cv) {
+string bczhc::ComplexValue::toString(ComplexValue cv) {
     return ComplexValue::toString(cv.re, cv.im);
 }
 
-string ComplexValue::toString(double _re, double _im) {
+string bczhc::ComplexValue::toString(double _re, double _im) {
     if (_re == 0 && _im == 0) {
         string s = "0";
         return s;

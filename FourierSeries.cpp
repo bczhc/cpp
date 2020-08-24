@@ -4,7 +4,7 @@
 
 #include "./FourierSeries.h"
 
-FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
+bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                              int32_t _epicyclesCount, int32_t period)
         : f(functionInterface), T(period), epicyclesCount(_epicyclesCount) {
     omega = M_PI * 2 / period;
@@ -14,7 +14,7 @@ FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
 
 }*/
 
-void FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
+void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                          int threadNum) {
     thread *threads[threadNum];
     int32_t a = -epicyclesCount / 2;

@@ -10,36 +10,40 @@
 #include "./zhc.h"
 
 using namespace std;
+using namespace bczhc;
 
-class FourierSeriesCallback {
-public:
-    virtual void callback(double n, double re, double im) = 0;
-};
+namespace bczhc {
 
-class FourierSeries {
-private:
-    double omega{};
-    double T{};
-    ComplexFunctionInterface &f;
-    int32_t epicyclesCount{};
-public:
-    FourierSeries(ComplexFunctionInterface &functionInterface, int32_t _epicyclesCount, int32_t period);
+    class FourierSeriesCallback {
+        public:
+            virtual void callback(double n, double re, double im) = 0;
+    };
 
-//    void calc(ArrayList<Epicycle> &list, int integralD);
+    class FourierSeries {
+        private:
+            double omega{};
+            double T{};
+            ComplexFunctionInterface &f;
+            int32_t epicyclesCount{};
+        public:
+            FourierSeries(ComplexFunctionInterface &functionInterface, int32_t _epicyclesCount, int32_t period);
 
-    void calc(FourierSeriesCallback &callback, int integralD, int threadNum);
-};
+            //    void calc(ArrayList<Epicycle> &list, int integralD);
 
-class ComplexPointFunction {
-private:
-    bczhc::ArrayList<ComplexValue> list;
-public:
-    ComplexValue get(int32_t index);
+            void calc(FourierSeriesCallback &callback, int integralD, int threadNum);
+    };
 
-    void put(ComplexValue &cv);
+    class ComplexPointFunction {
+        private:
+            bczhc::ArrayList<ComplexValue> list;
+        public:
+            ComplexValue get(int32_t index);
 
-    ComplexFunctionInterface getFunction();
+            void put(ComplexValue &cv);
 
-};
+            //ComplexFunctionInterface getFunction();
 
-void tF();
+    };
+
+    void tF();
+}

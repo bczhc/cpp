@@ -4,7 +4,7 @@
 
 #include "Epicycle.h"
 
-Epicycle::Epicycle(double n, const ComplexValue &c) : n(n), c(c) {}
+bczhc::Epicycle::Epicycle(double n, const ComplexValue &c) : n(n), c(c) {}
 
-Epicycle::Epicycle() = default;
+bczhc::Epicycle::Epicycle() = default;
 

@@ -12,17 +12,17 @@
 
 using namespace std;
 
-CharacterCounter::CharacterCounter() {
+bczhc::CharacterCounter::CharacterCounter() {
     data = new map<int, int64_t>;
 }
 
-CharacterCounter::~CharacterCounter() {
+bczhc::CharacterCounter::~CharacterCounter() {
     delete data;
 }
 
 int c = 0;
 
-int CharacterCounter::countCharacters(const char *u8Bytes, int size) const {
+int bczhc::CharacterCounter::countCharacters(const char *u8Bytes, int size) const {
     if (size == -1) size = strlen(u8Bytes);
     int offset = 0;
     bczhc::utf8::SolvedUTF8Properties solvedProperties{};

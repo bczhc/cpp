@@ -4,7 +4,9 @@
 
 #include "ComplexIntegral.h"
 
-ComplexValue ComplexIntegral::getDefiniteIntegralByTrapezium(double x0, double xn,
+using namespace bczhc;
+
+ComplexValue bczhc::ComplexIntegral::getDefiniteIntegralByTrapezium(double x0, double xn,
                                                              ComplexFunctionInterface &f) {
     double d = (xn - x0) / n;
     ComplexValue sum(0, 0), left(0, 0), right(0, 0);

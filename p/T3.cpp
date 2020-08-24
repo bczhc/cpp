@@ -21,5 +21,5 @@ int main() {
             cout << "n: " << n << " re: " << re << " im: " << im << endl;
         }
     } cb;
-    fs.calc(cb);
+    fs.calc(cb, 1000, 1);
 }

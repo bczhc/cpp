@@ -10,16 +10,17 @@
 #include <cstdint>
 
 using namespace std;
+namespace bczhc {
+    class CharacterCounter {
+        public:
+            map<int, int64_t> *data;
 
-class CharacterCounter {
-public:
-    map<int, int64_t> *data;
+            CharacterCounter();
 
-    CharacterCounter();
+            ~CharacterCounter();
 
-    ~CharacterCounter();
-
-    int countCharacters(const char *u8Bytes, int size) const;
-};
+            int countCharacters(const char *u8Bytes, int size) const;
+    };
+}
 
 #endif //CPP_COUNTCHARACTERS_H
