@@ -1,4 +1,9 @@
+SET(CMAKE_C_COMPILER /usr/bin/clang)
+SET(CMAKE_CXX_COMPILER /usr/bin/clang++)
+add_compile_options(-std=c++14 -g)
+
 project(cpp)
+
 add_executable(T1 ./p/T1.cpp ./zhc.cpp)
 add_executable(T2 ./p/T2.cpp ./zhc.cpp)
 add_executable(T3 p/T3.cpp ./zhc.cpp)
