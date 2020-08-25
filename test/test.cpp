@@ -1,4 +1,4 @@
-#include "zhc.h"
+#include "../zhc.h"
 #include <cstdarg>
 #include <vector>
 

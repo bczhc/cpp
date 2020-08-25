@@ -229,6 +229,7 @@ int main(int argc, char **argv) {
     char read = 0;
     while (!game->getGameoverStatus()) {
         read = scanKeyboard();
+        cout << (int) read << endl;
         switch (read) {
             case 'w':
             case 'W':

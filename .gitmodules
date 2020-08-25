@@ -1,3 +1,6 @@
 [submodule "third_party/json"]
 	path = third_party/json
 	url = https://hub.fastgit.org/nlohmann/json
+[submodule "third_party/sqlite3-single-c"]
+	path = third_party/sqlite3-single-c
+	url = https://hub.fastgit.org/bczhc/sqlite3-single-c.git

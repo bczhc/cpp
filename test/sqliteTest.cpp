@@ -1,6 +1,6 @@
 #include <sqlite3.h>
 #include <iostream>
-#include "./zhc.h"
+#include "../zhc.h"
 
 using namespace std;
 
