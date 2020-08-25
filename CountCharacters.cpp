@@ -54,7 +54,7 @@ json *bczhc::CharacterCounter::getJsonData() {
     for (int i = 0; i < size; ++i) {
         json pairJson;
         codepoint = (*vec)[i].first;
-        utf8::unicode2UTF8(u8Char, codepoint), u8Char[utf8::getUTF8Size(codepoint) - 1] = '\0';
+        utf8::unicode2UTF8(u8Char, codepoint), u8Char[utf8::getUTF8Size(codepoint)] = '\0';
         pairJson[0] = u8Char, pairJson[1] = (*vec)[i].second;
         (*j)[i] = pairJson;
     }
