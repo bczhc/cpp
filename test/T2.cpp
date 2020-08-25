@@ -5,9 +5,9 @@
 #include "../zhc.h"
 #include "../FourierSeries.h"
 #include <iostream>
-#include <bits/stdint-intn.h>
 #include <cstdio>
 #include <iostream>
+#include <cstdint>
 
 int main() {
     return 0;

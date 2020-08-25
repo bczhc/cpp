@@ -48,7 +48,7 @@ json *bczhc::CharacterCounter::getJsonData() {
     auto *vec = new vector<pair<int, int64_t>>(data->begin(), data->end());
     sort(vec->begin(), vec->end(), cmp);
     json *j = new json;
-    int size = j->size();
+    int size = vec->size();
     char u8Char[5];
     int codepoint;
     for (int i = 0; i < size; ++i) {
