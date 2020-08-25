@@ -1,5 +1,4 @@
 #include "./zhc.h"
-#include <bits/types/struct_timeval.h>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -9,7 +8,6 @@
 #include <sys/time.h>
 #include <termio.h>
 #include <termios.h>
-#include <time.h>
 #include <unistd.h>
 
 using namespace bczhc;
@@ -37,14 +35,14 @@ class SnakeGame {
 
         Point(int x, int y) : x(x), y(y) {}
 
-        Point() {}
+        Point() = default;
     };
 
 private:
     int col, row;
     char *map = nullptr;
     char orientation = RIGHT;
-    bool gameover = 0;
+    bool gameover = false;
     LinkedList<Point> snake{};
     int64_t manualMoveTime = 0;
     int delayMillis = 250;
@@ -109,7 +107,7 @@ public:
 
     ~SnakeGame() { delete this->map; }
 
-    bool getGameoverStatus() { return gameover; }
+    bool getGameoverStatus() const { return gameover; }
 
     void move() {
         Point coor = snake.get(0);
@@ -138,7 +136,7 @@ public:
         }
         c = MAP(next.x, next.y);
         if (c == '*' || c == 'X') {
-            gameover = 1;
+            gameover = true;
             goto end;
         }
         if (c == '$')
@@ -195,7 +193,7 @@ public:
 };
 
 void *f(void *arg) {
-    SnakeGame *game = (SnakeGame *) arg;
+    auto *game = (SnakeGame *) arg;
     game->start();
     exit(0);
     return nullptr;
@@ -203,8 +201,8 @@ void *f(void *arg) {
 
 char scanKeyboard() {
     char in;
-    struct termios new_settings;
-    struct termios stored_settings;
+    struct termios new_settings{};
+    struct termios stored_settings{};
     tcgetattr(0, &stored_settings);
     new_settings = stored_settings;
     new_settings.c_lflag &= (~ICANON);
@@ -218,7 +216,7 @@ char scanKeyboard() {
 }
 
 int main(int argc, char **argv) {
-    SnakeGame *game = nullptr;
+    SnakeGame *game;
     if (argc == 3) {
         game = new SnakeGame(atoi(argv[1]), atoi(argv[2]));
     } else if (argc == 4) {

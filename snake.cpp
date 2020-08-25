@@ -5,6 +5,8 @@
 
 #define RANDOM(a, b) (((double)rand() / RAND_MAX) * (b - a) + a)
 
+using namespace bczhc;
+
 class SnakeGame {
     class Point {
     public:

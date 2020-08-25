@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     counter = new CharacterCounter;
     sqlite3_exec(diaryDatabase, "SELECT content FROM diary", callback, nullptr, nullptr);
     map<int, int64_t> *data = counter->data;
-    vector<pair<int, int64_t>> *vec = new vector<pair<int, int64_t>>(data->begin(), data->end());
+    auto *vec = new vector<pair<int, int64_t>>(data->begin(), data->end());
     sort(vec->begin(), vec->end(), cmp);
     int t = vec->size();
     json *j = new json;
