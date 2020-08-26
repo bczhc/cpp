@@ -4,16 +4,16 @@ add_compile_options(-std=c++14 -g)
 
 project(cpp)
 
-add_executable(T1 test/T1.cpp zhc.cpp)
-add_executable(T2 test/T2.cpp zhc.cpp)
-add_executable(T3 test/T3.cpp zhc.cpp)
-add_executable(T4 test/T4.cpp zhc.cpp)
+add_executable(T1 Test/T1.cpp zhc.cpp)
+add_executable(T2 Test/T2.cpp zhc.cpp)
+add_executable(T3 Test/T3.cpp zhc.cpp)
+add_executable(T4 Test/T4.cpp zhc.cpp)
 add_executable(diaryCharactersStatistics DiaryCharactersStatistics.cpp CountCharacters.cpp zhc.cpp utf8.cpp)
-add_executable(Test test/test.cpp zhc.cpp)
-add_executable(sqlite3ToJSON test/sqlite3ToJSON.cpp)
+add_executable(test Test/test.cpp zhc.cpp)
+add_executable(sqlite3ToJSON Test/sqlite3ToJSON.cpp)
 add_executable(snake snake.cpp zhc.cpp)
 add_executable(snake2 snake2.cpp zhc.cpp)
-add_executable(sqliteTest test/sqliteTest.cpp)
+add_executable(sqliteTest Test/sqliteTest.cpp)
 
 add_library(fourierSeries SHARED FourierSeries.h ComplexIntegral.cpp ComplexValue.cpp Epicycle.cpp FourierSeries.cpp)
 
