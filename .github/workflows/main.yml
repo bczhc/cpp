@@ -23,11 +23,18 @@ jobs:
     - uses: actions/checkout@v2
 
     # Runs a single command using the runners shell
-    - name: clone json third party
-      run: git submodule update --init --recursive
-    - name: remove cache
-      run: rm -rfv CMakeFiles/ cmake_install.cmake CMakeCache.txt
+    - name: clone third party
+      run: |
+        git submodule update --init --recursive
+        git submodule update --remote --recursive
     - name: configure cmake
-      run: cmake CMakeLists.txt
+      run: |
+        rm -rf CMakeFiles/ cmake_install.cmake CMakeCache.txt
+        cmake CMakeLists.txt
     - name: build
-      run: make -j5
+      run: |
+        coreNum=`grep -c ^processor /proc/cpuinfo`
+        echo $coreNum
+        jobs=`echo "$coreNum+1" | bc`
+        make "-j$jobs"
+
