@@ -12,18 +12,16 @@
 
 using namespace std;
 
-bczhc::CharacterCounter::CharacterCounter() {
-    data = new map<int, int64_t>;
-}
+bczhc::CharacterCounter::CharacterCounter() { data = new map<int, int64_t>; }
 
-bczhc::CharacterCounter::~CharacterCounter() {
-    delete data;
-}
+bczhc::CharacterCounter::~CharacterCounter() { delete data; }
 
 int c = 0;
 
-int bczhc::CharacterCounter::countCharacters(const char *u8Bytes, int size) const {
-    if (size == -1) size = strlen(u8Bytes);
+int bczhc::CharacterCounter::countCharacters(const char *u8Bytes,
+                                             int size) const {
+    if (size == -1)
+        size = strlen(u8Bytes);
     int offset = 0;
     bczhc::utf8::SolvedUTF8Properties solvedProperties{};
     while (offset < size) {
@@ -54,7 +52,8 @@ json *bczhc::CharacterCounter::getJsonData() {
     for (int i = 0; i < size; ++i) {
         json pairJson;
         codepoint = (*vec)[i].first;
-        utf8::unicode2UTF8(u8Char, codepoint), u8Char[utf8::getUTF8Size(codepoint)] = '\0';
+        utf8::unicode2UTF8(u8Char, codepoint),
+            u8Char[utf8::getUTF8Size(codepoint)] = '\0';
         pairJson[0] = u8Char, pairJson[1] = (*vec)[i].second;
         (*j)[i] = pairJson;
     }

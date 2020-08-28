@@ -31,16 +31,16 @@ int64_t getTimestamp() {
 
 class SnakeGame {
     class Point {
-        public:
-            int x = 0;
-            int y = 0;
+    public:
+        int x = 0;
+        int y = 0;
 
-            Point(int x, int y) : x(x), y(y) {}
+        Point(int x, int y) : x(x), y(y) {}
 
-            Point() = default;
+        Point() = default;
     };
 
-    private:
+private:
     int col, row;
     char *map = nullptr;
     char orientation = RIGHT;
@@ -94,11 +94,11 @@ class SnakeGame {
         }
     }
 
-    public:
+public:
     SnakeGame(int col, int row, int delayMillis)
         : col(col + 2), row(row + 2), delayMillis(delayMillis) {
-            init();
-        };
+        init();
+    };
 
     ~SnakeGame() { delete this->map; }
 
@@ -108,20 +108,20 @@ class SnakeGame {
         Point coor = snake.get(0);
         Point next = coor;
         switch (orientation) {
-            case UP:
-                --next.y;
-                break;
-            case DOWN:
-                ++next.y;
-                break;
-            case LEFT:
-                --next.x;
-                break;
-            case RIGHT:
-                ++next.x;
-                break;
-            default:
-                break;
+        case UP:
+            --next.y;
+            break;
+        case DOWN:
+            ++next.y;
+            break;
+        case LEFT:
+            --next.x;
+            break;
+        case RIGHT:
+            ++next.x;
+            break;
+        default:
+            break;
         }
         char c = MAP(next.x, next.y);
         snake.putFirst(next);
@@ -138,7 +138,7 @@ class SnakeGame {
             generateFood();
         drawToMap();
         print();
-end:;
+    end:;
     }
 
     void start() {
@@ -155,32 +155,40 @@ end:;
     }
 
     void moveUp() {
-        if (orientation == DOWN && snake.length() != 1) return;
-        if (orientation == UP) return;
+        if (orientation == DOWN && snake.length() != 1)
+            return;
+        if (orientation == UP)
+            return;
         manualMoveTime = getTimestamp();
         orientation = UP;
         move();
     }
 
     void moveDown() {
-        if (orientation == UP && snake.length() != 1) return;
-        if (orientation == DOWN) return;
+        if (orientation == UP && snake.length() != 1)
+            return;
+        if (orientation == DOWN)
+            return;
         manualMoveTime = getTimestamp();
         orientation = DOWN;
         move();
     }
 
     void moveLeft() {
-        if (orientation == RIGHT && snake.length() != 1) return;
-        if (orientation == LEFT) return;
+        if (orientation == RIGHT && snake.length() != 1)
+            return;
+        if (orientation == LEFT)
+            return;
         manualMoveTime = getTimestamp();
         orientation = LEFT;
         move();
     }
 
     void moveRight() {
-        if (orientation == LEFT && snake.length() != 1) return;
-        if (orientation == RIGHT) return;
+        if (orientation == LEFT && snake.length() != 1)
+            return;
+        if (orientation == RIGHT)
+            return;
         manualMoveTime = getTimestamp();
         orientation = RIGHT;
         move();
@@ -188,7 +196,7 @@ end:;
 };
 
 void *f(void *arg) {
-    auto *game = (SnakeGame *) arg;
+    auto *game = (SnakeGame *)arg;
     game->start();
     delete game;
     exit(0);
@@ -197,8 +205,8 @@ void *f(void *arg) {
 
 char scanKeyboard() {
     char in;
-    struct termios new_settings{};
-    struct termios stored_settings{};
+    struct termios new_settings {};
+    struct termios stored_settings {};
     tcgetattr(0, &stored_settings);
     new_settings = stored_settings;
     new_settings.c_lflag &= (~ICANON);
@@ -219,7 +227,8 @@ int main(int argc, char **argv) {
     int index = 0;
     char *path = argv[0];
     for (int i = 0; path[i] != '\0'; ++i) {
-        if (path[i] == '/') index = i + 1;
+        if (path[i] == '/')
+            index = i + 1;
     }
     char *filename = path + index;
     typedef pair<char *, char *> param;
@@ -234,16 +243,16 @@ int main(int argc, char **argv) {
             if (i + 1 < argc && argv[i + 1][0] != '-') {
                 param par(argv[i], argv[i + 1]);
                 params.put(par);
-            } else invalidArguments = true;
+            } else
+                invalidArguments = true;
         }
     }
     if (help) {
-        cout
-            << "Usage: " << filename << " [options]" << endl
-            << "Options:" << endl
-            << "  -c,  --column <column>" << endl
-            << "  -r,  --row <row>" << endl
-            << "  -d,  --delay <delaied time (ms)>" << endl;
+        cout << "Usage: " << filename << " [options]" << endl
+             << "Options:" << endl
+             << "  -c,  --column <column>" << endl
+             << "  -r,  --row <row>" << endl
+             << "  -d,  --delay <delaied time (ms)>" << endl;
         return 0;
     }
     if (invalidArguments) {
@@ -255,9 +264,12 @@ int main(int argc, char **argv) {
     for (int i = 0; i < len; ++i) {
         param par = params.get(i);
         char *first = par.first, *second = par.second;
-        if (cmp2(first, "-c", "--column")) width = atoi(second);
-        else if (cmp2(first, "-r", "--row")) height = atoi(second);
-        else if (cmp2(first, "-d", "--delay")) delay = atoi(second);
+        if (cmp2(first, "-c", "--column"))
+            width = atoi(second);
+        else if (cmp2(first, "-r", "--row"))
+            height = atoi(second);
+        else if (cmp2(first, "-d", "--delay"))
+            delay = atoi(second);
         else {
             cout << "Unknown option: " << first << "." << endl;
             return 0;
@@ -265,34 +277,34 @@ int main(int argc, char **argv) {
     }
     SnakeGame *game = new SnakeGame(width, height, delay);
     pthread_t t;
-    pthread_create(&t, nullptr, f, (void *) game);
+    pthread_create(&t, nullptr, f, (void *)game);
     char read = 0;
     while (!game->getGameoverStatus()) {
         read = scanKeyboard();
-        cout << (int) read << endl;
+        cout << (int)read << endl;
         switch (read) {
-            case 'w':
-            case 'W':
-                game->moveUp();
-                break;
-            case 's':
-            case 'S':
-                game->moveDown();
-                break;
-            case 'a':
-            case 'A':
-                game->moveLeft();
-                break;
-            case 'd':
-            case 'D':
-                game->moveRight();
-                break;
-            case 'q':
-                delete game;
-                exit(0);
-                break;
-            default:
-                break;
+        case 'w':
+        case 'W':
+            game->moveUp();
+            break;
+        case 's':
+        case 'S':
+            game->moveDown();
+            break;
+        case 'a':
+        case 'A':
+            game->moveLeft();
+            break;
+        case 'd':
+        case 'D':
+            game->moveRight();
+            break;
+        case 'q':
+            delete game;
+            exit(0);
+            break;
+        default:
+            break;
         }
     }
     pthread_join(t, nullptr);

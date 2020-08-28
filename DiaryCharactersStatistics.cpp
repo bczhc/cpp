@@ -1,13 +1,13 @@
+#include "CountCharacters.h"
+#include "third_party/json/single_include/nlohmann/json.hpp"
+#include "utf8.h"
+#include "zhc.h"
 #include <algorithm>
 #include <iostream>
-#include "CountCharacters.h"
 #include <iterator>
 #include <map>
 #include <sqlite3.h>
 #include <vector>
-#include "utf8.h"
-#include "zhc.h"
-#include "third_party/json/single_include/nlohmann/json.hpp"
 
 using namespace std;
 using namespace bczhc;
@@ -33,7 +33,8 @@ int main(int argc, char **argv) {
         return 1;
     }
     counter = new CharacterCounter;
-    sqlite3_exec(diaryDatabase, "SELECT content FROM diary", callback, nullptr, nullptr);
+    sqlite3_exec(diaryDatabase, "SELECT content FROM diary", callback, nullptr,
+                 nullptr);
     sqlite3_close(diaryDatabase);
     json *j = counter->getJsonData();
     ::cout << j->dump() << ::endl;

@@ -5,8 +5,8 @@
 #include "./FourierSeries.h"
 
 bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
-                             int32_t _epicyclesCount, int32_t period)
-        : f(functionInterface), T(period), epicyclesCount(_epicyclesCount) {
+                                    int32_t _epicyclesCount, int32_t period)
+    : f(functionInterface), T(period), epicyclesCount(_epicyclesCount) {
     omega = M_PI * 2 / period;
 }
 
@@ -15,7 +15,7 @@ bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
 }*/
 
 void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
-                         int threadNum) {
+                                int threadNum) {
     thread *threads[threadNum];
     int32_t a = -epicyclesCount / 2;
     int32_t t = a + epicyclesCount;
@@ -28,7 +28,7 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
         double n{};
 
         FuncInIntegral(ComplexFunctionInterface &mF, double &mOmega)
-                : mF(mF), mOmega(mOmega) {}
+            : mF(mF), mOmega(mOmega) {}
 
     private:
         void x(ComplexValue &dest, double t) override {
@@ -40,7 +40,8 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
     for (int32_t n = a; n < t; ++n) {
         funcInIntegral.n = n;
         ComplexValue integralResult =
-                complexIntegral.getDefiniteIntegralByTrapezium(0, T, funcInIntegral);
+            complexIntegral.getDefiniteIntegralByTrapezium(0, T,
+                                                           funcInIntegral);
         integralResult.selfDivide(T, 0);
         callback.callback(n, integralResult.re, integralResult.im);
     }
@@ -48,4 +49,3 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
         delete threads[i];
     }
 }
-

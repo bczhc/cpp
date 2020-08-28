@@ -52,12 +52,14 @@ ComplexValue &bczhc::ComplexValue::selfSubtract(double _re, double _im) {
 }
 
 ComplexValue bczhc::ComplexValue::multiply(ComplexValue cv) {
-    ComplexValue r(this->re * cv.re - this->im * cv.im, this->re * cv.im + cv.re * this->im);
+    ComplexValue r(this->re * cv.re - this->im * cv.im,
+                   this->re * cv.im + cv.re * this->im);
     return r;
 }
 
 ComplexValue bczhc::ComplexValue::multiply(double _re, double _im) {
-    ComplexValue r(this->re * _re - this->im * _im, this->re * _im + _re * this->im);
+    ComplexValue r(this->re * _re - this->im * _im,
+                   this->re * _im + _re * this->im);
     return r;
 }
 
@@ -79,13 +81,15 @@ ComplexValue &bczhc::ComplexValue::selfMultiply(double _re, double _im) {
 
 ComplexValue bczhc::ComplexValue::divide(ComplexValue cv) {
     double a = pow(cv.re, 2) + pow(cv.im, 2);
-    ComplexValue r((this->re * cv.re + this->im * cv.im) / a, (cv.re * this->im - this->re * cv.im) / a);
+    ComplexValue r((this->re * cv.re + this->im * cv.im) / a,
+                   (cv.re * this->im - this->re * cv.im) / a);
     return r;
 }
 
 ComplexValue bczhc::ComplexValue::divide(double _re, double _im) {
     double a = pow(this->re, 2) + pow(this->im, 2);
-    ComplexValue r((this->re * _re + this->im * _im) / a, (_re * this->im - this->re * _im) / a);
+    ComplexValue r((this->re * _re + this->im * _im) / a,
+                   (_re * this->im - this->re * _im) / a);
     return r;
 }
 
@@ -145,14 +149,11 @@ string bczhc::ComplexValue::toString(double _re, double _im) {
         return s;
     } else if (_im > 0) {
         string s = to_string(_re);
-        s.append("+")
-                .append(to_string(_im))
-                .append("i");
+        s.append("+").append(to_string(_im)).append("i");
         return s;
     } else if (_im < 0) {
         string s = to_string(_re);
-        s.append(to_string(_im))
-                .append("i");
+        s.append(to_string(_im)).append("i");
         return s;
     }
     string s = "0";
