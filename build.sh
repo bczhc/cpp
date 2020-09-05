@@ -11,5 +11,7 @@ then
 else
     make "-j$jobNum" "$*"
 fi
+status=$?
 cd ..
+exit $status
 

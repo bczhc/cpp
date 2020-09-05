@@ -1,6 +1,6 @@
 #include <iostream>
 #include <sqlite3.h>
-#include "../third_party/json/single_include/nlohmann/json.hpp"
+#include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include <iostream>
 
 using namespace std;

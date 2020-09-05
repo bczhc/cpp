@@ -2,7 +2,7 @@
 #include "../zhc.h"
 #include <cstdio>
 #include <cstdlib>
-#include "../third_party/json/single_include/nlohmann/json.hpp"
+#include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
 
 using json = nlohmann::json;
 using namespace bczhc;

@@ -5,7 +5,7 @@
 #ifndef CPP_COUNTCHARACTERS_H
 #define CPP_COUNTCHARACTERS_H
 
-#include "third_party/json/single_include/nlohmann/json.hpp"
+#include "third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include <cstdint>
 #include <map>
 #include <sqlite3.h>
