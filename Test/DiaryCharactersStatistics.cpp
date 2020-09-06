@@ -1,7 +1,7 @@
-#include "CountCharacters.h"
-#include "third_party/json-single-header/single_include/nlohmann/json.hpp"
-#include "utf8.h"
-#include "zhc.h"
+#include "../CountCharacters.h"
+#include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
+#include "../utf8.h"
+#include "../zhc.h"
 #include <algorithm>
 #include <iostream>
 #include <iterator>
