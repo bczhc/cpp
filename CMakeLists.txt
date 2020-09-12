@@ -15,7 +15,7 @@ add_executable(sqlite3ToJSON test/sqlite3ToJSON.cpp)
 add_executable(snake snake.cpp zhc.cpp)
 add_executable(snake2 snake2.cpp zhc.cpp)
 add_executable(sqliteTest test/sqliteTest.cpp)
-add_executable(charactersStatistics CharactersStatistics.cpp CountCharacters.cpp utf8.cpp zhc.cpp)
+add_executable(charactersStatistics CharactersStatistics.cpp CountCharacters.cpp utf8.cpp zhc.cpp io.cpp)
 
 add_library(fourierSeries SHARED FourierSeries.h ComplexIntegral.cpp ComplexValue.cpp Epicycle.cpp FourierSeries.cpp)
 
