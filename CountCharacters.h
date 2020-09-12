@@ -6,9 +6,10 @@
 #define CPP_COUNTCHARACTERS_H
 
 #include "third_party/json-single-header/single_include/nlohmann/json.hpp"
+#include "third_party/sqlite3-single-c/sqlite3.h"
 #include <cstdint>
 #include <map>
-#include "third_party/sqlite3-single-c/sqlite3.h"
+#include <vector>
 
 using namespace std;
 using json = nlohmann::json;
@@ -23,6 +24,8 @@ public:
     ~CharacterCounter();
 
     int countCharacters(const char *u8Bytes, int size) const;
+
+    vector<pair<int, int64_t>> *getSortVector();
 
     json *getJsonData();
 };
