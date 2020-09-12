@@ -10,6 +10,7 @@
 
 #include "CountCharacters.h"
 #include "utf8.h"
+#include <iostream>
 
 using namespace std;
 

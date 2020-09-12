@@ -1,21 +1,44 @@
 #include "CountCharacters.h"
+#include "utf8.h"
 #include <cstdio>
-#include <iostream>
 
-using namespace std;
-#define BUFFER_SIZE 8192
+#define BUFFER_SIZE 10
 using namespace bczhc;
+using namespace utf8;
 
 int main() {
     CharacterCounter counter;
     FILE *in = stdin;
     char buf[BUFFER_SIZE];
     int readLen = 0;
-    while ((readLen = fread(buf, 1, BUFFER_SIZE, in)) > 0) {
-        counter.countCharacters(buf, readLen);
+    int lastValidPos = 0;
+    int readOff = 0;
+    while (true) {
+        // copy the rest bytes last time to buffer
+        for (int i = lastValidPos; i < readLen + readOff; ++i) {
+            buf[i - lastValidPos] = buf[i];
+        }
+        // offset of reading next time
+        if (lastValidPos != 0)
+            readOff = readLen + readOff - lastValidPos;
+        if ((readLen = fread(buf + readOff, 1, BUFFER_SIZE - readOff, in)) <= 0)
+            break;
+        if (readLen < BUFFER_SIZE - readOff)
+            continue;
+        for (int i = BUFFER_SIZE - 1; i >= 0; --i) {
+            if (getUTF8BytesLength(buf[i]) != 0) {
+                // find the last index of the first byte in valid utf8 bytes
+                lastValidPos = i;
+                break;
+            }
+        }
+        counter.countCharacters(buf, lastValidPos);
+        for (int i = 0; i < lastValidPos; ++i)
+            printf("%c", buf[i]);
     }
     json *j = counter.getJsonData();
-    cout << j->dump() << endl;
+    //printf("%s\n", j->dump().c_str());
+    printf("\n");
     delete j;
     return 0;
 }
