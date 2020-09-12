@@ -2,7 +2,7 @@
 #include "utf8.h"
 #include <cstdio>
 
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 8192
 using namespace bczhc;
 using namespace utf8;
 
@@ -25,20 +25,19 @@ int main() {
             break;
         if (readLen < BUFFER_SIZE - readOff)
             continue;
+            int u8BytesLen = 0;
         for (int i = BUFFER_SIZE - 1; i >= 0; --i) {
-            if (getUTF8BytesLength(buf[i]) != 0) {
+            if ((u8BytesLen = getUTF8BytesLength(buf[i])) != 0) {
                 // find the last index of the first byte in valid utf8 bytes
                 lastValidPos = i;
                 break;
             }
         }
+        if (readOff + readLen - lastValidPos == u8BytesLen) lastValidPos += u8BytesLen;
         counter.countCharacters(buf, lastValidPos);
-        for (int i = 0; i < lastValidPos; ++i)
-            printf("%c", buf[i]);
     }
     json *j = counter.getJsonData();
-    //printf("%s\n", j->dump().c_str());
-    printf("\n");
+    printf("%s\n", j->dump().c_str());
     delete j;
     return 0;
 }
