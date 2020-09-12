@@ -1,4 +1,4 @@
-#include <sqlite3.h>
+#include "../third_party/sqlite3-single-c/sqlite3.h"
 #include <iostream>
 #include "../zhc.h"
 

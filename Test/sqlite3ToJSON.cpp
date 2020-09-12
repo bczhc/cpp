@@ -1,5 +1,5 @@
 #include <iostream>
-#include <sqlite3.h>
+#include "../third_party/sqlite3-single-c/sqlite3.h"
 #include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include <iostream>
 

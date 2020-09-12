@@ -8,7 +8,7 @@
 #include "third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include <cstdint>
 #include <map>
-#include <sqlite3.h>
+#include "third_party/sqlite3-single-c/sqlite3.h"
 
 using namespace std;
 using json = nlohmann::json;
