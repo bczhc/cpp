@@ -4,3 +4,6 @@
 [submodule "third_party/json-single-header"]
 	path = third_party/json-single-header
 	url = https://hub.fastgit.org/bczhc/single-json-header.git
+[submodule "third_party/practice"]
+	path = third_party/practice
+	url = https://hub.fastgit.org/bczhc/practice.git
