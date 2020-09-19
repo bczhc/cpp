@@ -3,6 +3,7 @@
 //
 
 #include "./FourierSeries.h"
+#include <thread>
 
 bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                                     int32_t _epicyclesCount, int32_t period)

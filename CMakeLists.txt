@@ -16,6 +16,7 @@ add_executable(snake snake.cpp zhc.cpp)
 add_executable(snake2 snake2.cpp zhc.cpp)
 add_executable(sqliteTest test/sqliteTest.cpp)
 add_executable(charactersStatistics CharactersStatistics.cpp CountCharacters.cpp utf8.cpp zhc.cpp io.cpp)
+add_executable(thread test/thread.cpp)
 
 add_library(fourierSeries SHARED FourierSeries.h ComplexIntegral.cpp ComplexValue.cpp Epicycle.cpp FourierSeries.cpp)
 
@@ -27,3 +28,4 @@ target_link_libraries(sqliteTest sqlite3)
 target_link_libraries(T2 fourierSeries)
 target_link_libraries(T3 fourierSeries)
 target_link_libraries(test sqlite3 pthread)
+target_link_libraries(thread pthread)
