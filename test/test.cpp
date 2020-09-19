@@ -1,35 +1,22 @@
-#include <iostream>
+#include "../FourierSeries.h"
 
-using namespace std;
-
-int i = 0;
-
-pthread_mutex_t lock;
-
-void *f1(void *arg) {
-    for (int j = 0; j < 10000000; ++j) {
-        pthread_mutex_lock(&lock);
-        ++i;
-        pthread_mutex_unlock(&lock);
-    }
-    return nullptr;
-}
-
-void *f2(void *arg) {
-    for (int j = 0; j < 10000000; ++j) {
-        pthread_mutex_lock(&lock);
-        ++i;
-        pthread_mutex_unlock(&lock);
-    }
-    return nullptr;
-}
+using namespace bczhc;
 
 int main() {
-    pthread_t t1, t2;
-    pthread_create(&t1, nullptr, f1, nullptr);
-    pthread_create(&t2, nullptr, f2, nullptr);
-    pthread_join(t1, nullptr);
-    pthread_join(t2, nullptr);
-    cout << i << endl;
+    class F : public ComplexFunctionInterface {
+    public:
+        void x(ComplexValue &dest, double t) override {
+            dest.setValue(t, t * t);
+        }
+    } f;
+    FourierSeries fs(f, 30, 10);
+    class C : public FourierSeriesCallback {
+    public:
+        void callback(double n, double re, double im) override {
+            cout.precision(16);
+            cout << n << ' ' << re << ' ' << im << endl;
+        }
+    } c;
+    fs.calc(c, 100000, 2);
     return 0;
 }
