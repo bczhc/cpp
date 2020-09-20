@@ -40,7 +40,7 @@ public:
 BlockingQueue q;
 
 int main() {
-    class R : public Runnale {
+    class R : public Runnable {
     public:
         void run() override {
             for (;;) {

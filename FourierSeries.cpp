@@ -17,7 +17,7 @@ bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
 
 }*/
 
-class Run : public Runnale {
+class Run : public Runnable {
 public:
     void run() override {}
 };

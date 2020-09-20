@@ -49,7 +49,7 @@ public:
     inline void notify() { mCond.signal(); }
 };
 
-class Runnale {
+class Runnable {
 public:
     virtual void run() = 0;
 };
@@ -60,7 +60,7 @@ public:
 };
 
 void *call(void *arg) {
-    ((Runnale *)arg)->run();
+    ((Runnable *)arg)->run();
     return nullptr;
 }
 
@@ -86,10 +86,10 @@ private:
     pthread_t t;
 
 public:
-    Thread(Runnale &runnable) { pthread_create(&t, nullptr, call, &runnable); }
+    Thread(Runnable &runnable) { pthread_create(&t, nullptr, call, &runnable); }
 
     template <typename ArgType>
-    explicit Thread(Consumer<ArgType> &consumer, ArgType &arg) {
+    explicit Thread(Consumer<ArgType> consumer, ArgType &arg) {
         Bean<ArgType> *b = new Bean<ArgType>;
         b->arg = &arg, b->c = &consumer;
         pthread_create(&t, nullptr, ConsumerCall<ArgType>::call, b);
@@ -100,23 +100,69 @@ public:
 
 class ThreadPool {
 public:
-    virtual void execute(Runnale &r) = 0;
+    virtual void execute(Runnable &r) = 0;
+
+    ~ThreadPool() {}
 };
 
 class Executors {
 public:
     class FixedThreadPool : public ThreadPool {
     private:
-        SequentialList<Runnale *> runnables;
+        MutexLock lock;
+        class CoreThreadRunnable : public Runnable {
+        private:
+            SequentialList<Runnable *> &runnables;
+            MutexLock &lock;
+
+        public:
+            CoreThreadRunnable(SequentialList<Runnable *> &runnables,
+                               MutexLock &lock)
+                : runnables(runnables), lock(lock) {}
+            void run() override {
+                printf("run\n");
+                while (true) {
+                    printf("%i\n", runnables.length());
+                    lock.lock();
+                    while (runnables.isEmpty()) {
+                        lock.wait();
+                    }
+                    Runnable *runnable = runnables.remove(0);
+                    runnable->run();
+                    lock.unlock();
+                }
+            }
+        };
+        SequentialList<Runnable *> runnables;
         Thread **coreThreads;
-        Thread *pullTasksThread;
+        int poolSize;
+        CoreThreadRunnable *coreThreadRunnable;
 
     public:
-        FixedThreadPool(int poolSize) { coreThreads = new Thread *[poolSize]; }
+        FixedThreadPool(int poolSize) {
+            this->poolSize = poolSize;
+            coreThreads = new Thread *[poolSize];
+            coreThreadRunnable = new CoreThreadRunnable(runnables, lock);
+            for (int i = 0; i < poolSize; ++i) {
+                coreThreads[i] = new Thread(*coreThreadRunnable);
+            }
+        }
 
-        void execute(Runnale &runnable) override {}
+        ~FixedThreadPool() {
+            for (int i = 0; i < poolSize; ++i) {
+                delete coreThreads[i];
+            }
+            delete coreThreads;
+            delete coreThreadRunnable;
+        }
+
+        void execute(Runnable &runnable) override {
+            printf("execute\n");
+            runnables.insert(&runnable);
+            lock.notify();
+        }
     };
-    ThreadPool *newFixedThreadPool(int poolSize) {
+    static ThreadPool *newFixedThreadPool(int poolSize) {
         FixedThreadPool *pool = new FixedThreadPool(poolSize);
         return pool;
     }

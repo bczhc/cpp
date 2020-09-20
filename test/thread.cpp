@@ -12,36 +12,23 @@ void sleep(int sec) { usleep(sec * 1000000); }
 
 MutexLock lock;
 using Condition = MutexLock::Condition;
-Condition cond1 = lock.newCondition();
-Condition cond2 = lock.newCondition();
 
-class R : public Runnale {
-public:
-    void run() override {
-        lock.lock();
-        println("task1 waiting...");
-        cond1.wait();
-        println("task1 running...");
-        lock.unlock();
-    }
-} r1;
-
-class R2 : public Runnale {
-public:
-    void run() override {
-        lock.lock();
-        println("task2 waiting...");
-        cond2.wait();
-        println("task2 running...");
-        lock.unlock();
-    }
-} r2;
 int main() {
-    Thread t1(r1);
-    Thread t2(r2);
-    sleep(1), cond1.signal();
-    sleep(1), cond2.signal();
-    t1.join();
-    t2.join();
+    ThreadPool *pool = Executors::newFixedThreadPool(2);
+    class R : public Runnable {
+    public:
+        int a;
+        void run() override { printf("%i\n", a); }
+    };
+    R *r[10];
+    for (int i = 0; i < 10; ++i) {
+        r[i] = new R();
+        r[i]->a = i;
+        pool->execute(*(r[i]));
+    }
+    for (int i = 0; i < 10; ++i) {
+        delete r[i];
+    }
+    sleep(20);
     return 0;
 }
