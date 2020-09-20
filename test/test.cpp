@@ -8,9 +8,6 @@ void f(int &i) {
 
 int main() {
     int b = 3;
-    thread t(f, b);
-    t.join();
-    return 0;
     class F : public ComplexFunctionInterface {
     public:
         void x(ComplexValue &dest, double t) override {

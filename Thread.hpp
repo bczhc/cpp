@@ -1,7 +1,46 @@
+#include "./third_party/practice/LinearList.hpp"
+#include <cstdio>
 #include <pthread.h>
+#include <sched.h>
+
+using namespace bczhc;
+using namespace linearlist;
 
 namespace bczhc {
-namespace thread {
+namespace concurrent {
+class MutexLock {
+public:
+    class Condition {
+    private:
+        pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+        pthread_mutex_t &mutex;
+
+    public:
+        Condition(MutexLock &mutexLock) : mutex(mutexLock.mutexLock) {}
+
+        ~Condition() { pthread_cond_destroy(&cond); }
+
+        inline void wait() { pthread_cond_wait(&cond, &mutex); }
+
+        inline void signal() { pthread_cond_signal(&cond); }
+    };
+
+    pthread_mutex_t mutexLock = PTHREAD_MUTEX_INITIALIZER;
+
+    ~MutexLock() { pthread_mutex_destroy(&mutexLock); }
+
+    inline void lock() { pthread_mutex_lock(&mutexLock); };
+
+    inline void unlock() { pthread_mutex_unlock(&mutexLock); }
+
+    inline bool tryLock() { return pthread_mutex_trylock(&mutexLock) == 0; }
+
+    Condition newCondition() {
+        Condition cond(*this);
+        return cond;
+    }
+};
+
 class Runnale {
 public:
     virtual void run() = 0;
@@ -50,5 +89,29 @@ public:
 
     void join() { pthread_join(t, nullptr); }
 };
-}; // namespace thread
-}; // namespace bczhc
+
+class ThreadPool {
+public:
+    virtual void execute(Runnale &r) = 0;
+};
+
+class Executors {
+public:
+    class FixedThreadPool : public ThreadPool {
+    private:
+        SequentialList<Runnale *> runnables;
+        Thread **coreThreads;
+        Thread *pullTasksThread;
+
+    public:
+        FixedThreadPool(int poolSize) { coreThreads = new Thread *[poolSize]; }
+
+        void execute(Runnale &runnable) override {}
+    };
+    ThreadPool *newFixedThreadPool(int poolSize) {
+        FixedThreadPool *pool = new FixedThreadPool(poolSize);
+        return pool;
+    }
+};
+} // namespace concurrent
+} // namespace bczhc

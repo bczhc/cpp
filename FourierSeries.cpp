@@ -3,7 +3,10 @@
 //
 
 #include "./FourierSeries.h"
-#include <thread>
+#include "./Thread.hpp"
+
+using namespace bczhc;
+using namespace thread;
 
 bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                                     int32_t _epicyclesCount, int32_t period)
@@ -15,9 +18,17 @@ bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
 
 }*/
 
+class Run : public Runnale {
+public:
+    void run() override {}
+};
+
 void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                                 int threadNum) {
-    thread *threads[threadNum];
+    for (int i = 0; i < threadNum; ++i) {
+        Run r;
+        Thread t(r);
+    }
     int32_t a = -epicyclesCount / 2;
     int32_t t = a + epicyclesCount;
     class FuncInIntegral : public ComplexFunctionInterface {
@@ -45,8 +56,5 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                                                            funcInIntegral);
         integralResult.selfDivide(T, 0);
         callback.callback(n, integralResult.re, integralResult.im);
-    }
-    for (int i = 0; i < threadNum; ++i) {
-        delete threads[i];
     }
 }
