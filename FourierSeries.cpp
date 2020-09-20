@@ -3,10 +3,9 @@
 //
 
 #include "./FourierSeries.h"
-#include "./Thread.hpp"
 
 using namespace bczhc;
-using namespace thread;
+using namespace concurrent;
 
 bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                                     int32_t _epicyclesCount, int32_t period)

@@ -7,7 +7,7 @@
 #include "./zhc.h"
 #include "ComplexIntegral.h"
 #include <iostream>
-#include <thread>
+#include "./Concurrent.hpp"
 
 using namespace std;
 using namespace bczhc;

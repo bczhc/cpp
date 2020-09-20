@@ -39,6 +39,14 @@ public:
         Condition cond(*this);
         return cond;
     }
+
+private:
+    Condition mCond = newCondition();
+
+public:
+    inline void wait() { mCond.wait(); }
+
+    inline void notify() { mCond.signal(); }
 };
 
 class Runnale {
