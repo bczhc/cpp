@@ -1,4 +1,5 @@
 #include "./zhc.h"
+#include "third_party/practice/LinearList.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -11,8 +12,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include <utility>
-
-using namespace bczhc;
 
 #define MAP(x, y) (map[(x) + (y)*col])
 #define RANDOM(a, b) (((double)rand() / RAND_MAX) * ((b) - (a)) + (a))
@@ -45,7 +44,7 @@ private:
     char *map = nullptr;
     char orientation = RIGHT;
     bool gameover = false;
-    LinkedList<Point> snake{};
+    linearlist::DoublyLinkedList<Point> snake{};
     int64_t manualMoveTime = 0;
     int delayMillis;
 
@@ -63,7 +62,7 @@ private:
             MAP(col - 1, i) = '*';
         }
         // the snake's initial head
-        snake.put(Point(1, 1));
+        snake.insert(Point(1, 1));
         generateFood();
     }
 
@@ -105,7 +104,7 @@ public:
     bool getGameoverStatus() const { return gameover; }
 
     void move() {
-        Point coor = snake.get(0);
+        Point coor = snake.getFirst();
         Point next = coor;
         switch (orientation) {
         case UP:
@@ -124,9 +123,9 @@ public:
             break;
         }
         char c = MAP(next.x, next.y);
-        snake.putFirst(next);
+        snake.insert(0, next);
         if (c != '$') {
-            Point last = snake.removeLast();
+            Point last = snake.remove(snake.length() - 1);
             MAP(last.x, last.y) = ' ';
         }
         c = MAP(next.x, next.y);
@@ -232,7 +231,7 @@ int main(int argc, char **argv) {
     }
     char *filename = path + index;
     typedef pair<char *, char *> param;
-    LinkedList<param> params;
+    linearlist::LinkedList<param> params;
     bool help = false, invalidArguments = false;
     for (int i = 1; i < argc; ++i) {
         if (cmp2(argv[i], "--help", "-h")) {
@@ -242,7 +241,7 @@ int main(int argc, char **argv) {
         if (argv[i][0] == '-') {
             if (i + 1 < argc && argv[i + 1][0] != '-') {
                 param par(argv[i], argv[i + 1]);
-                params.put(par);
+                params.insert(par);
             } else
                 invalidArguments = true;
         }

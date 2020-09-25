@@ -16,7 +16,7 @@ class SnakeGame {
 
 private:
     int x = 10, y = 10;
-    LinkedList<Point> snake;
+    bczhc::LinkedList<Point> snake;
     int &gameover;
     char *map = nullptr;
     Point food{};
