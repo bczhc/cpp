@@ -23,6 +23,6 @@ int main() {
             cout << n << ' ' << re << ' ' << im << endl;
         }
     } c;
-    fs.calc(c, 100000, 5);
+    fs.calc(c, 100000, 9);
     return 0;
 }

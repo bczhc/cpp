@@ -190,8 +190,8 @@ public:
         }
 
         void execute(Runnable *runnable) override {
-            runnables.enqueue(runnable);
             lock.lock();
+            runnables.enqueue(runnable);
             lock.notify();
             lock.unlock();
         }
