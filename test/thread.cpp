@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <pthread.h>
 #include <unistd.h>
+#include "../zhc.h"
 
 using namespace bczhc;
 using namespace concurrent;
@@ -10,25 +11,29 @@ void println(const char *s) { printf("%s\n", s); }
 
 void sleep(int sec) { usleep(sec * 1000000); }
 
-MutexLock lock;
-using Condition = MutexLock::Condition;
+CountDownLatch latch(5);
 
 int main() {
-    ThreadPool *pool = Executors::newFixedThreadPool(2);
     class R : public Runnable {
     public:
-        int a;
-        void run() override { printf("%i\n", a); }
+        int i;
+        void run() override {
+            sleep(3);
+            printf("%i\n", i);
+            latch.countDown();
+        }
     };
-    R *r[10];
-    for (int i = 0; i < 10; ++i) {
-        r[i] = new R();
-        r[i]->a = i;
-        pool->execute(*(r[i]));
+    ThreadPool *pool = Executors::newFixedThreadPool(2);
+    PointersSet ps;
+    for (int i = 0; i < 5; ++i) {
+        R *r = new R;
+        ps.put(r);
+        r->i = i;
+        pool->execute(r);
+        sleep(1);
     }
-    for (int i = 0; i < 10; ++i) {
-        delete r[i];
-    }
-    sleep(20);
+    latch.await();
+    free(pool);
+    ps.freeAll();
     return 0;
 }

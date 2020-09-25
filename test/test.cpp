@@ -1,28 +1,11 @@
-#include "../Concurrent.hpp"
 #include <cstdio>
-
-using namespace concurrent;
-
-CountDownLatch latch(10);
+#include "../zhc.h"
 
 int main() {
-    class R : public Runnable {
-    private:
-        int i = 0;
-
-    public:
-        void setI(int a) { i = a; }
-        void run() override {
-            printf("%i\n", i);
-            latch.countDown();
-        }
-    };
-
-    for (int i = 0; i < 10; ++i) {
-        R *r = new R;
-        r->setI(i);
-        Thread t(r);
-    }
-    latch.await();
+    Queue<int> q;
+    q.enqueue(0);
+    printf("%i\n", q.dequeue());
+    q.enqueue(1);
+    printf("%i\n", q.dequeue());
     return 0;
 }

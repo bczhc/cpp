@@ -84,7 +84,6 @@ public:
 void *call(void *arg) {
     Runnable *runnable = (Runnable *)arg;
     runnable->run();
-    free(arg);
     return nullptr;
 }
 
@@ -117,7 +116,7 @@ public:
 
 class ThreadPool {
 public:
-    virtual void execute(Runnable &r) = 0;
+    virtual void execute(Runnable *r) = 0;
 
     ~ThreadPool() {}
 };
@@ -126,31 +125,33 @@ class Executors {
 public:
     class FixedThreadPool : public ThreadPool {
     private:
-        MutexLock lock;
+        MutexLock lock1;
+        MutexLock lock2;
         class CoreThreadRunnable : public Runnable {
         private:
-            SequentialList<Runnable *> &runnables;
-            MutexLock &lock;
+            Queue<Runnable *> &runnables;
+            MutexLock &lock1;
+            MutexLock &lock2;
 
         public:
-            CoreThreadRunnable(SequentialList<Runnable *> &runnables,
-                               MutexLock &lock)
-                : runnables(runnables), lock(lock) {}
+            CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock1,
+                               MutexLock &lock2)
+                : runnables(runnables), lock1(lock1), lock2(lock2) {}
             void run() override {
-                printf("run\n");
                 while (true) {
-                    printf("%i\n", runnables.length());
-                    lock.lock();
                     while (runnables.isEmpty()) {
-                        lock.wait();
+                        lock1.lock();
+                        lock1.wait();
+                        lock1.unlock();
                     }
-                    Runnable *runnable = runnables.remove(0);
+                    lock2.lock();
+                    Runnable *runnable = runnables.dequeue();
+                    lock2.unlock();
                     runnable->run();
-                    lock.unlock();
                 }
             }
         };
-        SequentialList<Runnable *> runnables;
+        Queue<Runnable *> runnables;
         Thread **coreThreads;
         int poolSize;
         CoreThreadRunnable *coreThreadRunnable;
@@ -159,7 +160,8 @@ public:
         FixedThreadPool(int poolSize) {
             this->poolSize = poolSize;
             coreThreads = new Thread *[poolSize];
-            coreThreadRunnable = new CoreThreadRunnable(runnables, lock);
+            coreThreadRunnable =
+                new CoreThreadRunnable(runnables, lock1, lock2);
             for (int i = 0; i < poolSize; ++i) {
                 coreThreads[i] = new Thread(coreThreadRunnable);
             }
@@ -173,15 +175,17 @@ public:
             delete coreThreadRunnable;
         }
 
-        void execute(Runnable &runnable) override {
-            printf("execute\n");
-            runnables.insert(&runnable);
-            lock.notify();
+        void execute(Runnable *runnable) override {
+            lock2.lock();
+            runnables.enqueue(runnable);
+            lock1.lock();
+            lock1.notify();
+            lock1.unlock();
+            lock2.unlock();
         }
     };
     static ThreadPool *newFixedThreadPool(int poolSize) {
-        FixedThreadPool *pool = new FixedThreadPool(poolSize);
-        return pool;
+        return new FixedThreadPool(poolSize);
     }
 };
 } // namespace concurrent

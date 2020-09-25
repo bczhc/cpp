@@ -5,6 +5,7 @@
 
 #ifndef C99_ZHC_H
 #define C99_ZHC_H
+#include <stdexcept>
 #ifndef __cplusplus
 #include <stdint.h>
 #include <stdio.h>
@@ -12,6 +13,7 @@
 #include <string.h>
 #else
 
+#include "third_party/practice/LinearList.hpp"
 #include <cctype>
 #include <cstdint>
 #include <cstdio>
@@ -19,6 +21,9 @@
 #include <cstring>
 #include <iostream>
 #include <iterator>
+
+using namespace bczhc;
+using namespace linearlist;
 
 namespace bczhc {
 using namespace std;
@@ -487,6 +492,21 @@ public:
     string toCppString();
 
     String &operator=(const char *s);
+};
+
+class PointersSet {
+private:
+    SequentialList<void *> list;
+
+public:
+    void put(void *p) { list.insert(p); }
+
+    void freeAll() {
+        int length = list.length();
+        for (int i = 0; i < length; ++i) {
+            free(list.get(i));
+        }
+    }
 };
 
 #ifdef __cplusplus

@@ -49,7 +49,7 @@ int main() {
             }
         }
     } r;
-    Thread t(r);
+    Thread t(&r);
     for (int i = 0; i < 10; ++i) {
         Message msg;
         msg.a = i;
