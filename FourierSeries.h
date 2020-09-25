@@ -2,6 +2,9 @@
 // Created by root on 2020/3/31.
 //
 
+#ifndef BCZHC_FOURIER_SERIES
+#define BCZHC_FOURIER_SERIES
+
 #include "./ComplexValue.h"
 #include "./Epicycle.h"
 #include "./zhc.h"
@@ -49,3 +52,5 @@ public:
 
 void tF();
 } // namespace bczhc
+
+#endif //BCZHC_FOURIER_SERIES

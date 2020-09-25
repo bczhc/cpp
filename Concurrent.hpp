@@ -1,5 +1,10 @@
+#ifndef BCZHC_CONCURRENT_H
+#define BCZHC_CONCURRENT_H
+
 #include "./third_party/practice/LinearList.hpp"
 #include <cstdio>
+#include <cstdlib>
+#include <features.h>
 #include <pthread.h>
 #include <sched.h>
 
@@ -49,6 +54,23 @@ public:
     inline void notify() { mCond.signal(); }
 };
 
+class CountDownLatch {
+private:
+    int count;
+
+public:
+    CountDownLatch(int count) : count(count) {}
+    CountDownLatch() {}
+    void await() {
+        while (count != 0) {
+        }
+    }
+
+    void countDown() { --count; }
+
+    void set(int count) { this->count = count; }
+};
+
 class Runnable {
 public:
     virtual void run() = 0;
@@ -60,7 +82,9 @@ public:
 };
 
 void *call(void *arg) {
-    ((Runnable *)arg)->run();
+    Runnable *runnable = (Runnable *)arg;
+    runnable->run();
+    free(arg);
     return nullptr;
 }
 
@@ -86,14 +110,7 @@ private:
     pthread_t t;
 
 public:
-    Thread(Runnable &runnable) { pthread_create(&t, nullptr, call, &runnable); }
-
-    template <typename ArgType>
-    explicit Thread(Consumer<ArgType> consumer, ArgType &arg) {
-        Bean<ArgType> *b = new Bean<ArgType>;
-        b->arg = &arg, b->c = &consumer;
-        pthread_create(&t, nullptr, ConsumerCall<ArgType>::call, b);
-    }
+    Thread(Runnable *runnable) { pthread_create(&t, nullptr, call, runnable); }
 
     void join() { pthread_join(t, nullptr); }
 };
@@ -144,7 +161,7 @@ public:
             coreThreads = new Thread *[poolSize];
             coreThreadRunnable = new CoreThreadRunnable(runnables, lock);
             for (int i = 0; i < poolSize; ++i) {
-                coreThreads[i] = new Thread(*coreThreadRunnable);
+                coreThreads[i] = new Thread(coreThreadRunnable);
             }
         }
 
@@ -169,3 +186,5 @@ public:
 };
 } // namespace concurrent
 } // namespace bczhc
+
+#endif // BCZHC_CONCURRENT_H

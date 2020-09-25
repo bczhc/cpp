@@ -1,27 +1,28 @@
-#include "../FourierSeries.h"
+#include "../Concurrent.hpp"
+#include <cstdio>
 
-using namespace bczhc;
+using namespace concurrent;
 
-void f(int &i) {
-    cout << i << endl;
-}
+CountDownLatch latch(10);
 
 int main() {
-    int b = 3;
-    class F : public ComplexFunctionInterface {
+    class R : public Runnable {
+    private:
+        int i = 0;
+
     public:
-        void x(ComplexValue &dest, double t) override {
-            dest.setValue(t, t * t);
+        void setI(int a) { i = a; }
+        void run() override {
+            printf("%i\n", i);
+            latch.countDown();
         }
-    } f;
-    FourierSeries fs(f, 30, 10);
-    class C : public FourierSeriesCallback {
-    public:
-        void callback(double n, double re, double im) override {
-            cout.precision(16);
-            cout << n << ' ' << re << ' ' << im << endl;
-        }
-    } c;
-    fs.calc(c, 100000, 2);
+    };
+
+    for (int i = 0; i < 10; ++i) {
+        R *r = new R;
+        r->setI(i);
+        Thread t(r);
+    }
+    latch.await();
     return 0;
 }

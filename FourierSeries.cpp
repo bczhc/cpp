@@ -25,7 +25,7 @@ public:
 void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                                 int threadNum) {
     for (int i = 0; i < threadNum; ++i) {
-        Run r;
+        Run *r = new Run;
         Thread t(r);
     }
     int32_t a = -epicyclesCount / 2;
