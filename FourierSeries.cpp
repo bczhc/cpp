@@ -3,6 +3,10 @@
 //
 
 #include "./FourierSeries.h"
+#include "ComplexIntegral.h"
+#include "Concurrent.hpp"
+#include "zhc.h"
+#include <unistd.h>
 
 using namespace bczhc;
 using namespace concurrent;
@@ -22,12 +26,14 @@ public:
     void run() override {}
 };
 
+LongWaitCountDownLatch *latch = nullptr;
+
 void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                                 int threadNum) {
-    for (int i = 0; i < threadNum; ++i) {
-        Run *r = new Run;
-        Thread t(r);
-    }
+    LongWaitCountDownLatch longLatch(epicyclesCount);
+    latch = &longLatch;
+    ThreadPool *pool = Executors::newFixedThreadPool(threadNum);
+    PointersSet deletable;
     int32_t a = -epicyclesCount / 2;
     int32_t t = a + epicyclesCount;
     class FuncInIntegral : public ComplexFunctionInterface {
@@ -48,12 +54,37 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
         }
     } funcInIntegral(f, omega);
     ComplexIntegral complexIntegral{.n = integralD};
+    class Run : public Runnable {
+    private:
+        FuncInIntegral &funcInIntegral;
+        ComplexIntegral &complexIntegral;
+        FourierSeriesCallback &callback;
+        int32_t n;
+        double T;
+
+    public:
+        Run(FuncInIntegral &funcInIntegral, ComplexIntegral &complexIntegral,
+            FourierSeriesCallback &callback, int32_t n, double T)
+            : funcInIntegral(funcInIntegral), complexIntegral(complexIntegral),
+              callback(callback), n(n), T(T) {}
+
+        void run() override {
+            funcInIntegral.n = n;
+            ComplexValue integralResult =
+                complexIntegral.getDefiniteIntegralByTrapezium(0, T,
+                                                               funcInIntegral);
+            integralResult.selfDivide(T, 0);
+            callback.callback(n, integralResult.re, integralResult.im);
+            latch->countDown();
+        }
+    };
     for (int32_t n = a; n < t; ++n) {
-        funcInIntegral.n = n;
-        ComplexValue integralResult =
-            complexIntegral.getDefiniteIntegralByTrapezium(0, T,
-                                                           funcInIntegral);
-        integralResult.selfDivide(T, 0);
-        callback.callback(n, integralResult.re, integralResult.im);
+        Run *runnable =
+            new Run(funcInIntegral, complexIntegral, callback, n, T);
+        deletable.put(runnable);
+        pool->execute(runnable);
     }
+    latch->wait();
+    free(pool);
+    deletable.freeAll();
 }

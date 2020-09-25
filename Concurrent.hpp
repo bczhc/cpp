@@ -71,6 +71,26 @@ public:
     void set(int count) { this->count = count; }
 };
 
+class LongWaitCountDownLatch {
+private:
+    int count;
+    MutexLock lock;
+
+public:
+    LongWaitCountDownLatch(int count) : count(count) {}
+    void countDown() {
+        if (--count == 0)
+            lock.notify();
+    }
+
+    void wait() { lock.wait(); }
+
+    void interruptAndReset() {
+        count = 0;
+        lock.notify();
+    }
+};
+
 class Runnable {
 public:
     virtual void run() = 0;
@@ -125,28 +145,23 @@ class Executors {
 public:
     class FixedThreadPool : public ThreadPool {
     private:
-        MutexLock lock1;
-        MutexLock lock2;
+        MutexLock lock;
         class CoreThreadRunnable : public Runnable {
         private:
             Queue<Runnable *> &runnables;
-            MutexLock &lock1;
-            MutexLock &lock2;
+            MutexLock &lock;
 
         public:
-            CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock1,
-                               MutexLock &lock2)
-                : runnables(runnables), lock1(lock1), lock2(lock2) {}
+            CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock)
+                : runnables(runnables), lock(lock) {}
             void run() override {
                 while (true) {
+                    lock.lock();
                     while (runnables.isEmpty()) {
-                        lock1.lock();
-                        lock1.wait();
-                        lock1.unlock();
+                        lock.wait();
                     }
-                    lock2.lock();
                     Runnable *runnable = runnables.dequeue();
-                    lock2.unlock();
+                    lock.unlock();
                     runnable->run();
                 }
             }
@@ -160,8 +175,7 @@ public:
         FixedThreadPool(int poolSize) {
             this->poolSize = poolSize;
             coreThreads = new Thread *[poolSize];
-            coreThreadRunnable =
-                new CoreThreadRunnable(runnables, lock1, lock2);
+            coreThreadRunnable = new CoreThreadRunnable(runnables, lock);
             for (int i = 0; i < poolSize; ++i) {
                 coreThreads[i] = new Thread(coreThreadRunnable);
             }
@@ -176,12 +190,10 @@ public:
         }
 
         void execute(Runnable *runnable) override {
-            lock2.lock();
             runnables.enqueue(runnable);
-            lock1.lock();
-            lock1.notify();
-            lock1.unlock();
-            lock2.unlock();
+            lock.lock();
+            lock.notify();
+            lock.unlock();
         }
     };
     static ThreadPool *newFixedThreadPool(int poolSize) {

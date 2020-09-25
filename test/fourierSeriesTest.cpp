@@ -1,4 +1,5 @@
 #include "../FourierSeries.h"
+#include <cstdio>
 
 using namespace bczhc;
 
@@ -14,7 +15,7 @@ int main() {
             dest.setValue(t, t * t);
         }
     } f;
-    FourierSeries fs(f, 30, 10);
+    FourierSeries fs(f, 500, 10);
     class C : public FourierSeriesCallback {
     public:
         void callback(double n, double re, double im) override {
@@ -22,6 +23,6 @@ int main() {
             cout << n << ' ' << re << ' ' << im << endl;
         }
     } c;
-    fs.calc(c, 100000, 2);
+    fs.calc(c, 100000, 5);
     return 0;
 }
