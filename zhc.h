@@ -5,7 +5,9 @@
 
 #ifndef C99_ZHC_H
 #define C99_ZHC_H
+
 #include <stdexcept>
+
 #ifndef __cplusplus
 #include <stdint.h>
 #include <stdio.h>
@@ -26,7 +28,7 @@ using namespace bczhc;
 using namespace linearlist;
 
 namespace bczhc {
-using namespace std;
+    using namespace std;
 #endif //__cplusplus
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
@@ -34,39 +36,39 @@ using namespace std;
 #define ARR_len(x) sizeof(x) / sizeof(x)[0]
 #endif // ARR_len
 #ifdef __cplusplus
-extern "C" {
+    extern "C" {
 #endif //__cplusplus
 
-char *ToUpperCase(char *Dest, const char *string);
+    char *ToUpperCase(char *Dest, const char *string);
 
-void PrintArr(const char arr[], int len);
+    void PrintArr(const char arr[], int len);
 
-int64_t m_pow(int64_t base, int64_t exponent);
+    int64_t m_pow(int64_t base, int64_t exponent);
 
-int BinToDec(const char *NumStr);
+    int BinToDec(const char *NumStr);
 
-void printArr(const char *a, int length);
+    void printArr(const char *a, int length);
 
-char *substring(char *Dest, const char *source, int beginIndex, int endIndex);
+    char *substring(char *Dest, const char *source, int beginIndex, int endIndex);
 
-void substr(char **Dest, const char *source, int from, int length);
+    void substr(char **Dest, const char *source, int from, int length);
 
-char *substr2(char *Dest, const char *source, int from, int length);
+    char *substr2(char *Dest, const char *source, int from, int length);
 
-long long getFileSize(FILE *fp);
+    long long getFileSize(FILE *fp);
 
-int getIntegerLen(int x);
+    int getIntegerLen(int x);
 
-int getLongLen(long x);
+    int getLongLen(long x);
 
-void Scanf(char **Dest);
+    void Scanf(char **Dest);
 
-void strcpyAndCat_auto(char **Dest, const char *cpy_s, int cpy_s_length,
-                       const char *cat_s, int cat_s_length, bool deleteOld);
+    void strcpyAndCat_auto(char **Dest, const char *cpy_s, int cpy_s_length,
+                           const char *cat_s, int cat_s_length, bool deleteOld);
 
-void strcat_auto(char **sourceDest, const char *cat_s);
+    void strcat_auto(char **sourceDest, const char *cat_s);
 
-void charToCharPtr(char **Dest, char c);
+    void charToCharPtr(char **Dest, char c);
 /**
  *
  * @param string s
@@ -77,7 +79,7 @@ void charToCharPtr(char **Dest, char c);
  * int *p = NULL;
  * int t = this(&p, "a1b1c1", "1"); => p[0] = 1, p[1] = 3, p[2] = 5; t = 3;
  */
-uint32_t strInStrCount(int **Dest, const char *string, const char *s);
+    uint32_t strInStrCount(int **Dest, const char *string, const char *s);
 /**
  * String split
  * @param Dest Dest
@@ -131,383 +133,415 @@ uint32_t strInStrCount(int **Dest, const char *string, const char *s);
 		}
 		}*/
 
-int Str_Cmp_nMatchCase(const char *a, const char *b);
+    int Str_Cmp_nMatchCase(const char *a, const char *b);
 
-void m_itoa(char **Dest, int i);
+    void m_itoa(char **Dest, int i);
 
 /*void m_lltoa(char **Dest, const int64_t int ll) {
 
   }*/
 
-void m_ltoa(char **Dest, long l);
+    void m_ltoa(char **Dest, long l);
 
-int split(char ***Dest, const char *SourceString, const char *SplitStr);
+    int split(char ***Dest, const char *SourceString, const char *SplitStr);
 
-int cmpIntArray(const int *a1, int a1Len, const int *a2, int a2Len);
+    int cmpIntArray(const int *a1, int a1Len, const int *a2, int a2Len);
 
-int cmpCharArray(const char *a1, int a1Len, const char *a2, int a2Len);
+    int cmpCharArray(const char *a1, int a1Len, const char *a2, int a2Len);
 
-int charArrToInt(const char *s, size_t size);
+    int charArrToInt(const char *s, size_t size);
 
-int getBiggerNum(int a, int b);
+    int getBiggerNum(int a, int b);
 
-int firstIndexOf(const char *s, int s_len, char c);
+    int firstIndexOf(const char *s, int s_len, char c);
 
-char m_itoc(int i);
+    char m_itoc(int i);
 
-int m_ctoi(char c);
+    int m_ctoi(char c);
 
-int Split(char ***dst, const char *s, int s_length, const char *separatorString,
-          int separatorString_length);
+    int Split(char ***dst, const char *s, int s_length, const char *separatorString,
+              int separatorString_length);
 #ifdef __cplusplus
-} // extern C
+    } // extern C
 #endif //__cplusplus
 
 #ifdef __cplusplus
 
-template <typename T> class ArrayList {
-private:
-    T *arr{};
-    int32_t lastIndex{};
-    int32_t pSize{};
+    template<typename T>
+    class ArrayList {
+    private:
+        T *arr{};
+        int32_t lastIndex{};
+        int32_t pSize{};
 
-public:
-    ArrayList();
+    public:
+        ArrayList();
 
-    void add(int32_t index, T a);
+        void add(int32_t index, T a);
 
-    void add(T a);
+        void add(T a);
 
-    bool addAll(int32_t index, ArrayList<T> &list);
+        bool addAll(int32_t index, ArrayList<T> &list);
 
-    T get(int32_t index);
+        T get(int32_t index);
 
-    int32_t indexOf(T a);
+        int32_t indexOf(T a);
 
-    T remove(int32_t index);
+        T remove(int32_t index);
 
-    T set(int32_t index, T a);
+        T set(int32_t index, T a);
 
-    ArrayList<T> subList(int32_t fromIndex, int32_t toIndex);
+        ArrayList<T> subList(int32_t fromIndex, int32_t toIndex);
 
-    int32_t length();
+        int32_t length();
 
-    void release();
-};
+        void release();
+    };
 
-template <typename T> class Stack {
-private:
-    int32_t len{};
-    int32_t pSize{};
-    T *stack{};
+    template<typename T>
+    class Stack {
+    private:
+        int32_t len{};
+        int32_t pSize{};
+        T *stack{};
 
-public:
-    Stack();
+    public:
+        Stack();
 
-    int32_t length();
+        int32_t length();
 
-    int32_t push(T a);
+        int32_t push(T a);
 
-    T pop();
+        T pop();
 
-    T peek();
+        T peek();
 
-    void release();
+        void release();
 
-    int32_t search(T a);
-};
+        int32_t search(T a);
+    };
 
-template <typename T> ArrayList<T>::ArrayList() {
-    arr = nullptr;
-    lastIndex = 0;
-    pSize = sizeof(T);
-}
-
-template <typename T> void ArrayList<T>::add(int32_t index, T a) {
-    ++lastIndex;
-    arr = (T *)realloc(arr, (size_t)(pSize * lastIndex));
-    for (int32_t i = lastIndex - 1; i > index; --i) {
-        arr[i] = arr[i - 1];
+    template<typename T>
+    ArrayList<T>::ArrayList() {
+        arr = nullptr;
+        lastIndex = 0;
+        pSize = sizeof(T);
     }
-    arr[index] = a;
-}
 
-template <typename T> void ArrayList<T>::add(T a) {
-    ++lastIndex;
-    arr = (T *)realloc(arr, (size_t)(pSize * lastIndex));
-    arr[lastIndex - 1] = a;
-}
-
-template <typename T>
-bool ArrayList<T>::addAll(int32_t index, ArrayList<T> &list) {
-    int32_t listLength = list.length();
-    if (!listLength)
-        return false;
-    lastIndex += listLength;
-    arr = (T *)realloc(arr, (size_t)(pSize * lastIndex));
-    int32_t i;
-    int32_t t = index + listLength;
-    for (i = lastIndex - 1; i >= t; --i) {
-        arr[i] = arr[i - listLength];
-    }
-    for (i = 0; i < listLength; ++i) {
-        arr[index + i] = arr[i];
-    }
-    return true;
-}
-
-template <typename T> T ArrayList<T>::get(int32_t index) { return arr[index]; }
-
-template <typename T> int32_t ArrayList<T>::indexOf(T a) {
-    for (int32_t i = 0; i < lastIndex; ++i) {
-        if (arr[i] == a)
-            return i;
-    }
-    return -1;
-}
-
-template <typename T> T ArrayList<T>::remove(int32_t index) {
-    T r = arr[index];
-    for (int32_t i = index; i < lastIndex; ++i) {
-        arr[i] = arr[i - 1];
-    }
-    --lastIndex;
-    arr = (T *)realloc(arr, (size_t)(pSize * lastIndex));
-    return r;
-}
-
-template <typename T> T ArrayList<T>::set(int32_t index, T a) {
-    T r = arr[index];
-    arr[index] = a;
-    return r;
-}
-
-template <typename T>
-ArrayList<T> ArrayList<T>::subList(int32_t fromIndex, int32_t toIndex) {
-    ArrayList<T> r{};
-    for (int32_t i = fromIndex; i < toIndex; ++i) {
-        r.add(arr[i]);
-    }
-    return r;
-}
-
-template <typename T> int32_t ArrayList<T>::length() { return this->lastIndex; }
-
-template <typename T> void ArrayList<T>::release() { delete this->arr; }
-
-template <typename T> Stack<T>::Stack() {
-    stack = nullptr;
-    len = 0;
-    pSize = sizeof(T);
-}
-
-template <typename T> int32_t Stack<T>::length() { return this->len; }
-
-template <typename T> int32_t Stack<T>::push(T a) {
-    ++len;
-    stack = (T *)realloc(stack, (size_t)(len * pSize));
-    stack[len - 1] = a;
-    return len;
-}
-
-template <typename T> T Stack<T>::pop() {
-    T r = stack[len - 1];
-    --len;
-    stack = (T *)realloc(stack, (size_t)(len * pSize));
-    return r;
-}
-
-template <typename T> T Stack<T>::peek() { return stack[len - 1]; }
-
-template <typename T> void Stack<T>::release() { delete this->stack; }
-
-template <typename T> int32_t Stack<T>::search(T a) {
-    for (int32_t i = 0; i < len; ++i) {
-        if (stack[i] == a)
-            return i + 1;
-    }
-}
-
-class RPN {
-public:
-};
-
-template <typename T> class Node {
-public:
-    T data;
-    Node *next;
-
-    Node();
-};
-
-template <typename T> Node<T>::Node() { this->next = nullptr; }
-
-template <typename T> class LinkedList {
-private:
-    // the head node, without any data.
-    Node<T> *head;
-    int32_t len{};
-
-    Node<T> *getNode(int32_t index);
-
-public:
-    void put(T a);
-
-    void put(int32_t index, T a);
-
-    void putFirst(T a);
-
-    T removeFirst();
-
-    T removeLast();
-
-    T get(int32_t index);
-
-    void set(int32_t index, T a);
-
-    int32_t length();
-
-    LinkedList();
-
-    ~LinkedList();
-};
-
-template <typename T> Node<T> *LinkedList<T>::getNode(int32_t index) {
-    if (index == -1)
-        return head;
-    Node<T> *t = head;
-    for (int32_t i = 0; i <= index; ++i) {
-        t = t->next;
-    }
-    return t;
-}
-
-template <typename T> LinkedList<T>::LinkedList() {
-    this->head = new Node<T>;
-    this->len = 0;
-}
-
-template <typename T> void LinkedList<T>::put(T a) {
-    Node<T> *last = this->getNode(len - 1);
-    auto *node = new Node<T>;
-    node->data = a;
-    last->next = node;
-    ++len;
-}
-
-template <typename T> void LinkedList<T>::put(int32_t index, T a) {
-    Node<T> *t = head;
-    Node<T> *needed = nullptr;
-    for (int32_t i = 0; i <= index; ++i) {
-        if (t->next == nullptr) {
-            auto *node = new Node<T>;
-            t->next = node;
-            ++len;
+    template<typename T>
+    void ArrayList<T>::add(int32_t index, T a) {
+        ++lastIndex;
+        arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
+        for (int32_t i = lastIndex - 1; i > index; --i) {
+            arr[i] = arr[i - 1];
         }
-        t = t->next;
-        if (i == index)
-            needed = t;
+        arr[index] = a;
     }
-    Node<T> *next = needed->next;
-    auto *newNode = new Node<T>;
-    newNode->data = a;
-    newNode->next = next;
-    needed->next = newNode;
-    ++len;
-}
 
-template <typename T> T LinkedList<T>::get(int32_t index) {
-    return this->getNode(index)->data;
-}
-
-template <typename T> T LinkedList<T>::removeFirst() {
-    Node<T> *root = head->next;
-    T removed = root->data;
-    head->next = root->next;
-    delete root;
-    --len;
-    return removed;
-}
-
-template <typename T> void LinkedList<T>::set(int32_t index, T a) {
-    Node<T> *t = head->next;
-    for (int32_t i = 0; i < index; ++i)
-        t = t->next;
-    t->data = a;
-}
-
-template <typename T> void LinkedList<T>::putFirst(T a) {
-    auto *newNode = new Node<T>;
-    newNode->data = a;
-    newNode->next = head->next;
-    head->next = newNode;
-    ++len;
-}
-
-template <typename T> T LinkedList<T>::removeLast() {
-    Node<T> *lastPrev = this->getNode(len - 2);
-    T removed = lastPrev->next->data;
-    delete lastPrev->next;
-    lastPrev->next = nullptr;
-    --len;
-    return removed;
-}
-
-template <typename T> int32_t LinkedList<T>::length() { return this->len; }
-
-template <typename T> LinkedList<T>::~LinkedList() {
-    Node<T> *t = head, *next;
-    for (int32_t i = 0; i <= len; ++i) {
-        next = t->next;
-        t = next;
-        delete t;
-        t = next;
+    template<typename T>
+    void ArrayList<T>::add(T a) {
+        ++lastIndex;
+        arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
+        arr[lastIndex - 1] = a;
     }
-}
 
-class String {
-private:
-    char *data;
-    size_t len;
+    template<typename T>
+    bool ArrayList<T>::addAll(int32_t index, ArrayList<T> &list) {
+        int32_t listLength = list.length();
+        if (!listLength)
+            return false;
+        lastIndex += listLength;
+        arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
+        int32_t i;
+        int32_t t = index + listLength;
+        for (i = lastIndex - 1; i >= t; --i) {
+            arr[i] = arr[i - listLength];
+        }
+        for (i = 0; i < listLength; ++i) {
+            arr[index + i] = arr[i];
+        }
+        return true;
+    }
 
-    void init(const char *s, int32_t length);
+    template<typename T>
+    T ArrayList<T>::get(int32_t index) { return arr[index]; }
 
-public:
-    explicit String(const char *s);
+    template<typename T>
+    int32_t ArrayList<T>::indexOf(T a) {
+        for (int32_t i = 0; i < lastIndex; ++i) {
+            if (arr[i] == a)
+                return i;
+        }
+        return -1;
+    }
 
-    String(const char *s, size_t len);
+    template<typename T>
+    T ArrayList<T>::remove(int32_t index) {
+        T r = arr[index];
+        for (int32_t i = index; i < lastIndex; ++i) {
+            arr[i] = arr[i - 1];
+        }
+        --lastIndex;
+        arr = (T *) realloc(arr, (size_t) (pSize * lastIndex));
+        return r;
+    }
 
-    ~String();
+    template<typename T>
+    T ArrayList<T>::set(int32_t index, T a) {
+        T r = arr[index];
+        arr[index] = a;
+        return r;
+    }
 
-    char *getData();
+    template<typename T>
+    ArrayList<T> ArrayList<T>::subList(int32_t fromIndex, int32_t toIndex) {
+        ArrayList<T> r{};
+        for (int32_t i = fromIndex; i < toIndex; ++i) {
+            r.add(arr[i]);
+        }
+        return r;
+    }
 
-    String append(const char *s);
+    template<typename T>
+    int32_t ArrayList<T>::length() { return this->lastIndex; }
 
-    String append(String &s);
+    template<typename T>
+    void ArrayList<T>::release() { delete this->arr; }
 
-    ArrayList<String *> split(const char *separator);
+    template<typename T>
+    Stack<T>::Stack() {
+        stack = nullptr;
+        len = 0;
+        pSize = sizeof(T);
+    }
 
-    ArrayList<String *> split(String &separator);
+    template<typename T>
+    int32_t Stack<T>::length() { return this->len; }
 
-    string toCppString();
+    template<typename T>
+    int32_t Stack<T>::push(T a) {
+        ++len;
+        stack = (T *) realloc(stack, (size_t) (len * pSize));
+        stack[len - 1] = a;
+        return len;
+    }
 
-    String &operator=(const char *s);
-};
+    template<typename T>
+    T Stack<T>::pop() {
+        T r = stack[len - 1];
+        --len;
+        stack = (T *) realloc(stack, (size_t) (len * pSize));
+        return r;
+    }
 
-class PointersSet {
-private:
-    SequentialList<void *> list;
+    template<typename T>
+    T Stack<T>::peek() { return stack[len - 1]; }
 
-public:
-    void put(void *p) { list.insert(p); }
+    template<typename T>
+    void Stack<T>::release() { delete this->stack; }
 
-    void freeAll() {
-        int length = list.length();
-        for (int i = 0; i < length; ++i) {
-            free(list.get(i));
+    template<typename T>
+    int32_t Stack<T>::search(T a) {
+        for (int32_t i = 0; i < len; ++i) {
+            if (stack[i] == a)
+                return i + 1;
         }
     }
-};
+
+    class RPN {
+    public:
+    };
+
+    template<typename T>
+    class Node {
+    public:
+        T data;
+        Node *next;
+
+        Node();
+    };
+
+    template<typename T>
+    Node<T>::Node() { this->next = nullptr; }
+
+    template<typename T>
+    class LinkedList {
+    private:
+        // the head node, without any data.
+        Node<T> *head;
+        int32_t len{};
+
+        Node<T> *getNode(int32_t index);
+
+    public:
+        void put(T a);
+
+        void put(int32_t index, T a);
+
+        void putFirst(T a);
+
+        T removeFirst();
+
+        T removeLast();
+
+        T get(int32_t index);
+
+        void set(int32_t index, T a);
+
+        int32_t length();
+
+        LinkedList();
+
+        ~LinkedList();
+    };
+
+    template<typename T>
+    Node<T> *LinkedList<T>::getNode(int32_t index) {
+        if (index == -1)
+            return head;
+        Node <T> *t = head;
+        for (int32_t i = 0; i <= index; ++i) {
+            t = t->next;
+        }
+        return t;
+    }
+
+    template<typename T>
+    LinkedList<T>::LinkedList() {
+        this->head = new Node<T>;
+        this->len = 0;
+    }
+
+    template<typename T>
+    void LinkedList<T>::put(T a) {
+        Node <T> *last = this->getNode(len - 1);
+        auto *node = new Node<T>;
+        node->data = a;
+        last->next = node;
+        ++len;
+    }
+
+    template<typename T>
+    void LinkedList<T>::put(int32_t index, T a) {
+        Node <T> *t = head;
+        Node <T> *needed = nullptr;
+        for (int32_t i = 0; i <= index; ++i) {
+            if (t->next == nullptr) {
+                auto *node = new Node<T>;
+                t->next = node;
+                ++len;
+            }
+            t = t->next;
+            if (i == index)
+                needed = t;
+        }
+        Node <T> *next = needed->next;
+        auto *newNode = new Node<T>;
+        newNode->data = a;
+        newNode->next = next;
+        needed->next = newNode;
+        ++len;
+    }
+
+    template<typename T>
+    T LinkedList<T>::get(int32_t index) {
+        return this->getNode(index)->data;
+    }
+
+    template<typename T>
+    T LinkedList<T>::removeFirst() {
+        Node <T> *root = head->next;
+        T removed = root->data;
+        head->next = root->next;
+        delete root;
+        --len;
+        return removed;
+    }
+
+    template<typename T>
+    void LinkedList<T>::set(int32_t index, T a) {
+        Node <T> *t = head->next;
+        for (int32_t i = 0; i < index; ++i)
+            t = t->next;
+        t->data = a;
+    }
+
+    template<typename T>
+    void LinkedList<T>::putFirst(T a) {
+        auto *newNode = new Node<T>;
+        newNode->data = a;
+        newNode->next = head->next;
+        head->next = newNode;
+        ++len;
+    }
+
+    template<typename T>
+    T LinkedList<T>::removeLast() {
+        Node <T> *lastPrev = this->getNode(len - 2);
+        T removed = lastPrev->next->data;
+        delete lastPrev->next;
+        lastPrev->next = nullptr;
+        --len;
+        return removed;
+    }
+
+    template<typename T>
+    int32_t LinkedList<T>::length() { return this->len; }
+
+    template<typename T>
+    LinkedList<T>::~LinkedList() {
+        Node <T> *t = head, *next;
+        for (int32_t i = 0; i <= len; ++i) {
+            next = t->next;
+            t = next;
+            delete t;
+            t = next;
+        }
+    }
+
+    class String {
+    private:
+        char *data;
+        size_t len;
+
+        void init(const char *s, int32_t length);
+
+    public:
+        explicit String(const char *s);
+
+        String(const char *s, size_t len);
+
+        ~String();
+
+        char *getData();
+
+        String append(const char *s);
+
+        String append(String &s);
+
+        ArrayList<String *> split(const char *separator);
+
+        ArrayList<String *> split(String &separator);
+
+        string toCppString();
+
+        String &operator=(const char *s);
+    };
+
+    class PointersSet {
+    private:
+        SequentialList<void *> list;
+
+    public:
+        void put(void *p) { list.insert(p); }
+
+        void freeAll() {
+            int length = list.length();
+            for (int i = 0; i < length; ++i) {
+                free(list.get(i));
+            }
+        }
+    };
 
 #ifdef __cplusplus
 } // namespace

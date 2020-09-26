@@ -1,8 +1,8 @@
 #include "../Concurrent.hpp"
+#include "../zhc.h"
 #include <cstdio>
 #include <pthread.h>
 #include <unistd.h>
-#include "../zhc.h"
 
 using namespace bczhc;
 using namespace concurrent;

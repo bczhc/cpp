@@ -13,8 +13,8 @@
 #include <unistd.h>
 #include <utility>
 
-#define MAP(x, y) (map[(x) + (y)*col])
-#define RANDOM(a, b) (((double)rand() / RAND_MAX) * ((b) - (a)) + (a))
+#define MAP(x, y) (map[(x) + (y) *col])
+#define RANDOM(a, b) (((double) rand() / RAND_MAX) * ((b) - (a)) + (a))
 #define UP 0
 #define DOWN 1
 #define LEFT 2
@@ -95,7 +95,7 @@ private:
 
 public:
     SnakeGame(int col, int row, int delayMillis)
-        : col(col + 2), row(row + 2), delayMillis(delayMillis) {
+            : col(col + 2), row(row + 2), delayMillis(delayMillis) {
         init();
     };
 
@@ -107,20 +107,20 @@ public:
         Point coor = snake.getFirst();
         Point next = coor;
         switch (orientation) {
-        case UP:
-            --next.y;
-            break;
-        case DOWN:
-            ++next.y;
-            break;
-        case LEFT:
-            --next.x;
-            break;
-        case RIGHT:
-            ++next.x;
-            break;
-        default:
-            break;
+            case UP:
+                --next.y;
+                break;
+            case DOWN:
+                ++next.y;
+                break;
+            case LEFT:
+                --next.x;
+                break;
+            case RIGHT:
+                ++next.x;
+                break;
+            default:
+                break;
         }
         char c = MAP(next.x, next.y);
         snake.insert(0, next);
@@ -137,7 +137,7 @@ public:
             generateFood();
         drawToMap();
         print();
-    end:;
+        end:;
     }
 
     void start() {
@@ -195,7 +195,7 @@ public:
 };
 
 void *f(void *arg) {
-    auto *game = (SnakeGame *)arg;
+    auto *game = (SnakeGame *) arg;
     game->start();
     delete game;
     exit(0);
@@ -204,8 +204,8 @@ void *f(void *arg) {
 
 char scanKeyboard() {
     char in;
-    struct termios new_settings {};
-    struct termios stored_settings {};
+    struct termios new_settings{};
+    struct termios stored_settings{};
     tcgetattr(0, &stored_settings);
     new_settings = stored_settings;
     new_settings.c_lflag &= (~ICANON);
@@ -276,34 +276,34 @@ int main(int argc, char **argv) {
     }
     SnakeGame *game = new SnakeGame(width, height, delay);
     pthread_t t;
-    pthread_create(&t, nullptr, f, (void *)game);
+    pthread_create(&t, nullptr, f, (void *) game);
     char read = 0;
     while (!game->getGameoverStatus()) {
         read = scanKeyboard();
-        cout << (int)read << endl;
+        cout << (int) read << endl;
         switch (read) {
-        case 'w':
-        case 'W':
-            game->moveUp();
-            break;
-        case 's':
-        case 'S':
-            game->moveDown();
-            break;
-        case 'a':
-        case 'A':
-            game->moveLeft();
-            break;
-        case 'd':
-        case 'D':
-            game->moveRight();
-            break;
-        case 'q':
-            delete game;
-            exit(0);
-            break;
-        default:
-            break;
+            case 'w':
+            case 'W':
+                game->moveUp();
+                break;
+            case 's':
+            case 'S':
+                game->moveDown();
+                break;
+            case 'a':
+            case 'A':
+                game->moveLeft();
+                break;
+            case 'd':
+            case 'D':
+                game->moveRight();
+                break;
+            case 'q':
+                delete game;
+                exit(0);
+                break;
+            default:
+                break;
         }
     }
     pthread_join(t, nullptr);

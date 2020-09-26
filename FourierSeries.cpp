@@ -6,14 +6,13 @@
 #include "ComplexIntegral.h"
 #include "Concurrent.hpp"
 #include "zhc.h"
-#include <unistd.h>
 
 using namespace bczhc;
 using namespace concurrent;
 
 bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                                     int32_t _epicyclesCount, int32_t period)
-    : f(functionInterface), T(period), epicyclesCount(_epicyclesCount) {
+        : f(functionInterface), T(period), epicyclesCount(_epicyclesCount) {
     omega = M_PI * 2 / period;
 }
 
@@ -26,12 +25,9 @@ public:
     void run() override {}
 };
 
-LongWaitCountDownLatch *latch = nullptr;
-
 void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                                 int threadNum) {
-    LongWaitCountDownLatch longLatch(epicyclesCount);
-    latch = &longLatch;
+    LongWaitCountDownLatch latch(epicyclesCount);
     ThreadPool *pool = Executors::newFixedThreadPool(threadNum);
     PointersSet deletable;
     int32_t a = -epicyclesCount / 2;
@@ -45,7 +41,7 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
         double n{};
 
         FuncInIntegral(ComplexFunctionInterface &mF, double &mOmega)
-            : mF(mF), mOmega(mOmega) {}
+                : mF(mF), mOmega(mOmega) {}
 
     private:
         void x(ComplexValue &dest, double t) override {
@@ -61,30 +57,31 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
         FourierSeriesCallback &callback;
         int32_t n;
         double T;
+        LongWaitCountDownLatch &latch;
 
     public:
         Run(FuncInIntegral &funcInIntegral, ComplexIntegral &complexIntegral,
-            FourierSeriesCallback &callback, int32_t n, double T)
-            : funcInIntegral(funcInIntegral), complexIntegral(complexIntegral),
-              callback(callback), n(n), T(T) {}
+            FourierSeriesCallback &callback, int32_t n, double T,
+            LongWaitCountDownLatch &latch)
+                : funcInIntegral(funcInIntegral), complexIntegral(complexIntegral),
+                  callback(callback), n(n), T(T), latch(latch) {}
 
         void run() override {
             funcInIntegral.n = n;
             ComplexValue integralResult =
-                complexIntegral.getDefiniteIntegralByTrapezium(0, T,
-                                                               funcInIntegral);
+                    complexIntegral.getDefiniteIntegralByTrapezium(0, T, funcInIntegral);
             integralResult.selfDivide(T, 0);
             callback.callback(n, integralResult.re, integralResult.im);
-            latch->countDown();
+            latch.countDown();
         }
     };
     for (int32_t n = a; n < t; ++n) {
         Run *runnable =
-            new Run(funcInIntegral, complexIntegral, callback, n, T);
+                new Run(funcInIntegral, complexIntegral, callback, n, T, latch);
         deletable.put(runnable);
         pool->execute(runnable);
     }
-    latch->wait();
+    latch.wait();
     free(pool);
     deletable.freeAll();
 }

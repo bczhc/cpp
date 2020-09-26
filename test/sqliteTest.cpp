@@ -1,6 +1,6 @@
 #include "../third_party/sqlite3-single-c/sqlite3.h"
-#include <iostream>
 #include "../zhc.h"
+#include <iostream>
 
 using namespace std;
 
@@ -18,7 +18,8 @@ int main(int argc, char **argv) {
     int status = sqlite3_open(argv[1], &db);
     if (status) {
         ::cout << "opening database failed" << ::endl;
-    } else ::cout << "opening database succeeded" << ::endl;
+    } else
+        ::cout << "opening database succeeded" << ::endl;
 
     char sql[] = "SELECT * FROM doc";
     int i = 0;

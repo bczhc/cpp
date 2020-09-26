@@ -4,7 +4,7 @@
 #include "utf8.h"
 
 namespace bczhc {
-void reverseCharacters(char *dest, char *s, int length);
+    void reverseCharacters(char *dest, char *s, int length);
 }
 
 #endif // BCZHC_REVERSE_CHARACTERS_H

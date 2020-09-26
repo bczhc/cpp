@@ -43,6 +43,7 @@ int main(int argc, char **argv) {
         void callback(char *s, int size) override {
             m_counter.countCharacters(s, size);
         }
+
         C(CharacterCounter &counter) : m_counter(counter) {}
     } c(counter);
     solveU8FromStream(stdin, c);
@@ -63,7 +64,8 @@ int main(int argc, char **argv) {
             if (c % 25 == 0)
                 cout << endl;
         }
-        cout << endl << "Total: " << c << endl;
+        cout << endl
+             << "Total: " << c << endl;
     } else {
         json *j = counter.getJsonData();
         cout << j->dump() << endl;

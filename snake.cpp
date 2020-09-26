@@ -3,7 +3,7 @@
 #include <cstring>
 #include <iostream>
 
-#define RANDOM(a, b) (((double)rand() / RAND_MAX) * (b - a) + a)
+#define RANDOM(a, b) (((double) rand() / RAND_MAX) * (b - a) + a)
 
 using namespace bczhc;
 
@@ -57,7 +57,7 @@ private:
 
     inline void initMap() {
         size_t mapSize = (x + 2) * (y + 2);
-        map = (char *)malloc(mapSize);
+        map = (char *) malloc(mapSize);
         memset(map, ' ', mapSize);
         for (int i = 0; i < y; ++i) {
             if (i == 0 || i == y - 1)
@@ -87,7 +87,7 @@ private:
 
 public:
     SnakeGame(int x, int y, int &gameoverMark)
-        : x(x), y(y), gameover(gameoverMark) {
+            : x(x), y(y), gameover(gameoverMark) {
         initMap();
         Point firstPoint{.x = 3, .y = 3};
         snake.put(firstPoint);
@@ -120,22 +120,22 @@ int main(int argc, char **argv) {
         char c;
         scanf("%c", &c);
         switch (c) {
-        case 'w':
-        case 'W':
-            game.moveU();
-            break;
-        case 'a':
-        case 'A':
-            game.moveL();
-            break;
-        case 's':
-        case 'S':
-            game.moveD();
-            break;
-        case 'd':
-        case 'D':
-            game.moveR();
-            break;
+            case 'w':
+            case 'W':
+                game.moveU();
+                break;
+            case 'a':
+            case 'A':
+                game.moveL();
+                break;
+            case 's':
+            case 'S':
+                game.moveD();
+                break;
+            case 'd':
+            case 'D':
+                game.moveR();
+                break;
         }
         game.print();
     }

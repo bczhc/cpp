@@ -58,7 +58,8 @@ void han() {
         ++c;
         if (c % 25 == 0) cout << endl;
     }
-    cout << endl << "Total: " << c << endl;
+    cout << endl
+         << "Total: " << c << endl;
     delete v;
 }
 

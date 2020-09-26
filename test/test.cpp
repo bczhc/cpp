@@ -1,5 +1,5 @@
-#include <cstdio>
 #include "../zhc.h"
+#include <cstdio>
 
 int main() {
     Queue<int> q;

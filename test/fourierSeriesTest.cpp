@@ -1,5 +1,4 @@
 #include "../FourierSeries.h"
-#include <cstdio>
 
 using namespace bczhc;
 
@@ -23,6 +22,6 @@ int main() {
             cout << n << ' ' << re << ' ' << im << endl;
         }
     } c;
-    fs.calc(c, 100000, 9);
+    fs.calc(c, 100000, 3);
     return 0;
 }

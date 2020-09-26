@@ -15,20 +15,20 @@ using namespace std;
 using json = nlohmann::json;
 
 namespace bczhc {
-class CharacterCounter {
-public:
-    map<int, int64_t> *data;
+    class CharacterCounter {
+    public:
+        map<int, int64_t> *data;
 
-    CharacterCounter();
+        CharacterCounter();
 
-    ~CharacterCounter();
+        ~CharacterCounter();
 
-    int countCharacters(const char *u8Bytes, int size) const;
+        int countCharacters(const char *u8Bytes, int size) const;
 
-    vector<pair<int, int64_t>> *getSortVector();
+        vector<pair<int, int64_t>> *getSortVector();
 
-    json *getJsonData();
-};
-} // namespace bczhc
+        json *getJsonData();
+    };
+}// namespace bczhc
 
-#endif // CPP_COUNTCHARACTERS_H
+#endif// CPP_COUNTCHARACTERS_H

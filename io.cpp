@@ -29,6 +29,6 @@ void bczhc::io::solveU8FromStream(FILE *f, U8StringCallback &callback) {
         if (readOff + readLen - lastValidPos == u8BytesLen)
             lastValidPos += u8BytesLen;
         callback.callback(
-            buf, readLen < (BUFFER_SIZE - readOff) ? readLen : lastValidPos);
+                buf, readLen < (BUFFER_SIZE - readOff) ? readLen : lastValidPos);
     }
 }

@@ -1,6 +1,5 @@
-#include <iostream>
-#include "../third_party/sqlite3-single-c/sqlite3.h"
 #include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
+#include "../third_party/sqlite3-single-c/sqlite3.h"
 #include <iostream>
 
 using namespace std;
@@ -15,16 +14,18 @@ int main() {
     ::JSON j;
     int i = 0;
     void *arg[] = {&j, &i};
-    sqlite3_exec(db, "SELECT * FROM doc", [](void *arg, int col, char **fields, char **cols) -> int {
-        JSON *json = (JSON *) (((void **) arg)[0]);
-        int *c = (int *) (((void **) arg)[1]);
-        ::JSON record;
-        for (int i = 0; i < col; ++i) {
-            record[cols[i]] = fields[i];
-        }
-        (*json)[(*c)++] = record;
-        return 0;
-    }, arg, &errmsg);
+    sqlite3_exec(
+            db, "SELECT * FROM doc", [](void *arg, int col, char **fields, char **cols) -> int {
+                JSON *json = (JSON *) (((void **) arg)[0]);
+                int *c = (int *) (((void **) arg)[1]);
+                ::JSON record;
+                for (int i = 0; i < col; ++i) {
+                    record[cols[i]] = fields[i];
+                }
+                (*json)[(*c)++] = record;
+                return 0;
+            },
+            arg, &errmsg);
     sqlite3_free(errmsg);
     sqlite3_close(db);
     ::cout << j.dump(4) << ::endl;

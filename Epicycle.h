@@ -9,16 +9,16 @@
 
 namespace bczhc {
 
-class Epicycle {
-public:
-    double n{};
-    ComplexValue c{};
+    class Epicycle {
+    public:
+        double n{};
+        ComplexValue c{};
 
-    Epicycle();
+        Epicycle();
 
-    Epicycle(double n, const ComplexValue &c);
-};
+        Epicycle(double n, const ComplexValue &c);
+    };
 
-} // namespace bczhc
+}// namespace bczhc
 
-#endif // CPP_EPICYCLE_H
+#endif// CPP_EPICYCLE_H

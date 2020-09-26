@@ -5,4 +5,4 @@
 #ifndef CPP_T2_H
 #define CPP_T2_H
 
-#endif //CPP_T2_H
+#endif//CPP_T2_H

@@ -12,7 +12,7 @@ char *bczhc::ToUpperCase(char *Dest, const char *string) {
     char r[len + 1];
     int i = 0;
     while (1) {
-        r[i] = (char)toupper((int)string[i]);
+        r[i] = (char) toupper((int) string[i]);
         if (string[i] == '\0')
             break;
         i++;
@@ -25,9 +25,9 @@ void bczhc::PrintArr(const char arr[], int len) {
     int l_ = len - 1;
     printf("[");
     for (int i = 0; i < l_; ++i) {
-        printf("%i%c", (int)arr[i], 44);
+        printf("%i%c", (int) arr[i], 44);
     }
-    printf("%i]___%u", (int)arr[l_ - 1], (l_ + 1));
+    printf("%i]___%u", (int) arr[l_ - 1], (l_ + 1));
 }
 
 int64_t bczhc::m_pow(const int64_t base, const int64_t exponent) {
@@ -52,7 +52,7 @@ void bczhc::printArr(const char *a, const int length) {
     int l = length;
     printf("[");
     for (int i = 0; i < l; ++i) {
-        printf("%i", (int)a[i]);
+        printf("%i", (int) a[i]);
         if (i != l - 1) {
             printf(",");
         }
@@ -63,27 +63,27 @@ void bczhc::printArr(const char *a, const int length) {
 char *bczhc::substring(char *Dest, const char *source, const int beginIndex,
                        const int endIndex) {
     char *r = Dest;
-    strncpy(r, source + beginIndex, (size_t)(endIndex - beginIndex));
+    strncpy(r, source + beginIndex, (size_t) (endIndex - beginIndex));
     return Dest;
 }
 
 void bczhc::substr(char **Dest, const char *source, const int from,
                    int length) {
-    *Dest = (char *)malloc((size_t)length + 1);
-    strncpy(*Dest, source + from, (size_t)length);
+    *Dest = (char *) malloc((size_t) length + 1);
+    strncpy(*Dest, source + from, (size_t) length);
 }
 
 char *bczhc::substr2(char *Dest, const char *source, const int from,
                      int length) {
     char *r = Dest;
-    strncpy(r, source + from, (size_t)length);
+    strncpy(r, source + from, (size_t) length);
     return Dest;
 }
 
 long long bczhc::getFileSize(FILE *fp) {
     long long sz;
     fseek(fp, 0L, SEEK_END);
-    sz = (long long)ftell(fp);
+    sz = (long long) ftell(fp);
     if (sz == -1) {
         //        sz = _ftelli64(fp);
         printf("Get file size error.\n");
@@ -123,7 +123,7 @@ void bczhc::Scanf(char **Dest) {
     int i = 1;
     while (1) {
         scanf("%c", &c);
-        *Dest = (char *)realloc(*Dest, (size_t)i);
+        *Dest = (char *) realloc(*Dest, (size_t) i);
         if (c == 0x0A) {
             (*Dest)[i - 1] = 0x0;
             break;
@@ -144,7 +144,7 @@ void bczhc::strcpyAndCat_auto(char **Dest, const char *cpy_s, int cpy_s_length,
     int cpy_s_len = cpy_s_length;
     int cat_s_len = cat_s_length;
     size_t size = cpy_s_len + cat_s_len + 1;
-    *Dest = (char *)malloc(size);
+    *Dest = (char *) malloc(size);
     for (int i = 0; i < cpy_s_length; ++i)
         (*Dest)[i] = cpy_s[i];
     for (int i = 0; i < cat_s_length; ++i)
@@ -154,14 +154,14 @@ void bczhc::strcpyAndCat_auto(char **Dest, const char *cpy_s, int cpy_s_length,
 
 void bczhc::strcat_auto(char **sourceDest, const char *cat_s) {
     if (*sourceDest == NULL) {
-        *sourceDest = (char *)malloc(1);
+        *sourceDest = (char *) malloc(1);
         (*sourceDest)[0] = 0;
     }
     int sourceLen = strlen(*sourceDest);
     char cloneSource[sourceLen + 1];
     strcpy(cloneSource, *sourceDest);
     size_t size = sourceLen + strlen(cat_s) + 1;
-    *sourceDest = (char *)malloc(size);
+    *sourceDest = (char *) malloc(size);
     strcpy(*sourceDest, cloneSource);
     strcat(*sourceDest, cat_s);
     (*sourceDest)[size - 1] = '\0';
@@ -192,7 +192,7 @@ uint32_t bczhc::strInStrCount(int **Dest, const char *string, const char *s) {
                 b &= (string[i + j] == s[j]);
             }
             if (b) {
-                *Dest = (int *)realloc(*Dest, (size_t)(4 * (++c)));
+                *Dest = (int *) realloc(*Dest, (size_t) (4 * (++c)));
                 (*Dest)[c - 1] = i;
             }
         }
@@ -263,10 +263,10 @@ int bczhc::Str_Cmp_nMatchCase(const char *a, const char *b) {
 
 void bczhc::m_itoa(char **Dest, const int i) {
     int I_L = getIntegerLen(i);
-    *Dest = (char *)malloc((size_t)(I_L + 1));
+    *Dest = (char *) malloc((size_t) (I_L + 1));
     int d_i = 0;
     for (int j = I_L - 1; j >= 0; --j) {
-        (*Dest)[d_i] = (int)(((long)i) / ((long)m_pow(10LL, j)) % 10) + 48;
+        (*Dest)[d_i] = (int) (((long) i) / ((long) m_pow(10LL, j)) % 10) + 48;
         ++d_i;
     }
     (*Dest)[d_i] = 0;
@@ -278,11 +278,11 @@ void bczhc::m_itoa(char **Dest, const int i) {
 
 void bczhc::m_ltoa(char **Dest, const long i) {
     int I_L = getLongLen(i);
-    *Dest = (char *)malloc((size_t)(I_L + 1));
+    *Dest = (char *) malloc((size_t) (I_L + 1));
     long d_i = 0;
     for (long j = I_L - 1; j >= 0; --j) {
         (*Dest)[d_i] =
-            (int)(((long long)i) / ((long long)m_pow(10LL, j)) % 10) + 48;
+                (int) (((long long) i) / ((long long) m_pow(10LL, j)) % 10) + 48;
         ++d_i;
     }
     (*Dest)[d_i] = 0;
@@ -292,14 +292,14 @@ int bczhc::split(char ***Dest, const char *SourceString, const char *SplitStr) {
     int *pos = NULL;
     int posL = strInStrCount(&pos, SourceString, SplitStr);
     uint32_t srcLen = strlen(SourceString), splitStrLen = strlen(SplitStr),
-             toP = srcLen - splitStrLen;
+            toP = srcLen - splitStrLen;
     int lastIndex = 0;
-    *Dest = (char **)malloc((size_t)(sizeof(char *) * (posL + 1)));
+    *Dest = (char **) malloc((size_t) (sizeof(char *) * (posL + 1)));
     for (int i = 0; i < posL; ++i) {
         int sL = 0;
         for (int j = lastIndex; j < pos[i]; ++j) {
             sL = pos[i] - lastIndex + 2;
-            (*Dest)[i] = (char *)malloc((size_t)(sL));
+            (*Dest)[i] = (char *) malloc((size_t) (sL));
             (*Dest)[i][j - lastIndex] = SourceString[j];
         }
         (*Dest)[i][pos[i]] = 0;
@@ -337,7 +337,7 @@ int bczhc::cmpCharArray(const char *a1, const int a1Len, const char *a2,
 int bczhc::charArrToInt(const char *s, size_t size) {
     int r = 0;
     for (int i = 0; i < size; ++i) {
-        r += ((uint32_t)s[i] - 48) * m_pow(10LL, size - i - 1);
+        r += ((uint32_t) s[i] - 48) * m_pow(10LL, size - i - 1);
     }
     return r;
 }
@@ -352,9 +352,9 @@ int bczhc::firstIndexOf(const char *s, const int s_len, const char c) {
     return -1;
 }
 
-char bczhc::m_itoc(const int i) { return (char)(i + 48); }
+char bczhc::m_itoc(const int i) { return (char) (i + 48); }
 
-int bczhc::m_ctoi(const char c) { return (int)c - 48; }
+int bczhc::m_ctoi(const char c) { return (int) c - 48; }
 
 int charsCmp(const char *longerS, const int longerS_length,
              const char *shorterS, const int shorterS_length,
@@ -372,12 +372,12 @@ int charsCmp(const char *longerS, const int longerS_length,
 
 char **charcat(char **dst, const int addChar) {
     if (*dst == NULL) {
-        *dst = (char *)malloc((size_t)(2));
+        *dst = (char *) malloc((size_t) (2));
         (*dst)[0] = addChar;
         (*dst)[1] = '\0';
     } else {
         int len = strlen(*dst);
-        *dst = (char *)realloc(*dst, len + 2);
+        *dst = (char *) realloc(*dst, len + 2);
         (*dst)[len] = addChar;
         (*dst)[len + 1] = '\0';
     }
@@ -386,8 +386,8 @@ char **charcat(char **dst, const int addChar) {
 
 int bczhc::Split(char ***dst, const char *s, int s_length,
                  const char *separatorString, int separatorString_length) {
-    *dst = (char **)malloc((size_t)(sizeof(char *) * 1)),
-    (*dst)[0] = (char *)malloc((size_t)1), (*dst)[0][0] = '\0';
+    *dst = (char **) malloc((size_t) (sizeof(char *) * 1)),
+    (*dst)[0] = (char *) malloc((size_t) 1), (*dst)[0][0] = '\0';
     if (s_length == -1)
         s_length = strlen(s);
     if (separatorString_length == -1)
@@ -399,8 +399,8 @@ int bczhc::Split(char ***dst, const char *s, int s_length,
         if (charsCmp(s, s_length, separatorString, separatorString_length, i) ==
             1) {
             ++dstI;
-            *dst = (char **)realloc(*dst, (size_t)((dstI + 1) * pLen)),
-            (*dst)[dstI] = (char *)malloc((size_t)1), (*dst)[dstI][0] = '\0';
+            *dst = (char **) realloc(*dst, (size_t) ((dstI + 1) * pLen)),
+            (*dst)[dstI] = (char *) malloc((size_t) 1), (*dst)[dstI][0] = '\0';
             t = separatorString_length;
         }
         if (t-- > 0)
@@ -412,7 +412,7 @@ int bczhc::Split(char ***dst, const char *s, int s_length,
 
 void bczhc::String::init(const char *s, int32_t length) {
     len = length;
-    data = (char *)malloc((size_t)(length + 1));
+    data = (char *) malloc((size_t) (length + 1));
     data[length] = '\0';
     strcpy(data, s);
 }
