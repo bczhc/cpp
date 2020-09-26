@@ -1,11 +1,20 @@
-#include "../zhc.h"
-#include <cstdio>
+#include "../Sqlite3.hpp"
+
+using namespace bczhc;
 
 int main() {
-    Queue<int> q;
-    q.enqueue(0);
-    printf("%i\n", q.dequeue());
-    q.enqueue(1);
-    printf("%i\n", q.dequeue());
-    return 0;
+    try {
+        Sqlite3 db("/home/zhc/diary.db");
+        class C : public Sqlite3::SqliteCallback {
+        public:
+            int callback(void *arg, int colNum, char **content, char **colName) override {
+                printf("%s %i\n", content[0], *(int *) arg);
+                return 0;
+            }
+        } callback;
+        int a = 324;
+        db.exec("SELECT * FROM diary", callback, &a);
+    } catch (...) {
+        printf("Something went wrong.");
+    }
 }
