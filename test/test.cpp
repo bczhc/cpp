@@ -1,20 +1,15 @@
-#include "../Sqlite3.hpp"
+#include "../String.h"
 
 using namespace bczhc;
+using namespace string;
+using namespace std;
 
 int main() {
-    try {
-        Sqlite3 db("/home/zhc/diary.db");
-        class C : public Sqlite3::SqliteCallback {
-        public:
-            int callback(void *arg, int colNum, char **content, char **colName) override {
-                printf("%s %i\n", content[0], *(int *) arg);
-                return 0;
-            }
-        } callback;
-        int a = 324;
-        db.exec("SELECT * FROM diary", callback, &a);
-    } catch (...) {
-        printf("Something went wrong.");
-    }
+    String s = "hello there";
+    String s2 = "hi this";
+    String s3 = (s = s2);
+    cout << s.getCString() << endl;
+    cout << s2.getCString() << endl;
+    cout << s3.getCString() << endl;
+    return 0;
 }

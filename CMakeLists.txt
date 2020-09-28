@@ -1,6 +1,6 @@
 SET(CMAKE_C_COMPILER clang)
 SET(CMAKE_CXX_COMPILER clang++)
-add_compile_options(-std=c++14 -g)
+add_compile_options(-std=c++17 -g)
 
 project(cpp)
 
@@ -10,7 +10,7 @@ add_executable(T3 test/T3.cpp zhc.cpp)
 add_executable(T4 test/T4.cpp zhc.cpp)
 add_executable(diaryCharactersStatistics test/DiaryCharactersStatistics.cpp CountCharacters.cpp zhc.cpp utf8.cpp)
 add_executable(printUnicodeCharcters test/printUnicodeCharacters.cpp zhc.cpp utf8.cpp)
-add_executable(test test/test.cpp zhc.cpp utf8.cpp reverseCharacters.cpp)
+add_executable(test test/test.cpp zhc.cpp utf8.cpp reverseCharacters.cpp String.cpp)
 add_executable(fourierSeriesTest test/fourierSeriesTest.cpp zhc.cpp)
 add_executable(sqlite3ToJSON test/sqlite3ToJSON.cpp)
 add_executable(snake snake.cpp zhc.cpp)
