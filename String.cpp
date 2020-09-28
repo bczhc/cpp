@@ -1,10 +1,14 @@
 #include "String.h"
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 #include <sched.h>
 
 using namespace bczhc;
 using namespace string;
+
+String::String() {
+}
 
 String::String(const String &string) {
     copy(string);
@@ -12,7 +16,8 @@ String::String(const String &string) {
 
 void String::copy(const String &string) {
     data = string.data;
-    len = string.len;
+    dataLength = string.dataLength;
+    stringLength = string.stringLength;
     *string.toModify = true;
 }
 
@@ -34,13 +39,14 @@ std::string String::getCppString() {
 }
 
 int String::length() {
-    return len;
+    return stringLength;
 }
 
 void String::fromCharsString(const char *s) {
-    len = strlen(s);
-    data = new char[len + 1];
-    strcpy(data, s), data[len] = '\0';
+    stringLength = strlen(s);
+    dataLength = stringLength + 1;
+    data = new char[dataLength];
+    strcpy(data, s), data[stringLength] = '\0';
 }
 
 String &String::operator=(const char *s) {
@@ -55,18 +61,48 @@ String &String::operator=(const String &string) {
 }
 
 void String::resize(int newLength) {
+    char *newChars = new char[newLength + 1];
+    newChars[newLength] = '\0';
+    strcpy(newChars, data);
+    delete[] data;
+    data = newChars;
 }
 
 void String::append(const char *s) {
+    int len = strlen(s);
+    if (stringLength + len + 1 > dataLength) {
+        dataLength = 2 * (stringLength + len) + 1;
+        resize(dataLength);
+    }
+    for (int i = 0; i < len; ++i)
+        data[stringLength + i] = s[i];
+    stringLength += len;
 }
 
-void String::append(char *c) {
+void String::append(const String &string) {
+    append(string.data);
 }
 
-int String::indexOf(char *c) {
+void String::append(char c) {
+    if (stringLength + c + 1 > dataLength) {
+        dataLength = 2 * stringLength;
+        resize(dataLength);
+    }
+    data[stringLength] = c;
+    ++stringLength;
+}
+
+int String::indexOf(char c) {
+    for (int i = 0; i < stringLength; ++i)
+        if (data[i] == c) return i;
     return -1;
 }
 
 int String::indexOf(const char *s) {
-    return -1;
+    char *match = strstr(data, s);
+    return match == nullptr ? -1 : (int) (match - data);
+}
+
+int String::indexOf(const String &string) {
+    return indexOf(string.data);
 }

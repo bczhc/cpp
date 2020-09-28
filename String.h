@@ -7,13 +7,15 @@ namespace bczhc {
         class String {
         private:
             char *data = nullptr;
-            int len = 0;
+            int stringLength = 0, dataLength = 0;
             bool willBeCopied = false;
             bool *toModify = &willBeCopied;
 
             void fromCharsString(const char *s);
 
         public:
+            String();
+
             String(const String &string);
 
             ~String();
@@ -36,11 +38,15 @@ namespace bczhc {
 
             void append(const char *s);
 
-            void append(char *c);
+            void append(const String &string);
 
-            int indexOf(char *c);
+            void append(char c);
+
+            int indexOf(char c);
 
             int indexOf(const char *s);
+
+            int indexOf(const String &string);
         };
     }// namespace string
 }// namespace bczhc
