@@ -19,17 +19,13 @@ int main() {
             s.append(buf[i]);
     }
     const char *sp = s.getCString();
-    int length = s.length();
-    int i = 0, destTail = length, bytesLength;
-    for (;;) {
-        bytesLength = getUTF8BytesLength(sp[i]);
-        destTail -= bytesLength;
-        for (int j = 0; j < bytesLength; ++j)
-            printf("%c", (sp + i)[j]);
-        i += bytesLength;
-        if (i == length)
-            break;
+    int len = s.size();
+    int bytesLength;
+    for (int i = len - 1; i >= 0; --i) {
+        if ((bytesLength = getUTF8BytesLength(sp[i])) != -1) {
+            for (int j = 0; j < bytesLength; ++j)
+                printf("%c", sp[i + j]);
+        }
     }
-
     return 0;
 }
