@@ -3,6 +3,7 @@
 //
 
 #include <cstdio>
+#include "Sqlite3.h"
 
 #ifndef BCZHC_SQLITE3_HPP
 #define BCZHC_SQLITE3_HPP

@@ -1,4 +1,4 @@
-#include "../Concurrent.hpp"
+#include "../Concurrent.h"
 #include "../zhc.h"
 #include <cstdio>
 #include <pthread.h>

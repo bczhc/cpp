@@ -6,7 +6,7 @@
 #define BCZHC_FOURIER_SERIES
 
 #include "./ComplexValue.h"
-#include "./Concurrent.hpp"
+#include "./Concurrent.h"
 #include "./Epicycle.h"
 #include "./zhc.h"
 #include "ComplexIntegral.h"
