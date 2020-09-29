@@ -6,16 +6,13 @@ using namespace string;
 using namespace std;
 using namespace linearlist;
 
-void f() {
-    String e = "exception here";
-    throw e;
-}
-
-int main() {
-    try {
-        f();
-    } catch (String e) {
-        cout << e.getCString() << endl;
+int main(int argc, char **argv) {
+    if (argc < 3) return 0;
+    String s = argv[1];
+    SequentialList<String> list = s.split(argv[2]);
+    int len = list.length();
+    for (int i = 0; i < len; ++i) {
+        cout << list.get(i).getCString() << endl;
     }
     return 0;
 }

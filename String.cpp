@@ -1,7 +1,10 @@
 #include "String.h"
 #include "./utf8.h"
+#include "third_party/practice/LinearList.hpp"
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
+#include <sys/types.h>
 
 using namespace bczhc;
 using namespace string;
@@ -26,7 +29,11 @@ String::~String() {
 }
 
 String::String(const char *s) {
-    fromCharsString(s);
+    fromCharsString(s, strlen(s));
+}
+
+String::String(const char *s, int size) {
+    fromCharsString(s, size);
 }
 
 const char *String::getCString() {
@@ -52,15 +59,14 @@ int String::size() {
     return stringSize;
 }
 
-void String::fromCharsString(const char *s) {
-    stringSize = strlen(s);
-    dataSize = stringSize + 1;
+void String::fromCharsString(const char *s, int size) {
+    stringSize = size, dataSize = stringSize;
     data = new char[dataSize];
-    strcpy(data, s), data[stringSize] = '\0';
+    strcpy(data, s), data[size] = '\0';
 }
 
 String &String::operator=(const char *s) {
-    fromCharsString(s);
+    fromCharsString(s, strlen(s));
     return *this;
 }
 
@@ -115,4 +121,35 @@ int String::indexOf(const char *s) {
 
 int String::indexOf(const String &string) {
     return indexOf(string.data);
+}
+
+SequentialList<String> String::split(const String &separator) {
+    return split(separator.data);
+}
+
+SequentialList<String> String::split(const char *separator) {
+    SequentialList<String> list;
+    SequentialList<int> indexes;
+    int length = strlen(separator);
+    char *found;
+    char *start = data;
+    while (start - data <= stringSize && (found = strstr(start, separator)) != nullptr) {
+        indexes.insert((int) (found - data));
+        start = found + 1;
+    }
+    //abcd
+    // 1
+    int len = indexes.length();
+    int subStart = 0;
+
+    for (int i = 0; i < len; ++i) {
+        int index = indexes.get(i);
+        int size = index - subStart;
+        String s(data + subStart, size);
+        list.insert(s);
+        subStart = index + length;
+    }
+    String rest(data + subStart, stringSize - subStart);
+    list.insert(rest);
+    return list;
 }

@@ -1,6 +1,9 @@
+#include "./third_party/practice/LinearList.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+
+using namespace bczhc::linearlist;
 
 namespace bczhc {
     namespace string {
@@ -11,7 +14,7 @@ namespace bczhc {
             bool willBeCopied = false;
             bool *toModify = &willBeCopied;
 
-            void fromCharsString(const char *s);
+            void fromCharsString(const char *s, int stringSize);
 
             void resize(int newLength);
 
@@ -19,6 +22,8 @@ namespace bczhc {
             String();
 
             String(const String &string);
+
+            String(const char *s, int size);
 
             ~String();
 
@@ -49,6 +54,10 @@ namespace bczhc {
             int indexOf(const char *s);
 
             int indexOf(const String &string);
+
+            SequentialList<String> split(const String &separator);
+
+            SequentialList<String> split(const char *separator);
         };
     }// namespace string
 }// namespace bczhc
