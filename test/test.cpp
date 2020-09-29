@@ -13,6 +13,7 @@ int main() {
     s.append(' ');
     s.append('h');
     s.append('i');
+    s.append(' ');
     s.append('o');
     s.append('k');
     s.append(" there");
@@ -25,9 +26,13 @@ int main() {
     if (it.moveToFirst()) do {
             cout << it.get().getCString() << endl;
         } while (it.next());
-        String s3 = "test hhh";
-        cout << s3.indexOf('s') << endl;
-        cout << s3.indexOf("est ") << endl;
-        cout << s3.indexOf("t") << endl;
+    String s3 = "test hhh";
+    cout << s3.indexOf('s') << endl;
+    cout << s3.indexOf("est ") << endl;
+    cout << s3.indexOf("t") << endl;
+    String s4 = "你好世界hhh";
+    cout << s4.getCppString() << endl;
+    cout << "size: " << s4.size() << endl
+         << "length: " << s4.length() << endl;
     return 0;
 }

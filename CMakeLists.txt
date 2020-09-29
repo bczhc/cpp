@@ -19,6 +19,7 @@ add_executable(sqliteTest test/sqliteTest.cpp)
 add_executable(charactersStatistics CharactersStatistics.cpp CountCharacters.cpp utf8.cpp zhc.cpp io.cpp)
 add_executable(thread test/thread.cpp)
 add_executable(producerAndConsumer test/producerAndConsumer.cpp)
+add_executable(reverse test/reverse.cpp String.cpp utf8.cpp)
 
 add_library(fourierSeries SHARED FourierSeries.h ComplexIntegral.cpp ComplexValue.cpp Epicycle.cpp FourierSeries.cpp)
 

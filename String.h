@@ -7,11 +7,13 @@ namespace bczhc {
         class String {
         private:
             char *data = nullptr;
-            int stringLength = 0, dataLength = 0;
+            int stringSize = 0, dataSize = 0;
             bool willBeCopied = false;
             bool *toModify = &willBeCopied;
 
             void fromCharsString(const char *s);
+
+            void resize(int newLength);
 
         public:
             String();
@@ -28,13 +30,13 @@ namespace bczhc {
 
             int length();
 
+            int size();
+
             String &operator=(const char *s);
 
             String &operator=(const String &string);
 
             void copy(const String &string);
-
-            void resize(int newLength);
 
             void append(const char *s);
 

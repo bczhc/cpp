@@ -1,11 +1,11 @@
 #include "String.h"
-#include <algorithm>
+#include "./utf8.h"
 #include <cstdio>
 #include <cstring>
-#include <sched.h>
 
 using namespace bczhc;
 using namespace string;
+using namespace utf8;
 
 String::String() {
 }
@@ -16,8 +16,8 @@ String::String(const String &string) {
 
 void String::copy(const String &string) {
     data = string.data;
-    dataLength = string.dataLength;
-    stringLength = string.stringLength;
+    dataSize = string.dataSize;
+    stringSize = string.stringSize;
     *string.toModify = true;
 }
 
@@ -39,14 +39,24 @@ std::string String::getCppString() {
 }
 
 int String::length() {
-    return stringLength;
+    int c = 0;
+    int i = 0;
+    while (data[i] != '\0') {
+        i += getUTF8BytesLength(data[i]);
+        ++c;
+    }
+    return c;
+}
+
+int String::size() {
+    return stringSize;
 }
 
 void String::fromCharsString(const char *s) {
-    stringLength = strlen(s);
-    dataLength = stringLength + 1;
-    data = new char[dataLength];
-    strcpy(data, s), data[stringLength] = '\0';
+    stringSize = strlen(s);
+    dataSize = stringSize + 1;
+    data = new char[dataSize];
+    strcpy(data, s), data[stringSize] = '\0';
 }
 
 String &String::operator=(const char *s) {
@@ -70,13 +80,13 @@ void String::resize(int newLength) {
 
 void String::append(const char *s) {
     int len = strlen(s);
-    if (stringLength + len + 1 > dataLength) {
-        dataLength = 2 * (stringLength + len) + 1;
-        resize(dataLength);
+    if (stringSize + len + 1 > dataSize) {
+        dataSize = 2 * (stringSize + len) + 1;
+        resize(dataSize);
     }
     for (int i = 0; i < len; ++i)
-        data[stringLength + i] = s[i];
-    stringLength += len;
+        data[stringSize + i] = s[i];
+    stringSize += len;
 }
 
 void String::append(const String &string) {
@@ -84,16 +94,16 @@ void String::append(const String &string) {
 }
 
 void String::append(char c) {
-    if (stringLength + c + 1 > dataLength) {
-        dataLength = 2 * stringLength;
-        resize(dataLength);
+    if (stringSize + c + 1 > dataSize) {
+        dataSize = 2 * stringSize;
+        resize(dataSize);
     }
-    data[stringLength] = c;
-    ++stringLength;
+    data[stringSize] = c;
+    ++stringSize;
 }
 
 int String::indexOf(char c) {
-    for (int i = 0; i < stringLength; ++i)
+    for (int i = 0; i < stringSize; ++i)
         if (data[i] == c) return i;
     return -1;
 }
