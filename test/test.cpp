@@ -1,18 +1,30 @@
-#include "../String.h"
-#include "../third_party/practice/LinearList.hpp"
+#include <iostream>
+#include "../Concurrent.h"
+#include "../zhc.h"
 
-using namespace bczhc;
-using namespace string;
+using namespace bczhc::concurrent;
 using namespace std;
-using namespace linearlist;
 
 int main(int argc, char **argv) {
-    if (argc < 3) return 0;
-    String s = argv[1];
-    SequentialList<String> list = s.split(argv[2]);
-    int len = list.length();
-    for (int i = 0; i < len; ++i) {
-        cout << list.get(i).getCString() << endl;
+    class R : public Runnable {
+    private:
+        int i;
+    public:
+        void run() override {
+            Thread::sleep(1000);
+            cout << i << endl;
+        }
+
+        explicit R(int i) : i(i) {}
+    };
+    ThreadPool *pool = Executors::newFixedThreadPool(3);
+    PointersSet set;
+    for (int i = 0; i < 10; ++i) {
+        Runnable *runnable = new R(i);
+        set.put(runnable);
+        pool->execute(runnable);
     }
+    set.freeAll();
+    delete pool;
     return 0;
 }

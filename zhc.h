@@ -523,7 +523,7 @@ namespace bczhc {
 
         ArrayList<String *> split(String &separator);
 
-        string toCppString();
+        std::string toCppString();
 
         String &operator=(const char *s);
     };

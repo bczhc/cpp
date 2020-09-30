@@ -4,9 +4,8 @@
 #include "./third_party/practice/LinearList.hpp"
 #include <cstdio>
 #include <cstdlib>
-#include <features.h>
 #include <pthread.h>
-#include <sched.h>
+#include <unistd.h>
 
 using namespace bczhc;
 using namespace linearlist;
@@ -21,56 +20,51 @@ namespace bczhc {
                 pthread_mutex_t &mutex;
 
             public:
-                Condition(MutexLock &mutexLock) : mutex(mutexLock.mutexLock) {}
+                Condition(MutexLock &mutexLock) : mutex(mutexLock.mutexLock) {};
 
-                ~Condition() { pthread_cond_destroy(&cond); }
+                ~Condition();
 
-                inline void wait() { pthread_cond_wait(&cond, &mutex); }
+                void wait();
 
-                inline void signal() { pthread_cond_signal(&cond); }
+                void signal();
             };
 
             pthread_mutex_t mutexLock = PTHREAD_MUTEX_INITIALIZER;
 
-            ~MutexLock() { pthread_mutex_destroy(&mutexLock); }
+            ~MutexLock();
 
-            inline void lock() { pthread_mutex_lock(&mutexLock); };
+            void lock();
 
-            inline void unlock() { pthread_mutex_unlock(&mutexLock); }
+            void unlock();
 
-            inline bool tryLock() { return pthread_mutex_trylock(&mutexLock) == 0; }
+            bool tryLock();
 
-            Condition newCondition() {
-                Condition cond(*this);
-                return cond;
-            }
+            Condition newCondition();
 
         private:
             Condition mCond = newCondition();
 
         public:
-            inline void wait() { mCond.wait(); }
+            void wait();
 
-            inline void notify() { mCond.signal(); }
+            void notify();
         };
 
         class CountDownLatch {
         private:
-            int count;
+            int count{};
+            MutexLock lock;
 
         public:
             CountDownLatch(int count) : count(count) {}
 
-            CountDownLatch() {}
+            CountDownLatch();
 
-            void await() {
-                while (count != 0) {
-                }
-            }
+            void await() const;
 
-            void countDown() { --count; }
+            void countDown();
 
-            void set(int count) { this->count = count; }
+            void set(int _count);
         };
 
         class LongWaitCountDownLatch {
@@ -79,19 +73,13 @@ namespace bczhc {
             MutexLock lock;
 
         public:
-            LongWaitCountDownLatch(int count) : count(count) {}
+            LongWaitCountDownLatch(int count);
 
-            void countDown() {
-                if (--count == 0)
-                    lock.notify();
-            }
+            void countDown();
 
-            void wait() { lock.wait(); }
+            void wait();
 
-            void interruptAndReset() {
-                count = 0;
-                lock.notify();
-            }
+            void interruptAndReset();
         };
 
         class Runnable {
@@ -105,11 +93,7 @@ namespace bczhc {
             virtual void accept(ArgType &arg) = 0;
         };
 
-        void *call(void *arg) {
-            Runnable *runnable = (Runnable *) arg;
-            runnable->run();
-            return nullptr;
-        }
+        void *call(void *arg);
 
         template<typename T>
         struct Bean {
@@ -132,83 +116,53 @@ namespace bczhc {
 
         class Thread {
         private:
-            pthread_t t;
+            pthread_t t{};
 
         public:
-            Thread(Runnable *runnable) { pthread_create(&t, nullptr, call, runnable); }
+            Thread(Runnable *runnable);
 
-            void join() { pthread_join(t, nullptr); }
+            void join() const;
+
+            static void sleep(int64_t millis);
         };
 
         class ThreadPool {
         public:
             virtual void execute(Runnable *r) = 0;
 
-            ~ThreadPool() {}
+            ~ThreadPool();
         };
 
         class Executors {
         public:
             class FixedThreadPool : public ThreadPool {
             private:
-                MutexLock lock;
-
                 class CoreThreadRunnable : public Runnable {
                 private:
                     Queue<Runnable *> &runnables;
                     MutexLock &lock;
 
                 public:
-                    CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock)
-                            : runnables(runnables), lock(lock) {}
+                    CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock);
 
-                    void run() override {
-                        while (true) {
-                            lock.lock();
-                            while (runnables.isEmpty()) {
-                                lock.wait();
-                            }
-                            Runnable *runnable = runnables.dequeue();
-                            lock.unlock();
-                            runnable->run();
-                        }
-                    }
+                    [[noreturn]] void run() override;
                 };
 
+                MutexLock lock;
                 Queue<Runnable *> runnables;
-                Thread **coreThreads;
                 int poolSize;
+                Thread **coreThreads;
                 CoreThreadRunnable *coreThreadRunnable;
 
             public:
-                FixedThreadPool(int poolSize) {
-                    this->poolSize = poolSize;
-                    coreThreads = new Thread *[poolSize];
-                    coreThreadRunnable = new CoreThreadRunnable(runnables, lock);
-                    for (int i = 0; i < poolSize; ++i) {
-                        coreThreads[i] = new Thread(coreThreadRunnable);
-                    }
-                }
+                FixedThreadPool(int poolSize);
 
-                ~FixedThreadPool() {
-                    for (int i = 0; i < poolSize; ++i) {
-                        delete coreThreads[i];
-                    }
-                    delete coreThreads;
-                    delete coreThreadRunnable;
-                }
+                ~FixedThreadPool();
 
-                void execute(Runnable *runnable) override {
-                    lock.lock();
-                    runnables.enqueue(runnable);
-                    lock.notify();
-                    lock.unlock();
-                }
+                void execute(Runnable *runnable) override;
             };
 
-            static ThreadPool *newFixedThreadPool(int poolSize) {
-                return new FixedThreadPool(poolSize);
-            }
+            static ThreadPool *newFixedThreadPool(int poolSize);
         };
     }// namespace concurrent
 }// namespace bczhc
