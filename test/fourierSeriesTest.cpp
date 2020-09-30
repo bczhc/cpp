@@ -22,6 +22,6 @@ int main() {
             cout << n << ' ' << re << ' ' << im << endl;
         }
     } c;
-    fs.calc(c, 100000, 3);
+    fs.calc(c, 100000, 5);
     return 0;
 }

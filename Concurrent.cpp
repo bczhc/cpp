@@ -55,6 +55,7 @@ namespace bczhc {
         class CountDownLatch {
         private:
             int count;
+            MutexLock lock;
 
         public:
             CountDownLatch(int count) : count(count) {}
@@ -66,9 +67,17 @@ namespace bczhc {
                 }
             }
 
-            void countDown() { --count; }
+            void countDown() {
+                lock.lock();
+                --count;
+                lock.unlock();
+            }
 
-            void set(int count) { this->count = count; }
+            void set(int count) {
+                lock.lock();
+                this->count = count;
+                lock.unlock();
+            }
         };
 
         class LongWaitCountDownLatch {
@@ -80,15 +89,24 @@ namespace bczhc {
             LongWaitCountDownLatch(int count) : count(count) {}
 
             void countDown() {
-                if (--count == 0)
+                lock.lock();
+                if (--count == 0) {
                     lock.notify();
+                }
+                lock.unlock();
             }
 
-            void wait() { lock.wait(); }
+            void wait() {
+                lock.lock();
+                lock.wait();
+                lock.unlock();
+            }
 
             void interruptAndReset() {
+                lock.lock();
                 count = 0;
                 lock.notify();
+                lock.unlock();
             }
         };
 
@@ -158,7 +176,7 @@ namespace bczhc {
 
                 public:
                     CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock)
-                            : runnables(runnables), lock(lock) {}
+                        : runnables(runnables), lock(lock) {}
 
                     void run() override {
                         while (true) {
