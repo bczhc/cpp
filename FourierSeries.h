@@ -8,12 +8,13 @@
 #include "./ComplexValue.h"
 #include "./Concurrent.h"
 #include "./Epicycle.h"
-#include "./zhc.h"
 #include "ComplexIntegral.h"
+#include "./third_party/practice/LinearList.hpp"
 #include <iostream>
 
 using namespace std;
 using namespace bczhc;
+using namespace linearlist;
 
 namespace bczhc {
 
@@ -38,19 +39,6 @@ namespace bczhc {
         void calc(FourierSeriesCallback &callback, int integralD, int threadNum);
     };
 
-    class ComplexPointFunction {
-    private:
-        bczhc::ArrayList<ComplexValue> list;
-
-    public:
-        ComplexValue get(int32_t index);
-
-        void put(ComplexValue &cv);
-
-        // ComplexFunctionInterface getFunction();
-    };
-
-    void tF();
 }// namespace bczhc
 
 #endif//BCZHC_FOURIER_SERIES
