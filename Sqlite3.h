@@ -31,17 +31,20 @@ namespace bczhc {
             return bean.callback.callback(bean.arg, colNum, content, colName);
         }
 
-        sqlite3 *db = nullptr;
-        char *errMsg = nullptr;
         bool closed = false;
     public:
-        void open(const char *path);
+        sqlite3 *db = nullptr;
+        char *errMsg = nullptr;
 
-        void close();
+        int open(const char *path);
 
-        void exec(const char *cmd, SqliteCallback &callback);
+        int close();
 
-        void exec(const char *cmd, SqliteCallback &callback, void *arg);
+        int exec(const char *cmd, SqliteCallback &callback);
+
+        int exec(const char *cmd);
+
+        int exec(const char *cmd, SqliteCallback &callback, void *arg);
 
         ~Sqlite3();
     };

@@ -1,16 +1,23 @@
 #include "Sqlite3.h"
 
-void bczhc::Sqlite3::close() {
-    if (!closed) sqlite3_close(db);
+int bczhc::Sqlite3::close() {
+    if (!closed) {
+        return sqlite3_close(db);
+    }
+    return 0;
 }
 
-void bczhc::Sqlite3::exec(const char *cmd, bczhc::Sqlite3::SqliteCallback &callback) {
-    exec(cmd, callback, nullptr);
+int bczhc::Sqlite3::exec(const char *cmd, bczhc::Sqlite3::SqliteCallback &callback) {
+    return exec(cmd, callback, nullptr);
 }
 
-void bczhc::Sqlite3::exec(const char *cmd, bczhc::Sqlite3::SqliteCallback &callback, void *arg) {
+int bczhc::Sqlite3::exec(const char *cmd) {
+    return sqlite3_exec(db, cmd, nullptr, nullptr, &errMsg);
+}
+
+int bczhc::Sqlite3::exec(const char *cmd, bczhc::Sqlite3::SqliteCallback &callback, void *arg) {
     Bean bean(callback, arg);
-    sqlite3_exec(db, cmd, callbackFunction, &bean, &errMsg);
+    return sqlite3_exec(db, cmd, callbackFunction, &bean, &errMsg);
 }
 
 bczhc::Sqlite3::~Sqlite3() {
@@ -18,7 +25,6 @@ bczhc::Sqlite3::~Sqlite3() {
     sqlite3_db_release_memory(db);
 }
 
-void bczhc::Sqlite3::open(const char *path) {
-    int status = sqlite3_open(path, &db);
-    if (status != SQLITE_OK) throw status;
+int bczhc::Sqlite3::open(const char *path) {
+    return sqlite3_open(path, &db);
 }
