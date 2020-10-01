@@ -1,10 +1,8 @@
 #include "Sqlite3.h"
 
 int bczhc::Sqlite3::close() {
-    if (!closed) {
-        return sqlite3_close(db);
-    }
-    return 0;
+    closed = true;
+    return sqlite3_close(db);
 }
 
 int bczhc::Sqlite3::exec(const char *cmd, bczhc::Sqlite3::SqliteCallback &callback) {
@@ -21,8 +19,10 @@ int bczhc::Sqlite3::exec(const char *cmd, bczhc::Sqlite3::SqliteCallback &callba
 }
 
 bczhc::Sqlite3::~Sqlite3() {
-    close();
-    sqlite3_db_release_memory(db);
+    if (!closed) {
+        close();
+        sqlite3_db_release_memory(db);
+    }
 }
 
 int bczhc::Sqlite3::open(const char *path) {
