@@ -2,21 +2,21 @@
 // Created by root on 2020/4/2.
 //
 
-#ifndef CPP_COMPLEXINTEGRAL_H
-#define CPP_COMPLEXINTEGRAL_H
+#ifndef CPP_COMPLEX_INTEGRAL_H
+#define CPP_COMPLEX_INTEGRAL_H
 
-#include "./ComplexValue.h"
+#include "FourierSeries.h"
 
 namespace bczhc {
     class ComplexIntegral {
     public:
-        int n = 100000;
+        int integralN = 100000;
 
         //梯形法求定积分
-        ComplexValue getDefiniteIntegralByTrapezium(
-                double x0, double xn,
-                ComplexFunctionInterface &complexFunctionInterface);
+        ComplexValue getDefiniteIntegralByTrapezium(double x0, double xn,
+                                                    bczhc::FuncInIntegralInterface &complexFunctionInterface,
+                                                    int32_t n) const;
     };
 }// namespace bczhc
 
-#endif// CPP_COMPLEXINTEGRAL_H
+#endif// CPP_COMPLEX_INTEGRAL_H

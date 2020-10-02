@@ -5,4 +5,6 @@
 #ifndef CPP_T1_H
 #define CPP_T1_H
 
+#include "../FourierSeries.h"
+
 #endif//CPP_T1_H

@@ -36,11 +36,11 @@ int main() {
     class F : public ComplexFunctionInterface {
     public:
         void x(ComplexValue &dest, double t) override {
-            dest.setValue(sin(t + cos(t)), cos(t - 2));
+            dest.setValue(10, 10 );
         }
     } f;
 
-    FourierSeries fs(f, 1000, 100);
-    fs.calc(cb, 10000, 16);
+    FourierSeries fs(f, 100, 100);
+    fs.calc(cb, 12345, 5);
     return 0;
 }

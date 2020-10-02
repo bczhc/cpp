@@ -15,15 +15,6 @@ bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
     omega = M_PI * 2 / period;
 }
 
-/*void FourierSeries::calc(ArrayList<Epicycle> &list) {
-
-}*/
-
-class Run : public Runnable {
-public:
-    void run() override {}
-};
-
 void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                                 int threadNum) {
     LongWaitCountDownLatch latch(epicyclesCount);
@@ -31,24 +22,22 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
     PointersSet deletable;
     int32_t a = -epicyclesCount / 2;
     int32_t t = a + epicyclesCount;
-    class FuncInIntegral : public ComplexFunctionInterface {
+    class FuncInIntegral : public FuncInIntegralInterface {
     private:
         ComplexFunctionInterface &mF;
-        double &mOmega;
+        double mOmega;
 
     public:
-        double n{};
-
         FuncInIntegral(ComplexFunctionInterface &mF, double &mOmega)
                 : mF(mF), mOmega(mOmega) {}
 
     private:
-        void x(ComplexValue &dest, double t) override {
+        void x(ComplexValue &dest, double t, int32_t n) override {
             mF.x(dest, t);
             dest.selfMultiply(cos(-n * t * mOmega), sin(-n * t * mOmega));
         }
     } funcInIntegral(f, omega);
-    ComplexIntegral complexIntegral{.n = integralD};
+    ComplexIntegral complexIntegral{.integralN = integralD};
     class Run : public Runnable {
     private:
         FuncInIntegral &funcInIntegral;
@@ -66,9 +55,8 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                   callback(callback), n(n), T(T), latch(latch) {}
 
         void run() override {
-            funcInIntegral.n = n;
             ComplexValue integralResult =
-                    complexIntegral.getDefiniteIntegralByTrapezium(0, T, funcInIntegral);
+                    complexIntegral.getDefiniteIntegralByTrapezium(0, T, funcInIntegral, n);
             integralResult.selfDivide(T, 0);
             callback.callback(n, integralResult.re, integralResult.im);
             latch.countDown();
