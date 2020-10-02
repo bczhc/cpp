@@ -14,8 +14,6 @@ namespace bczhc {
         private:
             char *data = nullptr;
             int stringSize = 0, dataSize = 0;
-            bool willBeCopied = false;
-            bool *toModify = &willBeCopied;
 
             void fromCharsString(const char *s, size_t stringSize);
 
@@ -29,8 +27,6 @@ namespace bczhc {
             String(const std::string &str);
 
             String(const char *s, int size);
-
-            ~String();
 
             String(const char *s);
 
@@ -67,6 +63,8 @@ namespace bczhc {
             SequentialList<String> split(const String &separator);
 
             SequentialList<String> split(const char *separator);
+
+            void release();
         };
     }// namespace string
 }// namespace bczhc

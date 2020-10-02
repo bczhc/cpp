@@ -9,7 +9,7 @@ using namespace utf8;
 
 String::String() {
     fromCharsString(nullptr, 0);
-};
+}
 
 String::String(const String &string) {
     copy(string);
@@ -19,11 +19,6 @@ void String::copy(const String &string) {
     data = string.data;
     dataSize = string.dataSize;
     stringSize = string.stringSize;
-    *string.toModify = true;
-}
-
-String::~String() {
-    if (!willBeCopied) delete data;
 }
 
 String::String(const char *s) {
@@ -167,4 +162,8 @@ String &String::operator=(const std::string &str) {
 String::String(const std::string &str) {
     const char *s = str.c_str();
     fromCharsString(s, strlen(s));
+}
+
+void String::release() {
+    delete data;
 }
