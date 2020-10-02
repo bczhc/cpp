@@ -11,11 +11,15 @@ using namespace linearlist;
 using namespace bczhc::string;
 using namespace concurrent;
 
+MutexLock lock;
+
 int main() {
     class CB : public FourierSeriesCallback {
     private:
         void f(String a, String s) {
+            lock.lock();
             cout << a.getCString() << ' ' << s.getCString() << endl;
+            lock.unlock();
         }
 
     public:
@@ -36,7 +40,7 @@ int main() {
         }
     } f;
 
-    FourierSeries fs(f, 1000000, 100);
-    fs.calc(cb, 10000, 8);
+    FourierSeries fs(f, 1000, 100);
+    fs.calc(cb, 10000, 16);
     return 0;
 }
