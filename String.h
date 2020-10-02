@@ -13,7 +13,7 @@ namespace bczhc {
         class String {
         private:
             char *data = nullptr;
-            int stringSize = 0, dataSize = 0;
+            size_t stringSize = 0, dataSize = 0;
 
             void fromCharsString(const char *s, size_t stringSize);
 
@@ -26,9 +26,11 @@ namespace bczhc {
 
             String(const std::string &str);
 
-            String(const char *s, int size);
+            String(const char *s, size_t size);
 
             String(const char *s);
+
+            ~String();
 
             const char *getCString() const;
 
@@ -36,7 +38,7 @@ namespace bczhc {
 
             int length();
 
-            int size() const;
+            size_t size() const;
 
             String &operator=(const char *s);
 
@@ -64,7 +66,6 @@ namespace bczhc {
 
             SequentialList<String> split(const char *separator);
 
-            void release();
         };
     }// namespace string
 }// namespace bczhc

@@ -11,17 +11,7 @@ using namespace linearlist;
 using namespace bczhc::string;
 using namespace concurrent;
 
-void f(String s) {
-    cout << s.getCString() << endl;
-}
-
 int main() {
-    String s = "12345678";
-    f(s);
-    Thread::sleep(1000);
-    cout << s.getCString() << endl;
-    s.release();
-    return 0;
     class CB : public FourierSeriesCallback {
     private:
         void f(String a, String s) {

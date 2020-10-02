@@ -3,6 +3,7 @@
 #include "third_party/practice/LinearList.hpp"
 #include <cstddef>
 #include <cstring>
+
 using namespace bczhc;
 using namespace string;
 using namespace utf8;
@@ -16,16 +17,19 @@ String::String(const String &string) {
 }
 
 void String::copy(const String &string) {
-    data = string.data;
-    dataSize = string.dataSize;
+    size_t oldStringSize = string.size();
+    data = new char[oldStringSize + 1];
+    for (int i = 0; i < oldStringSize; ++i) data[i] = string.data[i];
+    data[oldStringSize] = '\0';
     stringSize = string.stringSize;
+    dataSize = oldStringSize + 1;
 }
 
 String::String(const char *s) {
     fromCharsString(s, s == nullptr ? 0 : strlen(s));
 }
 
-String::String(const char *s, int size) {
+String::String(const char *s, size_t size) {
     fromCharsString(s, size);
 }
 
@@ -48,7 +52,7 @@ int String::length() {
     return c;
 }
 
-int String::size() const {
+size_t String::size() const {
     return stringSize;
 }
 
@@ -164,6 +168,6 @@ String::String(const std::string &str) {
     fromCharsString(s, strlen(s));
 }
 
-void String::release() {
+String::~String() {
     delete data;
 }
