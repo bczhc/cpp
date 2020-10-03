@@ -75,9 +75,8 @@ String &String::operator=(const String &string) {
     return *this;
 }
 
-void String::resize(int newStringLength) {
-    char *newChars = new char[newStringLength + 1];
-    newChars[newStringLength] = '\0';
+void String::resize(int newSize) {
+    char *newChars = new char[newSize];
     strcpy(newChars, data);
     delete[] data;
     data = newChars;
@@ -86,12 +85,13 @@ void String::resize(int newStringLength) {
 String &String::append(const char *s) {
     int len = strlen(s);
     if (stringSize + len + 1 > dataSize) {
-        dataSize = 2 * (stringSize + len);
+        dataSize = 2 * (stringSize + len) + 1;
         resize(dataSize);
     }
     for (int i = 0; i < len; ++i)
         data[stringSize + i] = s[i];
     stringSize += len;
+    data[stringSize] = '\0';
     return *this;
 }
 
@@ -102,11 +102,12 @@ String &String::append(const String &string) {
 
 String &String::append(char c) {
     if (stringSize + c + 1 > dataSize) {
-        dataSize = 2 * stringSize;
+        dataSize = 2 * stringSize + 1;
         resize(dataSize);
     }
     data[stringSize] = c;
     ++stringSize;
+    data[stringSize] = '\0';
     return *this;
 }
 
