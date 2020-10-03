@@ -3,7 +3,8 @@
 #include "../FourierSeries.h"
 #include "../String.h"
 #include "../Concurrent.h"
-
+#include "../Sqlite3.h"
+#include "../CountCharacters.h"
 
 using namespace std;
 using namespace bczhc;
@@ -14,33 +15,14 @@ using namespace concurrent;
 MutexLock lock;
 
 int main() {
-    class CB : public FourierSeriesCallback {
-    private:
-        void f(String a, String s) {
-            lock.lock();
-            cout << a.getCString() << ' ' << s.getCString() << endl;
-            lock.unlock();
-        }
-
-    public:
-        void callback(double n, double re, double im) override {
-            String s = to_string(n).c_str();
-            s.append(" ")
-                    .append(to_string(re))
-                    .append(" ")
-                    .append(to_string(im));
-            f("jni---", s);
-        }
-    } cb;
-
-    class F : public ComplexFunctionInterface {
-    public:
-        void x(ComplexValue &dest, double t) override {
-            dest.setValue(10, 10 );
-        }
-    } f;
-
-    FourierSeries fs(f, 100, 100);
-    fs.calc(cb, 12345, 5);
+    CharacterCounter counter;
+    for (int i = 0; i < 1000; ++i) {
+        String s = "abc";
+        cout << s.append(" code: ").append(to_string(21)).getCString() << endl;
+        counter.countCharacters(s.getCString(), strlen(s.getCString()));
+    }
+    json *j = counter.getJsonData();
+    cout << j->dump() << endl;
+    delete j;
     return 0;
 }
