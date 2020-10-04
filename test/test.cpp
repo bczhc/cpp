@@ -1,8 +1,12 @@
 #include <iostream>
+#include <functional>
+#include <sys/time.h>
 #include "../third_party/practice/LinearList.hpp"
 #include "../FourierSeries.h"
 #include "../String.h"
 #include "../Concurrent.h"
+#include "thread"
+#include "../Sqlite3.h"
 
 
 using namespace std;
@@ -14,33 +18,16 @@ using namespace concurrent;
 MutexLock lock;
 
 int main() {
-    class CB : public FourierSeriesCallback {
-    private:
-        void f(String a, String s) {
-            lock.lock();
-            cout << a.getCString() << ' ' << s.getCString() << endl;
-            lock.unlock();
-        }
+    typedef int(*fp)(int);
+    fp p;
+    {
+        p = [](int i) {
+            return i + 10;
+        };
+    }
+    cout << p(24) << endl;
 
-    public:
-        void callback(double n, double re, double im) override {
-            String s = to_string(n).c_str();
-            s.append(" ")
-                    .append(to_string(re))
-                    .append(" ")
-                    .append(to_string(im));
-            f("jni---", s);
-        }
-    } cb;
-
-    class F : public ComplexFunctionInterface {
-    public:
-        void x(ComplexValue &dest, double t) override {
-            dest.setValue(10, 10 );
-        }
-    } f;
-
-    FourierSeries fs(f, 100, 100);
-    fs.calc(cb, 12345, 5);
+    float f = 1234.56789;
+    cout << (int) f << endl;
     return 0;
 }

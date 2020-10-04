@@ -172,3 +172,31 @@ String::String(const std::string &str) {
 String::~String() {
     delete data;
 }
+
+String String::toString(int32_t a) {
+    String s;
+    int x = a;
+    while (x != 0) {
+        s.append((char) (x % 10 + 48));
+        x /= 10;
+    }
+    return s;
+}
+
+String String::toString(int64_t a) {
+    String s;
+    int64_t x = a;
+    while (x != 0) {
+        s.append((char) (x % 10 + 48));
+        x /= 10;
+    }
+    return s;
+}
+
+String String::toString(float a) {
+    return String();
+}
+
+String String::toString(double a) {
+    return String();
+}
