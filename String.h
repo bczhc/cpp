@@ -66,6 +66,14 @@ namespace bczhc {
 
             SequentialList<String> split(const char *separator);
 
+            static String toString(int32_t a);
+
+            static String toString(int64_t a);
+
+            static String toString(float a);
+
+            static String toString(double a);
+
         };
     }// namespace string
 }// namespace bczhc
