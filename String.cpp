@@ -101,7 +101,7 @@ String &String::append(const String &string) {
 }
 
 String &String::append(char c) {
-    if (stringSize + c + 1 > dataSize) {
+    if (stringSize + 2 > dataSize) {
         dataSize = 2 * stringSize + 1;
         resize(dataSize);
     }
@@ -177,7 +177,7 @@ String String::toString(int32_t a) {
     String s;
     int x = a;
     while (x != 0) {
-        s.append((char) (x % 10 + 48));
+        s.insert(0, (char) (x % 10 + 48));
         x /= 10;
     }
     return s;
@@ -199,4 +199,91 @@ String String::toString(float a) {
 
 String String::toString(double a) {
     return String();
+}
+
+String &String::insert(int index, char c) {
+    stringSize += 1;
+    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 1, resize(dataSize);
+    for (int i = stringSize; i > index; --i) {
+        data[i] = data[i - 1];
+    }
+    data[index] = c;
+    data[stringSize] = '\0';
+    return *this;
+}
+
+String &String::insert(int index, const String &string) {
+    int len = string.size();
+    stringSize += len;
+    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 1, resize(dataSize);
+    for (int i = stringSize; i >= index + len ; --i) {
+        data[i] = data[i - len];
+    }
+    for (int i = 0; i < len; ++i) {
+        data[index + i] = string.data[i];
+    }
+    data[stringSize] = '\0';
+    return *this;
+}
+
+String String::toString(int32_t i, int radix) {
+    if (radix < 2 || radix > 36)
+        radix = 10;
+
+    /* Use the faster version */
+    if (radix == 10) {
+        return String::toString(i);
+    }
+
+    char buf[33];
+    bool negative = (i < 0);
+    int charPos = 32;
+
+    if (!negative) {
+        i = -i;
+    }
+
+    while (i <= -radix) {
+        buf[charPos--] = digits[-(i % radix)];
+        i = i / radix;
+    }
+    buf[charPos] = digits[-i];
+
+    if (negative) {
+        buf[--charPos] = '-';
+    }
+
+    return String(buf + charPos, (33 - charPos));
+}
+
+String String::toString(int64_t i, int radix) {
+    if (radix < 2 || radix > 36)
+        radix = 10;
+    if (radix == 10)
+        return toString(i);
+    char buf[65];
+    int charPos = 64;
+    bool negative = (i < 0);
+
+    if (!negative) {
+        i = -i;
+    }
+
+    while (i <= -radix) {
+        buf[charPos--] = digits[(int) (-(i % radix))];
+        i = i / radix;
+    }
+    buf[charPos] = digits[(int) (-i)];
+
+    if (negative) {
+        buf[--charPos] = '-';
+    }
+
+    return String(buf + charPos, (65 - charPos));
+}
+
+String String::toString(char c) {
+    char s[2];
+    s[0] = c, s[1] = '\0';
+    return String(s);
 }

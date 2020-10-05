@@ -17,17 +17,42 @@ using namespace concurrent;
 
 MutexLock lock;
 
-int main() {
-    typedef int(*fp)(int);
-    fp p;
-    {
-        p = [](int i) {
-            return i + 10;
-        };
-    }
-    cout << p(24) << endl;
+String int2bin(int a) {
 
-    float f = 1234.56789;
-    cout << (int) f << endl;
+}
+
+String float2bin(float f) {
+    String s;
+    float t = f;
+    for (int i = 0;; ++i) {
+        t = 2 * (t >= 1 ? (t - 1) : t);
+        if (t == 0) break;
+        s.append(t >= 1 ? '1' : '0');
+    }
+    return s;
+}
+
+String double2bin(double f) {
+    String s;
+    double t = f;
+    for (int i = 0;; ++i) {
+        t = 2 * (t >= 1 ? (t - 1) : t);
+        if (t == 0) break;
+        s.append(t >= 1 ? '1' : '0');
+    }
+    return s;
+}
+
+int main() {
+    float f = 263.3;
+    char *p = (char *) &f;
+    cout << hex << (int) (unsigned char) p[0] << ' ';
+    cout << hex << (int) (unsigned char) p[1] << ' ';
+    cout << hex << (int) (unsigned char) p[2] << ' ';
+    cout << hex << (int) (unsigned char) p[3] << ' ' << endl;
+
+    String s = "abcde";
+    s.insert(1, "fg");
+    cout << s.getCString() << endl;
     return 0;
 }
