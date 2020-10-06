@@ -10,6 +10,15 @@ using namespace bczhc::linearlist;
 
 namespace bczhc {
     namespace string {
+        static char digits[] = {
+                '0', '1', '2', '3', '4', '5',
+                '6', '7', '8', '9', 'a', 'b',
+                'c', 'd', 'e', 'f', 'g', 'h',
+                'i', 'j', 'k', 'l', 'm', 'n',
+                'o', 'p', 'q', 'r', 's', 't',
+                'u', 'v', 'w', 'x', 'y', 'z'
+        };
+
         class String {
         private:
             char *data = nullptr;
@@ -74,6 +83,15 @@ namespace bczhc {
 
             static String toString(double a);
 
+            String &insert(int index, char c);
+
+            String &insert(int index, const String &string);
+
+            static String toString(int32_t i, int radix);
+
+            static String toString(int64_t i, int radix);
+
+            static String toString(char c);
         };
     }// namespace string
 }// namespace bczhc

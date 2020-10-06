@@ -1,5 +1,6 @@
 #include <iostream>
 #include <functional>
+#include <string>
 #include <sys/time.h>
 #include "../third_party/practice/LinearList.hpp"
 #include "../FourierSeries.h"
