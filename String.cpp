@@ -83,7 +83,14 @@ void String::resize(int newSize) {
 }
 
 String &String::append(const char *s) {
-    int len = strlen(s);
+    int len = -1;
+    String *t = nullptr;
+    if (s == this->data) {
+        t = new String(s);
+        len = t->size();
+        s = t->data;
+    }
+    if (len == -1) len=strlen(s);
     if (stringSize + len + 1 > dataSize) {
         dataSize = 2 * (stringSize + len) + 1;
         resize(dataSize);
@@ -92,6 +99,7 @@ String &String::append(const char *s) {
         data[stringSize + i] = s[i];
     stringSize += len;
     data[stringSize] = '\0';
+    delete t;
     return *this;
 }
 

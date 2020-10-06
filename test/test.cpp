@@ -1,5 +1,6 @@
 #include <iostream>
 #include <functional>
+#include <string>
 #include <sys/time.h>
 #include "../third_party/practice/LinearList.hpp"
 #include "../FourierSeries.h"
@@ -54,5 +55,13 @@ int main() {
     String s = "abcde";
     s.insert(1, "fg");
     cout << s.getCString() << endl;
+
+    String ss = "ab";
+    for (int i = 0; i < 20; ++i) {
+        ss.append("12");
+    }
+
+    cout << ss.getCppString() << endl;
+
     return 0;
 }
