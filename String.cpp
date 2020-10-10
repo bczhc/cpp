@@ -63,11 +63,6 @@ void String::fromCharsString(const char *s, size_t size) {
     data[size] = '\0';
 }
 
-String &String::operator=(const char *s) {
-    fromCharsString(s, s == nullptr ? 0 : strlen(s));
-    return *this;
-}
-
 
 String &String::operator=(const String &string) {
     if (&string == this) return *this;
@@ -82,15 +77,15 @@ void String::resize(int newSize) {
     data = newChars;
 }
 
-String &String::append(const char *s) {
-    int len = -1;
+String &String::append(const char *s, size_t size) {
+    size_t len = -1;
     String *t = nullptr;
     if (s == this->data) {
         t = new String(s);
         len = t->size();
         s = t->data;
     }
-    if (len == -1) len=strlen(s);
+    if (len == -1) len = size;
     if (stringSize + len + 1 > dataSize) {
         dataSize = 2 * (stringSize + len) + 1;
         resize(dataSize);
@@ -104,7 +99,7 @@ String &String::append(const char *s) {
 }
 
 String &String::append(const String &string) {
-    append(string.data);
+    append(string.data, string.size());
     return *this;
 }
 
@@ -164,17 +159,16 @@ SequentialList<String> String::split(const char *separator) {
 }
 
 String &String::append(const std::string &s) {
-    return append(s.c_str());
+    return append(s.c_str(), s.size());
 }
 
 String &String::operator=(const std::string &str) {
-    operator=(str.c_str());
+    operator=(String(str.c_str()));
     return *this;
 }
 
 String::String(const std::string &str) {
-    const char *s = str.c_str();
-    fromCharsString(s, strlen(s));
+    fromCharsString(str.c_str(), str.size());
 }
 
 String::~String() {
@@ -224,7 +218,7 @@ String &String::insert(int index, const String &string) {
     int len = string.size();
     stringSize += len;
     if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 1, resize(dataSize);
-    for (int i = stringSize; i >= index + len ; --i) {
+    for (int i = stringSize; i >= index + len; --i) {
         data[i] = data[i - len];
     }
     for (int i = 0; i < len; ++i) {
