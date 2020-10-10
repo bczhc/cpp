@@ -17,8 +17,7 @@ namespace bczhc {
                 'c', 'd', 'e', 'f', 'g', 'h',
                 'i', 'j', 'k', 'l', 'm', 'n',
                 'o', 'p', 'q', 'r', 's', 't',
-                'u', 'v', 'w', 'x', 'y', 'z'
-        };
+                'u', 'v', 'w', 'x', 'y', 'z'};
 
         class String {
         private:
@@ -31,7 +30,10 @@ namespace bczhc {
 
             String &append(const char *s, size_t size);
 
+
         public:
+            bool copyData = true;
+
             String();
 
             String(const String &string);
@@ -91,8 +93,12 @@ namespace bczhc {
             static String toString(int64_t i, int radix);
 
             static String toString(char c);
+
+            static String fromRef(char *s);
+
+            static String fromRef(char *s, size_t size);
         };
     }// namespace string
 }// namespace bczhc
 
-#endif //BCZHC_STRING_H
+#endif//BCZHC_STRING_H

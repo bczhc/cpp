@@ -19,17 +19,15 @@ using namespace concurrent;
 MutexLock lock;
 
 int main() {
-    std::string ss = "不是a2";
-    cout << ss.size() << endl;
-    cout << ss.length() << endl;
-    timeval start, t;
-    gettimeofday(&start, nullptr);
-    String s = "ab";
-    //std::string s = "ab";
-    for (int i = 0; i < 25; ++i) {
-        s.append(s);
+    char o[] = "hello";
+    String s = String::fromRef(o);
+    cout << s.getCString() << endl;
+    cout << (s.getCString() == o) << endl;
+
+    auto splited = s.split("el");
+    int size = splited.length();
+    for (int i = 0; i < size; ++i) {
+        cout << splited.get(i).getCString() << endl;
     }
-    gettimeofday(&t, nullptr);
-    cout << (t.tv_sec * 1000 - start.tv_sec * 1000 + t.tv_usec / 1000 - start.tv_usec / 1000) << endl;
     return 0;
 }

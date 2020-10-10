@@ -13,7 +13,8 @@ String::String() {
 }
 
 String::String(const String &string) {
-    copy(string);
+    if (copyData)
+        copy(string);
 }
 
 void String::copy(const String &string) {
@@ -23,6 +24,7 @@ void String::copy(const String &string) {
     data[oldStringSize] = '\0';
     stringSize = string.stringSize;
     dataSize = oldStringSize + 1;
+    copyData = string.copyData;
 }
 
 String::String(const char *s) {
@@ -172,7 +174,8 @@ String::String(const std::string &str) {
 }
 
 String::~String() {
-    delete data;
+    if (copyData)
+        delete data;
 }
 
 String String::toString(int32_t a) {
@@ -288,4 +291,18 @@ String String::toString(char c) {
     char s[2];
     s[0] = c, s[1] = '\0';
     return String(s);
+}
+
+String String::fromRef(char *s) {
+    size_t size = s[0] == '\0' ? 0 : strlen(s);
+    return String::fromRef(s, size);
+}
+
+String String::fromRef(char *s, size_t size) {
+    String str;
+    str.data = s;
+    str.copyData = false;
+    str.stringSize = size;
+    str.dataSize = str.stringSize + 1;
+    return str;
 }
