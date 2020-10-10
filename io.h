@@ -1,12 +1,15 @@
 #ifndef BCZHC_IO_H
 #define BCZHC_IO_H
 
+#include "String.h"
 #include "utf8.h"
 #include <cstdio>
 
 #define BUFFER_SIZE 8192
 
-using namespace bczhc::utf8;
+using namespace bczhc;
+using namespace utf8;
+using namespace string;
 
 namespace bczhc {
     namespace io {
@@ -17,6 +20,32 @@ namespace bczhc {
         };
 
         void solveU8FromStream(FILE *f, U8StringCallback &callback);
+
+        class InputStream {
+        private:
+            FILE *fp = nullptr;
+
+        public:
+            InputStream(String file);
+
+            int read(char *bytes, int size);
+
+            void close();
+        };
+
+        class OutputStream {
+        private:
+            FILE *fp = nullptr;
+
+        public:
+            OutputStream(String file);
+
+            int write(const char *bytes, int size);
+
+            void flush();
+
+            void close();
+        };
     }// namespace io
 }// namespace bczhc
 #endif// BCZHC_IO_H
