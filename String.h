@@ -30,7 +30,6 @@ namespace bczhc {
 
             String &append(const char *s, size_t size);
 
-
         public:
             bool copyData = true;
 
