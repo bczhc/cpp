@@ -18,50 +18,18 @@ using namespace concurrent;
 
 MutexLock lock;
 
-String int2bin(int a) {
-
-}
-
-String float2bin(float f) {
-    String s;
-    float t = f;
-    for (int i = 0;; ++i) {
-        t = 2 * (t >= 1 ? (t - 1) : t);
-        if (t == 0) break;
-        s.append(t >= 1 ? '1' : '0');
-    }
-    return s;
-}
-
-String double2bin(double f) {
-    String s;
-    double t = f;
-    for (int i = 0;; ++i) {
-        t = 2 * (t >= 1 ? (t - 1) : t);
-        if (t == 0) break;
-        s.append(t >= 1 ? '1' : '0');
-    }
-    return s;
-}
-
 int main() {
-    float f = 263.3;
-    char *p = (char *) &f;
-    cout << hex << (int) (unsigned char) p[0] << ' ';
-    cout << hex << (int) (unsigned char) p[1] << ' ';
-    cout << hex << (int) (unsigned char) p[2] << ' ';
-    cout << hex << (int) (unsigned char) p[3] << ' ' << endl;
-
-    String s = "abcde";
-    s.insert(1, "fg");
-    cout << s.getCString() << endl;
-
-    String ss = "ab";
-    for (int i = 0; i < 20; ++i) {
-        ss.append("12");
+    std::string ss = "不是a2";
+    cout << ss.size() << endl;
+    cout << ss.length() << endl;
+    timeval start, t;
+    gettimeofday(&start, nullptr);
+    String s = "ab";
+    //std::string s = "ab";
+    for (int i = 0; i < 25; ++i) {
+        s.append(s);
     }
-
-    cout << ss.getCppString() << endl;
-
+    gettimeofday(&t, nullptr);
+    cout << (t.tv_sec * 1000 - start.tv_sec * 1000 + t.tv_usec / 1000 - start.tv_usec / 1000) << endl;
     return 0;
 }

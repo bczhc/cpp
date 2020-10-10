@@ -2,6 +2,7 @@
 #define BCZHC_STRING_H
 
 #include "./third_party/practice/LinearList.hpp"
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -28,6 +29,8 @@ namespace bczhc {
 
             void resize(int newStringLength);
 
+            String &append(const char *s, size_t size);
+
         public:
             String();
 
@@ -49,15 +52,11 @@ namespace bczhc {
 
             size_t size() const;
 
-            String &operator=(const char *s);
-
             String &operator=(const String &string);
 
             String &operator=(const std::string &str);
 
             void copy(const String &string);
-
-            String &append(const char *s);
 
             String &append(const String &string);
 
