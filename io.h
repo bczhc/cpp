@@ -28,6 +28,8 @@ namespace bczhc {
         public:
             InputStream(String file);
 
+            InputStream(FILE *stream);
+
             int read(char *bytes, int size);
 
             void close();
@@ -39,6 +41,8 @@ namespace bczhc {
 
         public:
             OutputStream(String file);
+
+            OutputStream(FILE *stream);
 
             int write(const char *bytes, int size);
 

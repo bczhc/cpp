@@ -61,3 +61,11 @@ void OutputStream::flush() {
 void OutputStream::close() {
     fclose(fp);
 }
+
+InputStream::InputStream(FILE *stream) {
+    fp = stream;
+}
+
+OutputStream::OutputStream(FILE *stream) {
+    fp = stream;
+}
