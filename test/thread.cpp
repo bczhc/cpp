@@ -11,26 +11,25 @@ void println(const char *s) { printf("%s\n", s); }
 
 void sleep(int sec) { usleep(sec * 1000000); }
 
-CountDownLatch latch(5);
+CountDownLatch latch(10);
 
 int main() {
     class R : public Runnable {
     public:
         int i;
         void run() override {
-            sleep(3);
+            sleep(1);
             printf("%i\n", i);
             latch.countDown();
         }
     };
     ThreadPool *pool = Executors::newFixedThreadPool(2);
     PointersSet ps;
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
         R *r = new R;
         ps.put(r);
         r->i = i;
         pool->execute(r);
-        sleep(1);
     }
     latch.await();
     free(pool);

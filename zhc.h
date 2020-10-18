@@ -7,6 +7,7 @@
 #define C99_ZHC_H
 
 #include <stdexcept>
+#define M_PI ((double) 3.14159265358979323846264338327950288)
 
 #ifndef __cplusplus
 #include <stdint.h>

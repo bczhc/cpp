@@ -2,6 +2,7 @@
 #define BCZHC_CONCURRENT_H
 
 #include "./third_party/practice/LinearList.hpp"
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <pthread.h>
