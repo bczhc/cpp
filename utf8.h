@@ -15,6 +15,8 @@ namespace bczhc {
         int getUTF8Size(int codepoint);
 
         int unicode2UTF8(char *dest, int codepoint);
+
+        wchar_t *utf8ToWChar(const char *s);
     } // namespace utf8
 } // namespace bczhc
 #endif // UTF8_H

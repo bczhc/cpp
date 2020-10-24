@@ -7,7 +7,6 @@
 #include <iostream>
 #include <pthread.h>
 #include <sys/time.h>
-#include <sys/wait.h>
 #include <termio.h>
 #include <termios.h>
 #include <unistd.h>

@@ -1,6 +1,40 @@
-set(CMAKE_EXE_LINKER_FLAGS -static)
+add_compile_options(-g)
+set(CMAKE_CXX_FLAGS -std=c++17)
+set(CMAKE_C_FLAGS -std=c99)
+
+include_directories(D:/zhc/jdk1.8/include)
+include_directories(D:/zhc/jdk1.8/include/win32)
 
 project(cpp)
 
-add_executable(test test/test.cpp utf8.cpp Concurrent.cpp)
-add_executable(T1 test/T1.cpp utf8.cpp)
+if (WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS -static)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+    add_library(sqlite3 SHARED third_party/sqlite3-single-c/sqlite3.c)
+endif ()
+
+#add_library(zhcLib SHARED ComplexIntegral.cpp ComplexValue.cpp Epicycle.cpp FourierSeries.cpp utf8.cpp CountCharacters.cpp Concurrent.cpp Sqlite3.cpp zhc.cpp io.cpp String.cpp reverseCharacters.cpp)
+add_library(zhcLib STATIC ComplexIntegral.cpp ComplexValue.cpp Epicycle.cpp FourierSeries.cpp utf8.cpp CountCharacters.cpp Concurrent.cpp Sqlite3.cpp zhc.cpp io.cpp String.cpp reverseCharacters.cpp)
+target_link_libraries(zhcLib pthread sqlite3)
+
+link_libraries(zhcLib)
+
+add_executable(T1 test/T1.cpp zhc.cpp)
+add_executable(T2 test/T2.cpp zhc.cpp)
+add_executable(T3 test/T3.cpp zhc.cpp)
+add_executable(T4 test/T4.cpp zhc.cpp)
+add_executable(diaryCharactersStatistics test/DiaryCharactersStatistics.cpp)
+add_executable(printUnicodeCharcters test/printUnicodeCharacters.cpp)
+add_executable(test test/test.cpp)
+add_executable(fourierSeriesTest test/fourierSeriesTest.cpp)
+add_executable(sqlite3ToJSON test/sqlite3ToJSON.cpp)
+add_executable(snake snake.cpp zhc.cpp)
+add_executable(snake2 snake2.cpp zhc.cpp)
+add_executable(sqliteTest test/sqliteTest.cpp)
+add_executable(charactersStatistics CharactersStatistics.cpp)
+add_executable(thread test/thread.cpp)
+add_executable(producerAndConsumer test/producerAndConsumer.cpp)
+add_executable(reverse test/reverse.cpp)
+add_executable(echoAndWrite test/echoAndWrite.cpp)
+
+add_library(tts SHARED test/test.cpp)
