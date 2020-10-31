@@ -19,15 +19,7 @@ using namespace concurrent;
 MutexLock lock;
 
 int main() {
-    char o[] = "hello";
-    String s = String::fromRef(o);
-    cout << s.getCString() << endl;
-    cout << (s.getCString() == o) << endl;
-
-    auto splited = s.split("el");
-    int size = splited.length();
-    for (int i = 0; i < size; ++i) {
-        cout << splited.get(i).getCString() << endl;
-    }
+    int i = String::indexOf("dsfahello world", 'l');
+    cout << i << endl;
     return 0;
 }

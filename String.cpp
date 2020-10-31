@@ -117,32 +117,43 @@ String &String::append(char c) {
 }
 
 int String::indexOf(char c) {
-    for (int i = 0; i < stringSize; ++i)
-        if (data[i] == c) return i;
-    return -1;
+    return String::indexOf(data, c);
 }
 
 int String::indexOf(const char *s) {
-    char *match = strstr(data, s);
-    return match == nullptr ? -1 : (int) (match - data);
+    return String::indexOf(data, s);
 }
 
 int String::indexOf(const String &string) {
     return indexOf(string.data);
 }
 
-SequentialList<String> String::split(const String &separator) {
-    return split(separator.data);
+int String::indexOf(const char *s, char c) {
+    for (int i = 0; s[i] != '\0'; ++i)
+        if (s[i] == c) return i;
+    return -1;
 }
 
-SequentialList<String> String::split(const char *separator) {
+int String::indexOf(const char *haystack, const char *needle) {
+    const char *match = strstr(haystack, needle);
+    return match == nullptr ? -1 : (int) (match - haystack);
+}
+
+
+SequentialList<String> String::split(const String &separator) const {
+    return String::split(*this, separator);
+}
+
+SequentialList<String> String::split(const String &str, const String &separator) {
+    const char *s = str.getCString();
+    int stringSize = str.size();
     SequentialList<String> list;
     SequentialList<int> indexes;
-    int length = strlen(separator);
-    char *found;
-    char *start = data;
-    while (start - data <= stringSize && (found = strstr(start, separator)) != nullptr) {
-        indexes.insert((int) (found - data));
+    int length = separator.size();
+    const char *found;
+    const char *start = s;
+    while (start - s <= stringSize && (found = strstr(start, separator.getCString())) != nullptr) {
+        indexes.insert((int) (found - s));
         start = found + 1;
     }
     int len = indexes.length();
@@ -151,11 +162,11 @@ SequentialList<String> String::split(const char *separator) {
     for (int i = 0; i < len; ++i) {
         int index = indexes.get(i);
         int size = index - subStart;
-        String s(data + subStart, size);
-        list.insert(s);
+        String r(s + subStart, size);
+        list.insert(r);
         subStart = index + length;
     }
-    String rest(data + subStart, stringSize - subStart);
+    String rest(s + subStart, stringSize - subStart);
     list.insert(rest);
     return list;
 }
@@ -199,10 +210,12 @@ String String::toString(int64_t a) {
 }
 
 String String::toString(float a) {
+    //TODO float toString
     return String();
 }
 
 String String::toString(double a) {
+    //TODO double toString
     return String();
 }
 
@@ -291,18 +304,4 @@ String String::toString(char c) {
     char s[2];
     s[0] = c, s[1] = '\0';
     return String(s);
-}
-
-String String::fromRef(char *s) {
-    size_t size = s[0] == '\0' ? 0 : strlen(s);
-    return String::fromRef(s, size);
-}
-
-String String::fromRef(char *s, size_t size) {
-    String str;
-    str.data = s;
-    str.copyData = false;
-    str.stringSize = size;
-    str.dataSize = str.stringSize + 1;
-    return str;
 }

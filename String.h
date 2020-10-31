@@ -71,9 +71,14 @@ namespace bczhc {
 
             int indexOf(const String &string);
 
-            SequentialList<String> split(const String &separator);
+            static int indexOf(const char *s, char c);
 
-            SequentialList<String> split(const char *separator);
+            static int indexOf(const char *haystack, const char *needle);
+
+
+            SequentialList<String> split(const String &separator) const;
+
+            static SequentialList<String> split(const String &str, const String &separator);
 
             static String toString(int32_t a);
 
@@ -92,10 +97,6 @@ namespace bczhc {
             static String toString(int64_t i, int radix);
 
             static String toString(char c);
-
-            static String fromRef(char *s);
-
-            static String fromRef(char *s, size_t size);
         };
     }// namespace string
 }// namespace bczhc
