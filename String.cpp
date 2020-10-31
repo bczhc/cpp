@@ -73,6 +73,7 @@ String &String::operator=(const String &string) {
 }
 
 void String::resize(int newSize) {
+    printf("resize: %zu to %i\n", dataSize, newSize);
     char *newChars = new char[newSize];
     strcpy(newChars, data);
     delete[] data;
@@ -169,15 +170,6 @@ SequentialList<String> String::split(const String &str, const String &separator)
     String rest(s + subStart, stringSize - subStart);
     list.insert(rest);
     return list;
-}
-
-String &String::append(const std::string &s) {
-    return append(s.c_str(), s.size());
-}
-
-String &String::operator=(const std::string &str) {
-    operator=(String(str.c_str()));
-    return *this;
 }
 
 String::String(const std::string &str) {
@@ -304,4 +296,15 @@ String String::toString(char c) {
     char s[2];
     s[0] = c, s[1] = '\0';
     return String(s);
+}
+
+String::String(int capacity) {
+    stringSize = 0, dataSize = capacity + 1;
+    data = new char[dataSize];
+    data[0] = '\0';
+}
+
+void String::clear() {
+    stringSize = 0;
+    data[0] = '\0';
 }

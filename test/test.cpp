@@ -19,7 +19,14 @@ using namespace concurrent;
 MutexLock lock;
 
 int main() {
-    int i = String::indexOf("dsfahello world", 'l');
-    cout << i << endl;
+    String s(100000 * 5);
+    s.append("afds");
+    s.append("afds");
+    s.append("afds");
+    s.append("afds");
+    s.clear();
+    for (int i = 0; i < 100000; ++i) {
+        s.append("12345");
+    }
     return 0;
 }

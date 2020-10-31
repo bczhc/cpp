@@ -55,15 +55,11 @@ namespace bczhc {
 
             String &operator=(const String &string);
 
-            String &operator=(const std::string &str);
-
             void copy(const String &string);
 
             String &append(const String &string);
 
             String &append(char c);
-
-            String &append(const std::string &s);
 
             int indexOf(char c);
 
@@ -97,6 +93,10 @@ namespace bczhc {
             static String toString(int64_t i, int radix);
 
             static String toString(char c);
+
+            String(int capacity);
+
+            void clear();
         };
     }// namespace string
 }// namespace bczhc
