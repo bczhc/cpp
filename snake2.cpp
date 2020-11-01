@@ -223,6 +223,7 @@ inline bool cmp2(const char *str, const char *cmp, const char *orCmp) {
 }
 
 int main(int argc, char **argv) {
+    srand(time(0));
     int index = 0;
     char *path = argv[0];
     for (int i = 0; path[i] != '\0'; ++i) {

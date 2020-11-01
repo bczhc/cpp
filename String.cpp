@@ -73,7 +73,6 @@ String &String::operator=(const String &string) {
 }
 
 void String::resize(int newSize) {
-    printf("resize: %zu to %i\n", dataSize, newSize);
     char *newChars = new char[newSize];
     strcpy(newChars, data);
     delete[] data;
