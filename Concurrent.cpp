@@ -89,6 +89,8 @@ void Thread::sleep(int64_t millis) {
     usleep(millis * 1000);
 }
 
+ThreadPool::~ThreadPool() = default;
+
 Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock)
         : runnables(runnables), lock(lock) {}
 
