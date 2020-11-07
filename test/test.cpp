@@ -18,15 +18,11 @@ using namespace concurrent;
 
 MutexLock lock;
 
+#include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
+using json = nlohmann::json;
+
 int main() {
-    String s(100000 * 5);
-    s.append("afds");
-    s.append("afds");
-    s.append("afds");
-    s.append("afds");
-    s.clear();
-    for (int i = 0; i < 100000; ++i) {
-        s.append("12345");
-    }
+    json j = json::parse("{\"a\": 7}");
+    cout << j["a"] << endl;
     return 0;
 }

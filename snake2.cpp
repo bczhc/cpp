@@ -99,7 +99,7 @@ public:
         init();
     };
 
-    ~SnakeGame() { delete this->map; }
+    ~SnakeGame() { delete[] this->map; }
 
     bool getGameoverStatus() const { return gameover; }
 

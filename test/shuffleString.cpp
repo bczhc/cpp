@@ -2,19 +2,32 @@
 #include "../third_party/practice/LinearList.hpp"
 #include "../utf8.h"
 #include <iostream>
+#include "../io.h"
+#include <sys/time.h>
 
 using namespace std;
 using namespace bczhc;
 using namespace linearlist;
 using namespace utf8;
 using namespace string;
+using namespace io;
 
 #define RANDOM(a, b) (((double) rand() / RAND_MAX) * ((b) - (a)) + (a))
 
 int main() {
-    const char *s = "wo xian zai fei chang gao xing ren shi ni.";
+    String str;
+    InputStream is(stdin);
+    char buf[2048];
+    int read;
+    while ((read = is.read(buf, 2048)) > 0) {
+        str.append(buf, read);
+    }
+    is.close();
+    const char *s = str.getCString();
 
-    srand(time(0));
+    timeval t;
+    gettimeofday(&t, nullptr);
+    srand(t.tv_sec * 1000 + t.tv_usec / 1000);
     using List = LinkedList<int>;
     List list;
     SolvedUTF8Properties solved;

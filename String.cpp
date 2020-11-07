@@ -177,7 +177,7 @@ String::String(const std::string &str) {
 
 String::~String() {
     if (copyData)
-        delete data;
+        delete[] data;
 }
 
 String String::toString(int32_t a) {

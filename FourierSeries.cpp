@@ -19,7 +19,6 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                                 int threadNum) {
     LongWaitCountDownLatch latch(epicyclesCount);
     ThreadPool *pool = Executors::newFixedThreadPool(threadNum);
-    PointersSet deletable;
     int32_t a = -epicyclesCount / 2;
     int32_t t = a + epicyclesCount;
     class FuncInIntegral : public FuncInIntegralInterface {
@@ -60,15 +59,14 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
             integralResult.selfDivide(T, 0);
             callback.callback(n, integralResult.re, integralResult.im);
             latch.countDown();
+            delete this;
         }
     };
     for (int32_t n = a; n < t; ++n) {
         Run *runnable =
                 new Run(funcInIntegral, complexIntegral, callback, n, T, latch);
-        deletable.put(runnable);
         pool->execute(runnable);
     }
     latch.wait();
-    free(pool);
-    deletable.freeAll();
+    delete pool;
 }

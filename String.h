@@ -28,7 +28,6 @@ namespace bczhc {
 
             void resize(int newStringLength);
 
-            String &append(const char *s, size_t size);
 
         public:
             bool copyData = true;
@@ -60,6 +59,8 @@ namespace bczhc {
             String &append(const String &string);
 
             String &append(char c);
+
+            String &append(const char *s, size_t size);
 
             int indexOf(char c);
 
