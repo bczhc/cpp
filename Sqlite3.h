@@ -15,6 +15,31 @@ namespace bczhc {
             virtual int callback(void *arg, int colNum, char **content, char **colName) = 0;
         };
 
+        class Statement {
+        private:
+            sqlite3_stmt *stmt;
+        public:
+            int step() const;
+
+            int status{};
+
+            Statement(sqlite3_stmt *stmt, int status);
+
+            int reset() const;
+
+            int bind(int row, int a) const;
+
+            int bind(int row, int64_t a) const;
+
+            int bind(int row, double a) const;
+
+            int bind(int row, const char *s) const;
+
+            int bind(int row, const char *s, int size) const;
+
+            int bindNull(int row) const;
+        };
+
     private:
 
         class Bean {
@@ -47,6 +72,8 @@ namespace bczhc {
         int exec(const char *cmd, SqliteCallback &callback, void *arg);
 
         ~Sqlite3();
+
+        Statement compileStatement(const char *sql) const;
     };
 }
 
