@@ -4,7 +4,6 @@
 
 #include "./FourierSeries.h"
 #include "ComplexIntegral.h"
-#include "zhc.h"
 
 using namespace bczhc;
 using namespace concurrent;
