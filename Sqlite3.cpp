@@ -20,7 +20,7 @@ int bczhc::Sqlite3::exec(const char *cmd, bczhc::Sqlite3::SqliteCallback &callba
 }
 
 bczhc::Sqlite3::~Sqlite3() {
-    if (!closed) {
+    if (!closed && db != nullptr) {
         close();
         sqlite3_db_release_memory(db);
     }
@@ -63,10 +63,14 @@ int bczhc::Sqlite3::Statement::bindNull(int row) const {
     return sqlite3_bind_null(stmt, row);
 }
 
-int bczhc::Sqlite3::Statement::bind(int row, const char *s) const {
-    return bind(row, s, -1);
+int bczhc::Sqlite3::Statement::bindText(int row, const char *s) const {
+    return bindText(row, s, -1);
 }
 
-int bczhc::Sqlite3::Statement::bind(int row, const char *s, int size) const {
+int bczhc::Sqlite3::Statement::bindBlob(int row, const char *bytes, int size) const {
+    return sqlite3_bind_blob(stmt, row, bytes, size, SQLITE_STATIC);
+}
+
+int bczhc::Sqlite3::Statement::bindText(int row, const char *s, int size) const {
     return sqlite3_bind_text(stmt, row, s, size, SQLITE_STATIC);
 }

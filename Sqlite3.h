@@ -16,9 +16,9 @@ namespace bczhc {
         };
 
         class Statement {
-        private:
-            sqlite3_stmt *stmt;
         public:
+            sqlite3_stmt *stmt;
+
             int step() const;
 
             int status{};
@@ -33,9 +33,11 @@ namespace bczhc {
 
             int bind(int row, double a) const;
 
-            int bind(int row, const char *s) const;
+            int bindText(int row, const char *s) const;
 
-            int bind(int row, const char *s, int size) const;
+            int bindText(int row, const char *s, int size) const;
+
+            int bindBlob(int row, const char *bytes, int size) const;
 
             int bindNull(int row) const;
         };

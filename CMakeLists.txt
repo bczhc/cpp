@@ -40,7 +40,24 @@ find_library(PTHREAD_LIB pthread REQUIRED)
 find_path(PTHREAD_INCLUDE_DIR pthread.h)
 include_directories("${PTHREAD_INCLUDE_DIR}")
 
-add_library(zhcLib SHARED ComplexIntegral.cpp ComplexValue.cpp Epicycle.cpp FourierSeries.cpp utf8.cpp CountCharacters.cpp Concurrent.cpp Sqlite3.cpp io.cpp String.cpp reverseCharacters.cpp utils.cpp)
+add_library(
+        zhcLib
+        SHARED
+        ComplexIntegral.cpp
+        ComplexValue.cpp
+        Epicycle.cpp
+        FourierSeries.cpp
+        utf8.cpp
+        CountCharacters.cpp
+        Concurrent.cpp
+        Sqlite3.cpp
+        io.cpp
+        String.cpp
+        reverseCharacters.cpp
+        utils.cpp
+        File.cpp
+        Base128Lib.cpp
+)
 target_link_libraries(zhcLib "${SQLITE3_LIB}" "${PTHREAD_LIB}")
 
 link_libraries(zhcLib)
@@ -63,3 +80,5 @@ add_executable(producerAndConsumer test/producerAndConsumer.cpp)
 add_executable(reverse test/reverse.cpp)
 add_executable(echoAndWrite test/echoAndWrite.cpp)
 add_executable(shuffleString test/shuffleString.cpp)
+add_executable(bases128 Base128.cpp)
+add_executable(stdinSize test/stdinSize.cpp)
