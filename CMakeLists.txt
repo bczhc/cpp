@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 include(./functions.cmake)
 
 setCompiler()
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -fPIC")
 
 project(cpp)
 
