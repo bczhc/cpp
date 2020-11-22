@@ -98,6 +98,14 @@ namespace bczhc {
             String(int capacity);
 
             void clear();
+
+            static String toUpperCase(const char *s) {
+                String r;
+                for (int i = 0; s[i] != '\0'; ++i) {
+                    r.append(toupper(s[i]));
+                }
+                return r;
+            }
         };
     }// namespace string
 }// namespace bczhc
