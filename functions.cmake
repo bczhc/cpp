@@ -18,6 +18,7 @@ function(setCompiler)
 endfunction()
 
 function(confLib)
+
     #sqlite3
     find_library(SQLITE3_LIB sqlite3)
     if (NOT SQLITE3_LIB)
@@ -68,5 +69,5 @@ function(confLib)
     add_library(zhcLibStatic STATIC ${zhcLibSrc})
     target_link_libraries(zhcLibStatic "${SQLITE3_LIB}" "${PTHREAD_LIB}")
     set_target_properties(zhcLibStatic PROPERTIES OUTPUT_NAME zhcLib)
-    target_link_options(zhcLib PRIVATE -static-libstdc++ -static-libgcc)
+    set_target_properties(zhcLib PROPERTIES LINK_FLAGS "-static-libstdc++ -static-libgcc")
 endfunction()
