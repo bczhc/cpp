@@ -4,58 +4,103 @@
 #include "../String.h"
 #include "../third_party/practice/LinearList.hpp"
 #include "thread"
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <string>
 #include "../utils.h"
 #include "../File.h"
 #include <map>
+#include <sys/wait.h>
 
-using namespace std;
 using namespace bczhc;
 using namespace linearlist;
 using namespace bczhc::string;
 using namespace concurrent;
 using namespace utils;
 using namespace file;
+using namespace std;
 
 MutexLock lock; // NOLINT(cert-err58-cpp)
 
-int convert2Int(const String &s) {
-    int r = 0;
-    int len = (int) s.size();
-    for (int i = len - 1; i >= 0; --i) {
-        r += (s.getCString()[i] - 'a' + 1) * (int) pow(26, len - 1 - i);
-    }
-    return r;
-}
-
 int main() {
-    using List = SequentialList<String *>;
-    char *marks = new char[100000];
-    memset(marks, 0, 100000);
-    List list;
+    struct WordBean {
+        std::string code;
+        String word;
+        int64_t num{};
+
+        WordBean(std::string code, String word, int64_t num) : code(code), word(word), num(num) {}
+
+        WordBean() {}
+    };
+    using LList = LinkedList<WordBean>;
+    using Map = map<std::string, LList *>;
+    auto *m = new Map();
 
     Sqlite3 db;
-    db.open("/home/zhc/code/some-tools/app/src/main/res/raw/wubi_dict.db");
+    db.open("/root/some-tools/app/src/main/res/raw/wubi_dict.db");
     class CB : public Sqlite3::SqliteCallback {
     private:
-        char *marks;
-        List &list;
+        Map &m;
     public:
-        explicit CB(char *marks, List &list) : marks(marks), list(list) {}
+        explicit CB(Map &m) : m(m) {}
 
     public:
         int callback(void *arg, int colNum, char **content, char **colName) override {
-            auto *code = new String(content[0]);
-            int mark = convert2Int(*code);
-            if (marks[mark] == 0) {
-                list.insert(code);
-                marks[mark] = 1;
+            int64_t num = atoll(content[2]);
+            std::string code = content[0];
+            WordBean bean(code, content[1], num);
+            if (m.find(code) == m.end()) {
+                auto *newList = new LList();
+                newList->insert(bean);
+                m[code] = newList;
+            } else {
+                m.find(code)->second->insert(bean);
             }
             return 0;
         }
-    } cb(marks, list);
-    db.exec("select code from wubi_dict order by num desc", cb);
+    } cb(*m);
+
+    db.exec("select code,char,num from wubi_dict order by num desc", cb);
+
+    auto iter = m->begin();
+    for (;iter != m->end(); ++iter) {
+        auto candidateList = iter->second;
+        int candidatesLength = candidateList->length();
+        WordBean beans[candidatesLength];
+        int i = 0;
+        auto listIter = candidateList->getIterator();
+        if (listIter.moveToFirst()) {
+            do {
+                auto wordBean = listIter.get();
+                beans[i++] = wordBean;
+            } while (listIter.next());
+        }
+
+        class C : public sort::Comparable<WordBean> {
+            public:
+            int compare(WordBean &o1, WordBean &o2) override {
+                return o2.num - o1.num;
+            }
+        } comparable;
+        sort::BubbleSort<WordBean>::sort(beans, i, comparable);
+
+
+        String candidateCombinedString = beans[0].word;
+        for (int j = 1; j < i; ++j) {
+            candidateCombinedString.append('|').append(beans[j].word);
+        }
+        String sql = "insert into wubi_code values(";
+        sql.append('\'')
+        .append(candidateList->get(0).code)
+        .append("','")
+        .append(candidateCombinedString)
+        .append("');");
+        cout << sql.getCString() << endl;
+        delete candidateList;
+    }
+    delete m;
     return 0;
 }
