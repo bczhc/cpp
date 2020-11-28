@@ -39,12 +39,7 @@ const char *String::getCString() const {
     return data;
 }
 
-std::string String::getCppString() {
-    std::string s = data;
-    return s;
-}
-
-int String::length() {
+size_t String::utf8Length() {
     int c = 0;
     int i = 0;
     while (data[i] != '\0') {
