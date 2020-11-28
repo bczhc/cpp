@@ -26,6 +26,13 @@ using namespace std;
 MutexLock lock; // NOLINT(cert-err58-cpp)
 
 int main() {
+    cout << "begin transaction;" << endl;
+    for (char c = 'a'; c <= 'z'; ++c) {
+        String sql = "create table wubi_code_";
+        sql.append(c)
+        .append("(code text not null primary key, word text not null);");
+        cout << sql.getCString() << endl;
+    }
     struct WordBean {
         std::string code;
         String word;
@@ -68,6 +75,7 @@ int main() {
     auto iter = m->begin();
     for (;iter != m->end(); ++iter) {
         auto candidateList = iter->second;
+        std::string code = candidateList->get(0).code;
         int candidatesLength = candidateList->length();
         WordBean beans[candidatesLength];
         int i = 0;
@@ -85,15 +93,17 @@ int main() {
                 return o2.num - o1.num;
             }
         } comparable;
-        sort::BubbleSort<WordBean>::sort(beans, i, comparable);
 
 
         String candidateCombinedString = beans[0].word;
         for (int j = 1; j < i; ++j) {
             candidateCombinedString.append('|').append(beans[j].word);
         }
-        String sql = "insert into wubi_code values(";
-        sql.append('\'')
+        char theFirstCodeChar = code.c_str()[0];
+        String sql = "insert into wubi_code_";
+        sql.append(theFirstCodeChar)
+        .append(" values(")
+        .append('\'')
         .append(candidateList->get(0).code)
         .append("','")
         .append(candidateCombinedString)
@@ -102,5 +112,6 @@ int main() {
         delete candidateList;
     }
     delete m;
+    cout << "commit;" << endl;
     return 0;
 }
