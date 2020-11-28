@@ -3,7 +3,6 @@
 //
 
 #include "../FourierSeries.h"
-#include "../zhc.h"
 #include <cstdint>
 #include <cstdio>
 #include <iostream>

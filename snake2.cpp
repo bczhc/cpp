@@ -1,4 +1,3 @@
-#include "./zhc.h"
 #include "third_party/practice/LinearList.hpp"
 #include <cstdint>
 #include <cstdio>
@@ -44,7 +43,7 @@ private:
     char *map = nullptr;
     char orientation = RIGHT;
     bool gameover = false;
-    linearlist::DoublyLinkedList<Point> snake{};
+    bczhc::linearlist::DoublyLinkedList<Point> snake{};
     int64_t manualMoveTime = 0;
     int delayMillis;
 
@@ -99,7 +98,7 @@ public:
         init();
     };
 
-    ~SnakeGame() { delete this->map; }
+    ~SnakeGame() { delete[] this->map; }
 
     bool getGameoverStatus() const { return gameover; }
 
@@ -223,6 +222,7 @@ inline bool cmp2(const char *str, const char *cmp, const char *orCmp) {
 }
 
 int main(int argc, char **argv) {
+    srand(time(0));
     int index = 0;
     char *path = argv[0];
     for (int i = 0; path[i] != '\0'; ++i) {
@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
     }
     char *filename = path + index;
     typedef pair<char *, char *> param;
-    linearlist::LinkedList<param> params;
+    bczhc::linearlist::LinkedList<param> params;
     bool help = false, invalidArguments = false;
     for (int i = 1; i < argc; ++i) {
         if (cmp2(argv[i], "--help", "-h")) {

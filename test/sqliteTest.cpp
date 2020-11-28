@@ -1,5 +1,4 @@
 #include "../third_party/sqlite3-single-c/sqlite3.h"
-#include "../zhc.h"
 #include <iostream>
 
 using namespace std;

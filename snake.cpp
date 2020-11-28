@@ -1,11 +1,12 @@
-#include "./zhc.h"
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include "third_party/practice/LinearList.hpp"
 
 #define RANDOM(a, b) (((double) rand() / RAND_MAX) * (b - a) + a)
 
-using namespace bczhc;
+using namespace bczhc::linearlist;
+using namespace std;
 
 class SnakeGame {
     class Point {
@@ -16,7 +17,7 @@ class SnakeGame {
 
 private:
     int x = 10, y = 10;
-    bczhc::LinkedList<Point> snake;
+    LinkedList<Point> snake;
     int &gameover;
     char *map = nullptr;
     Point food{};
@@ -33,8 +34,8 @@ private:
         next.y = prev.y + offY;
         char nextChar = getMapPoint(next.x, next.y);
         if (nextChar != '$')
-            snake.removeLast();
-        snake.putFirst(next);
+            snake.remove(snake.length() - 1);
+        snake.insert(0, next);
         if (nextChar == '$')
             placeFood();
         if (nextChar == '*' || nextChar == 'O' || nextChar == 'X')
@@ -90,7 +91,7 @@ public:
             : x(x), y(y), gameover(gameoverMark) {
         initMap();
         Point firstPoint{.x = 3, .y = 3};
-        snake.put(firstPoint);
+        snake.insert(firstPoint);
         drawMap();
         placeFood();
     }

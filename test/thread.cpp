@@ -1,5 +1,4 @@
 #include "../Concurrent.h"
-#include "../zhc.h"
 #include <cstdio>
 #include <pthread.h>
 #include <unistd.h>
@@ -16,24 +15,22 @@ CountDownLatch latch(5);
 int main() {
     class R : public Runnable {
     public:
-        int i;
+        int i{};
         void run() override {
             sleep(3);
             printf("%i\n", i);
             latch.countDown();
+            delete this;
         }
     };
     ThreadPool *pool = Executors::newFixedThreadPool(2);
-    PointersSet ps;
     for (int i = 0; i < 5; ++i) {
         R *r = new R;
-        ps.put(r);
         r->i = i;
         pool->execute(r);
         sleep(1);
     }
     latch.await();
-    free(pool);
-    ps.freeAll();
+    delete pool;
     return 0;
 }

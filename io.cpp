@@ -1,4 +1,5 @@
 #include "io.h"
+#include <cstdio>
 
 using namespace bczhc;
 using namespace io;
@@ -31,4 +32,40 @@ void bczhc::io::solveU8FromStream(FILE *f, U8StringCallback &callback) {
         callback.callback(
                 buf, readLen < (BUFFER_SIZE - readOff) ? readLen : lastValidPos);
     }
+}
+
+InputStream::InputStream(String file) {
+    if ((fp = fopen(file.getCString(), "rb")) == nullptr) throw String("Open file failed.");
+}
+
+int InputStream::read(char *bytes, int size) {
+    return fread(bytes, 1, size, fp);
+}
+
+void InputStream::close() {
+    fclose(fp);
+}
+
+OutputStream::OutputStream(String file) {
+    if ((fp = fopen(file.getCString(), "wb")) == nullptr) throw String("Open file failed.");
+}
+
+int OutputStream::write(const char *bytes, int size) {
+    return fwrite(bytes, 1, size, fp);
+}
+
+void OutputStream::flush() {
+    fflush(fp);
+}
+
+void OutputStream::close() {
+    fclose(fp);
+}
+
+InputStream::InputStream(FILE *stream) {
+    fp = stream;
+}
+
+OutputStream::OutputStream(FILE *stream) {
+    fp = stream;
 }

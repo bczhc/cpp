@@ -20,7 +20,7 @@ namespace bczhc {
                 pthread_mutex_t &mutex;
 
             public:
-                Condition(MutexLock &mutexLock) : mutex(mutexLock.mutexLock) {};
+                Condition(MutexLock &mutexLock) : mutex(mutexLock.mutexLock){};
 
                 ~Condition();
 
@@ -130,7 +130,7 @@ namespace bczhc {
         public:
             virtual void execute(Runnable *r) = 0;
 
-            ~ThreadPool();
+            virtual ~ThreadPool();
         };
 
         class Executors {
@@ -157,7 +157,7 @@ namespace bczhc {
             public:
                 FixedThreadPool(int poolSize);
 
-                ~FixedThreadPool();
+                ~FixedThreadPool() override;
 
                 void execute(Runnable *runnable) override;
             };
