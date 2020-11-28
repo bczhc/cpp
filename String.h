@@ -46,9 +46,7 @@ namespace bczhc {
 
             const char *getCString() const;
 
-            std::string getCppString();
-
-            int length();
+            size_t utf8Length();
 
             size_t size() const;
 
@@ -71,7 +69,6 @@ namespace bczhc {
             static int indexOf(const char *s, char c);
 
             static int indexOf(const char *haystack, const char *needle);
-
 
             SequentialList<String> split(const String &separator) const;
 
