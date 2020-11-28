@@ -2,6 +2,7 @@
 #define BCZHC_STRING_H
 
 #include "./third_party/practice/LinearList.hpp"
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -16,8 +17,7 @@ namespace bczhc {
                 'c', 'd', 'e', 'f', 'g', 'h',
                 'i', 'j', 'k', 'l', 'm', 'n',
                 'o', 'p', 'q', 'r', 's', 't',
-                'u', 'v', 'w', 'x', 'y', 'z'
-        };
+                'u', 'v', 'w', 'x', 'y', 'z'};
 
         class String {
         private:
@@ -28,7 +28,10 @@ namespace bczhc {
 
             void resize(int newStringLength);
 
+
         public:
+            bool copyData = true;
+
             String();
 
             String(const String &string);
@@ -43,27 +46,19 @@ namespace bczhc {
 
             const char *getCString() const;
 
-            std::string getCppString();
-
-            int length();
+            size_t utf8Length();
 
             size_t size() const;
 
-            String &operator=(const char *s);
-
             String &operator=(const String &string);
 
-            String &operator=(const std::string &str);
-
             void copy(const String &string);
-
-            String &append(const char *s);
 
             String &append(const String &string);
 
             String &append(char c);
 
-            String &append(const std::string &s);
+            String &append(const char *s, size_t size);
 
             int indexOf(char c);
 
@@ -71,9 +66,13 @@ namespace bczhc {
 
             int indexOf(const String &string);
 
-            SequentialList<String> split(const String &separator);
+            static int indexOf(const char *s, char c);
 
-            SequentialList<String> split(const char *separator);
+            static int indexOf(const char *haystack, const char *needle);
+
+            SequentialList<String> split(const String &separator) const;
+
+            static SequentialList<String> split(const String &str, const String &separator);
 
             static String toString(int32_t a);
 
@@ -92,8 +91,20 @@ namespace bczhc {
             static String toString(int64_t i, int radix);
 
             static String toString(char c);
+
+            String(int capacity);
+
+            void clear();
+
+            static String toUpperCase(const char *s) {
+                String r;
+                for (int i = 0; s[i] != '\0'; ++i) {
+                    r.append(toupper(s[i]));
+                }
+                return r;
+            }
         };
     }// namespace string
 }// namespace bczhc
 
-#endif //BCZHC_STRING_H
+#endif//BCZHC_STRING_H

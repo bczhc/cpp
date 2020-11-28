@@ -13,7 +13,8 @@ String::String() {
 }
 
 String::String(const String &string) {
-    copy(string);
+    if (copyData)
+        copy(string);
 }
 
 void String::copy(const String &string) {
@@ -23,6 +24,7 @@ void String::copy(const String &string) {
     data[oldStringSize] = '\0';
     stringSize = string.stringSize;
     dataSize = oldStringSize + 1;
+    copyData = string.copyData;
 }
 
 String::String(const char *s) {
@@ -37,12 +39,7 @@ const char *String::getCString() const {
     return data;
 }
 
-std::string String::getCppString() {
-    std::string s = data;
-    return s;
-}
-
-int String::length() {
+size_t String::utf8Length() {
     int c = 0;
     int i = 0;
     while (data[i] != '\0') {
@@ -63,11 +60,6 @@ void String::fromCharsString(const char *s, size_t size) {
     data[size] = '\0';
 }
 
-String &String::operator=(const char *s) {
-    fromCharsString(s, s == nullptr ? 0 : strlen(s));
-    return *this;
-}
-
 
 String &String::operator=(const String &string) {
     if (&string == this) return *this;
@@ -82,15 +74,15 @@ void String::resize(int newSize) {
     data = newChars;
 }
 
-String &String::append(const char *s) {
-    int len = -1;
+String &String::append(const char *s, size_t size) {
+    size_t len = -1;
     String *t = nullptr;
     if (s == this->data) {
         t = new String(s);
         len = t->size();
         s = t->data;
     }
-    if (len == -1) len=strlen(s);
+    if (len == -1) len = size;
     if (stringSize + len + 1 > dataSize) {
         dataSize = 2 * (stringSize + len) + 1;
         resize(dataSize);
@@ -104,7 +96,7 @@ String &String::append(const char *s) {
 }
 
 String &String::append(const String &string) {
-    append(string.data);
+    append(string.data, string.size());
     return *this;
 }
 
@@ -120,32 +112,43 @@ String &String::append(char c) {
 }
 
 int String::indexOf(char c) {
-    for (int i = 0; i < stringSize; ++i)
-        if (data[i] == c) return i;
-    return -1;
+    return String::indexOf(data, c);
 }
 
 int String::indexOf(const char *s) {
-    char *match = strstr(data, s);
-    return match == nullptr ? -1 : (int) (match - data);
+    return String::indexOf(data, s);
 }
 
 int String::indexOf(const String &string) {
     return indexOf(string.data);
 }
 
-SequentialList<String> String::split(const String &separator) {
-    return split(separator.data);
+int String::indexOf(const char *s, char c) {
+    for (int i = 0; s[i] != '\0'; ++i)
+        if (s[i] == c) return i;
+    return -1;
 }
 
-SequentialList<String> String::split(const char *separator) {
+int String::indexOf(const char *haystack, const char *needle) {
+    const char *match = strstr(haystack, needle);
+    return match == nullptr ? -1 : (int) (match - haystack);
+}
+
+
+SequentialList<String> String::split(const String &separator) const {
+    return String::split(*this, separator);
+}
+
+SequentialList<String> String::split(const String &str, const String &separator) {
+    const char *s = str.getCString();
+    int stringSize = str.size();
     SequentialList<String> list;
     SequentialList<int> indexes;
-    int length = strlen(separator);
-    char *found;
-    char *start = data;
-    while (start - data <= stringSize && (found = strstr(start, separator)) != nullptr) {
-        indexes.insert((int) (found - data));
+    int length = separator.size();
+    const char *found;
+    const char *start = s;
+    while (start - s <= stringSize && (found = strstr(start, separator.getCString())) != nullptr) {
+        indexes.insert((int) (found - s));
         start = found + 1;
     }
     int len = indexes.length();
@@ -154,31 +157,22 @@ SequentialList<String> String::split(const char *separator) {
     for (int i = 0; i < len; ++i) {
         int index = indexes.get(i);
         int size = index - subStart;
-        String s(data + subStart, size);
-        list.insert(s);
+        String r(s + subStart, size);
+        list.insert(r);
         subStart = index + length;
     }
-    String rest(data + subStart, stringSize - subStart);
+    String rest(s + subStart, stringSize - subStart);
     list.insert(rest);
     return list;
 }
 
-String &String::append(const std::string &s) {
-    return append(s.c_str());
-}
-
-String &String::operator=(const std::string &str) {
-    operator=(str.c_str());
-    return *this;
-}
-
 String::String(const std::string &str) {
-    const char *s = str.c_str();
-    fromCharsString(s, strlen(s));
+    fromCharsString(str.c_str(), str.size());
 }
 
 String::~String() {
-    delete data;
+    if (copyData)
+        delete[] data;
 }
 
 String String::toString(int32_t a) {
@@ -202,10 +196,12 @@ String String::toString(int64_t a) {
 }
 
 String String::toString(float a) {
+    //TODO float toString
     return String();
 }
 
 String String::toString(double a) {
+    //TODO double toString
     return String();
 }
 
@@ -224,7 +220,7 @@ String &String::insert(int index, const String &string) {
     int len = string.size();
     stringSize += len;
     if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 1, resize(dataSize);
-    for (int i = stringSize; i >= index + len ; --i) {
+    for (int i = stringSize; i >= index + len; --i) {
         data[i] = data[i - len];
     }
     for (int i = 0; i < len; ++i) {
@@ -294,4 +290,15 @@ String String::toString(char c) {
     char s[2];
     s[0] = c, s[1] = '\0';
     return String(s);
+}
+
+String::String(int capacity) {
+    stringSize = 0, dataSize = capacity + 1;
+    data = new char[dataSize];
+    data[0] = '\0';
+}
+
+void String::clear() {
+    stringSize = 0;
+    data[0] = '\0';
 }

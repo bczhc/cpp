@@ -1,11 +1,12 @@
-#include "./zhc.h"
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include "third_party/practice/LinearList.hpp"
 
 #define RANDOM(a, b) (((double) rand() / RAND_MAX) * (b - a) + a)
 
-using namespace bczhc;
+using namespace bczhc::linearlist;
+using namespace std;
 
 class SnakeGame {
     class Point {

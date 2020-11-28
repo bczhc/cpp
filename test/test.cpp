@@ -1,53 +1,61 @@
-#include <iostream>
-#include <functional>
-#include <string>
-#include <sys/time.h>
-#include "../third_party/practice/LinearList.hpp"
-#include "../FourierSeries.h"
-#include "../String.h"
 #include "../Concurrent.h"
+#include "../FourierSeries.h"
 #include "../Sqlite3.h"
-#include "../CountCharacters.h"
-#include <csignal>
+#include "../String.h"
+#include "../third_party/practice/LinearList.hpp"
 #include "thread"
-#include "../Sqlite3.h"
-
-#include "../zhc.h"
+#include <functional>
+#include <iostream>
+#include <string>
+#include "../utils.h"
+#include "../File.h"
+#include <map>
 
 using namespace std;
 using namespace bczhc;
 using namespace linearlist;
 using namespace bczhc::string;
 using namespace concurrent;
+using namespace utils;
+using namespace file;
 
-MutexLock lock;
+MutexLock lock; // NOLINT(cert-err58-cpp)
 
-String int2bin(int32_t i) {
-    SequentialList<bool> list;
-    int x = i;
-    while (x != 0) {
-        list.insert(0, x % 2);
-        x /= 2;
+int convert2Int(const String &s) {
+    int r = 0;
+    int len = (int) s.size();
+    for (int i = len - 1; i >= 0; --i) {
+        r += (s.getCString()[i] - 'a' + 1) * (int) pow(26, len - 1 - i);
     }
-    int len = list.length();
-    char chars[len + 1];
-    chars[len] = '\0';
-    for (int j = 0; j < len; ++j) {
-        chars[j] = (char) ((int) list.get(j) + 48);
-    }
-    return chars;
+    return r;
 }
 
 int main() {
-    int i = 0x12345678;
-    int *p = &i;
-    char i1 = *((char *) p + 0);
-    char i2 = *((char *) p + 1);
-    char i3 = *((char *) p + 2);
-    char i4 = *((char *) p + 3);
-    cout << hex << (int) i1 << endl;
-    cout << hex << (int) i2 << endl;
-    cout << hex << (int) i3 << endl;
-    cout << hex << (int) i4 << endl;
+    using List = SequentialList<String *>;
+    char *marks = new char[100000];
+    memset(marks, 0, 100000);
+    List list;
+
+    Sqlite3 db;
+    db.open("/home/zhc/code/some-tools/app/src/main/res/raw/wubi_dict.db");
+    class CB : public Sqlite3::SqliteCallback {
+    private:
+        char *marks;
+        List &list;
+    public:
+        explicit CB(char *marks, List &list) : marks(marks), list(list) {}
+
+    public:
+        int callback(void *arg, int colNum, char **content, char **colName) override {
+            auto *code = new String(content[0]);
+            int mark = convert2Int(*code);
+            if (marks[mark] == 0) {
+                list.insert(code);
+                marks[mark] = 1;
+            }
+            return 0;
+        }
+    } cb(marks, list);
+    db.exec("select code from wubi_dict order by num desc", cb);
     return 0;
 }

@@ -119,7 +119,7 @@ Executors::FixedThreadPool::~FixedThreadPool() {
     for (int i = 0; i < poolSize; ++i) {
         delete coreThreads[i];
     }
-    delete coreThreads;
+    delete[] coreThreads;
     delete coreThreadRunnable;
 }
 

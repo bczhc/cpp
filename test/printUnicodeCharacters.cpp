@@ -1,12 +1,13 @@
 #include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include "../utf8.h"
-#include "../zhc.h"
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 
 using json = nlohmann::json;
 using namespace bczhc;
 using namespace utf8;
+using namespace std;
 
 int main(int argc, char **argv) {
     int begin = 0, end = 128;

@@ -2,7 +2,6 @@
 // Created by root on 2020/4/11.
 //
 
-#include "../zhc.h"
 #include <iostream>
 #include <unistd.h>
 
