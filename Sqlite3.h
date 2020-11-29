@@ -6,6 +6,7 @@
 #define BCZHC_SQLITE3_HPP
 
 #include "third_party/sqlite3-single-c/sqlite3.h"
+#include <cstdint>
 
 namespace bczhc {
     class Sqlite3 {

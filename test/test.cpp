@@ -30,24 +30,28 @@ int main() {
     for (char c = 'a'; c <= 'z'; ++c) {
         String sql = "create table wubi_code_";
         sql.append(c)
-        .append("(code text not null primary key, word text not null);");
+                .append("(code text not null primary key, word text not null);");
         cout << sql.getCString() << endl;
     }
     struct WordBean {
-        std::string code;
-        String word;
+        std::string *code{};
+        String *word{};
         int64_t num{};
 
-        WordBean(std::string code, String word, int64_t num) : code(code), word(word), num(num) {}
+        WordBean(std::string *code, String *word, int64_t num) : code(code), word(word), num(num) {}
 
-        WordBean() {}
+        WordBean() = default;
+
+        ~WordBean() {
+            delete code, delete word;
+        }
     };
-    using LList = LinkedList<WordBean>;
-    using Map = map<std::string, LList *>;
+    using List = SequentialList<WordBean *>;
+    using Map = map<std::string, List *>;
     auto *m = new Map();
 
     Sqlite3 db;
-    db.open("/root/some-tools/app/src/main/res/raw/wubi_dict.db");
+    db.open("/home/zhc/code/some-tools/app/src/main/res/raw/wubi_dict.db");
     class CB : public Sqlite3::SqliteCallback {
     private:
         Map &m;
@@ -57,14 +61,14 @@ int main() {
     public:
         int callback(void *arg, int colNum, char **content, char **colName) override {
             int64_t num = atoll(content[2]);
-            std::string code = content[0];
-            WordBean bean(code, content[1], num);
-            if (m.find(code) == m.end()) {
-                auto *newList = new LList();
+            auto *code = new std::string(content[0]);
+            auto *bean = new WordBean(code, new String(content[1]), num);
+            if (m.find(*code) == m.end()) {
+                auto *newList = new List();
                 newList->insert(bean);
-                m[code] = newList;
+                m[*code] = newList;
             } else {
-                m.find(code)->second->insert(bean);
+                m.find(*code)->second->insert(bean);
             }
             return 0;
         }
@@ -73,45 +77,33 @@ int main() {
     db.exec("select code,char,num from wubi_dict order by num desc", cb);
 
     auto iter = m->begin();
-    for (;iter != m->end(); ++iter) {
+    for (; iter != m->end(); ++iter) {
         auto candidateList = iter->second;
-        std::string code = candidateList->get(0).code;
+        std::string *code = candidateList->get(0)->code;
         int candidatesLength = candidateList->length();
-        WordBean beans[candidatesLength];
-        int i = 0;
-        auto listIter = candidateList->getIterator();
-        if (listIter.moveToFirst()) {
-            do {
-                auto wordBean = listIter.get();
-                beans[i++] = wordBean;
-            } while (listIter.next());
+
+        String *candidateCombinedString = candidateList->get(0)->word;
+        for (int j = 1; j < candidatesLength; ++j) {
+            candidateCombinedString->append('|').append(*(candidateList->get(j)->word));
         }
-
-        class C : public sort::Comparable<WordBean> {
-            public:
-            int compare(WordBean &o1, WordBean &o2) override {
-                return o2.num - o1.num;
-            }
-        } comparable;
-
-
-        String candidateCombinedString = beans[0].word;
-        for (int j = 1; j < i; ++j) {
-            candidateCombinedString.append('|').append(beans[j].word);
-        }
-        char theFirstCodeChar = code.c_str()[0];
+        char theFirstCodeChar = code->c_str()[0];
         String sql = "insert into wubi_code_";
         sql.append(theFirstCodeChar)
-        .append(" values(")
-        .append('\'')
-        .append(candidateList->get(0).code)
-        .append("','")
-        .append(candidateCombinedString)
-        .append("');");
+                .append(" values(")
+                .append('\'')
+                .append(*(candidateList->get(0)->code))
+                .append("','")
+                .append(*candidateCombinedString)
+                .append("');");
         cout << sql.getCString() << endl;
+
+        for (int i = 0; i < candidatesLength; ++i) {
+            delete candidateList->get(i);
+        }
         delete candidateList;
     }
     delete m;
     cout << "commit;" << endl;
+    db.close();
     return 0;
 }
