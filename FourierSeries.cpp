@@ -11,6 +11,7 @@ using namespace concurrent;
 #ifndef M_PI
 #define M_PI (3.14159265358979323846264338327950288)
 #endif
+int ccc = 0;
 
 bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                                     int32_t _epicyclesCount, int32_t period)
@@ -62,6 +63,7 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
             integralResult.selfDivide(T, 0);
             callback.callback(n, integralResult.re, integralResult.im);
             latch.countDown();
+            cout << ++ccc << endl;
             delete this;
         }
     };

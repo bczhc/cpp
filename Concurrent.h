@@ -125,13 +125,17 @@ namespace bczhc {
             void join() const;
 
             static void sleep(int64_t millis);
+
+            void terminate();
         };
 
         class ThreadPool {
         public:
             virtual void execute(Runnable *r) = 0;
 
-            virtual ~ThreadPool();
+            virtual void shutdown() = 0;
+
+            virtual ~ThreadPool() = default;
         };
 
         class Executors {
@@ -142,11 +146,12 @@ namespace bczhc {
                 private:
                     Queue<Runnable *> &runnables;
                     MutexLock &lock;
+                    CountDownLatch *terminateLatch;
 
                 public:
-                    CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock);
+                    CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock, CountDownLatch *&terminateLatch);
 
-                    [[noreturn]] void run() override;
+                    void run() override;
                 };
 
                 MutexLock lock;
@@ -154,6 +159,7 @@ namespace bczhc {
                 int poolSize;
                 Thread **coreThreads;
                 CoreThreadRunnable *coreThreadRunnable;
+                CountDownLatch *terminateLatch;
 
             public:
                 FixedThreadPool(int poolSize);
@@ -161,6 +167,10 @@ namespace bczhc {
                 ~FixedThreadPool() override;
 
                 void execute(Runnable *runnable) override;
+
+                void shutdown() override;
+
+                void terminateCoreThreads();
             };
 
             static ThreadPool *newFixedThreadPool(int poolSize);

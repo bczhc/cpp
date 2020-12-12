@@ -89,15 +89,22 @@ void Thread::sleep(int64_t millis) {
     usleep(millis * 1000);
 }
 
-ThreadPool::~ThreadPool() = default;
+bool interrupted = false;
 
-Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock)
-        : runnables(runnables), lock(lock) {}
+Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock,
+                                                                   CountDownLatch *&terminateLatch)
+        : runnables(runnables), lock(lock), terminateLatch(terminateLatch) {}
 
-[[noreturn]] void Executors::FixedThreadPool::CoreThreadRunnable::run() {
+void Executors::FixedThreadPool::CoreThreadRunnable::run() {
     while (true) {
         lock.lock();
         while (runnables.isEmpty()) {
+            if (interrupted) {
+                lock.unlock();
+                terminateLatch->countDown();
+                //exit the current thread
+                return;
+            }
             lock.wait();
         }
         Runnable *runnable = runnables.dequeue();
@@ -109,16 +116,20 @@ Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnabl
 Executors::FixedThreadPool::FixedThreadPool(int poolSize) {
     this->poolSize = poolSize;
     coreThreads = new Thread *[poolSize];
-    coreThreadRunnable = new CoreThreadRunnable(runnables, lock);
+    terminateLatch = new CountDownLatch(poolSize);
+    coreThreadRunnable = new CoreThreadRunnable(runnables, lock, terminateLatch);
     for (int i = 0; i < poolSize; ++i) {
         coreThreads[i] = new Thread(coreThreadRunnable);
     }
 }
 
 Executors::FixedThreadPool::~FixedThreadPool() {
+    if (!interrupted) terminateCoreThreads();
+    terminateLatch->await();
     for (int i = 0; i < poolSize; ++i) {
         delete coreThreads[i];
     }
+    delete terminateLatch;
     delete[] coreThreads;
     delete coreThreadRunnable;
 }
@@ -128,6 +139,19 @@ void Executors::FixedThreadPool::execute(Runnable *runnable) {
     runnables.enqueue(runnable);
     lock.notify();
     lock.unlock();
+}
+
+void Executors::FixedThreadPool::shutdown() {
+    terminateCoreThreads();
+}
+
+void Executors::FixedThreadPool::terminateCoreThreads() {
+    interrupted = true;
+    for (int i = 0; i < poolSize; ++i) {
+        lock.lock();
+        lock.notify();
+        lock.unlock();
+    }
 }
 
 ThreadPool *Executors::newFixedThreadPool(int poolSize) {
