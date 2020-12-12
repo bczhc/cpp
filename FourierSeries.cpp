@@ -8,6 +8,10 @@
 using namespace bczhc;
 using namespace concurrent;
 
+#ifndef M_PI
+#define M_PI (3.14159265358979323846264338327950288)
+#endif
+
 bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                                     int32_t _epicyclesCount, int32_t period)
         : f(functionInterface), T(period), epicyclesCount(_epicyclesCount) {

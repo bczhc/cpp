@@ -1,12 +1,14 @@
+#include <iostream>
+using namespace std;
+
+#ifndef __WIN32
 #include "third_party/practice/LinearList.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <pthread.h>
 #include <sys/time.h>
-#include <sys/wait.h>
 #include <termio.h>
 #include <termios.h>
 #include <unistd.h>
@@ -18,8 +20,6 @@
 #define DOWN 1
 #define LEFT 2
 #define RIGHT 3
-
-using namespace std;
 
 int64_t getTimestamp() {
     struct timeval tv;
@@ -310,3 +310,9 @@ int main(int argc, char **argv) {
     delete game;
     return 0;
 }
+#else
+int main() {
+    cout << "not supported for Windows" << endl;
+    return 0;
+}
+#endif

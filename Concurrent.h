@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <pthread.h>
 #include <unistd.h>
+#include <cstdint>
 
 using namespace bczhc;
 using namespace linearlist;

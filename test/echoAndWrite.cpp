@@ -1,5 +1,4 @@
 #include "../io.h"
-#include <bits/types/FILE.h>
 #include <csignal>
 #include <cstdio>
 #include <iostream>

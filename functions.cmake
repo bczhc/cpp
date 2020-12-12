@@ -1,4 +1,9 @@
 function(setCompiler)
+    if (WIN32)
+        #use MinGW for Windows
+        set(C_COMPILER gcc)
+        set(CXX_COMPILER g++)
+    endif ()
     find_file(CLANG_PATH clang)
     find_file(CLANG++_PATH clang++)
     if (CLANG_PATH)
@@ -18,7 +23,6 @@ function(setCompiler)
 endfunction()
 
 function(confLib)
-
     #sqlite3
     find_library(SQLITE3_LIB sqlite3)
     if (NOT SQLITE3_LIB)

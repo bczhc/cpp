@@ -2,9 +2,9 @@
 if [ "$1" == "clean" ]; then rm -rf build/*;exit; fi
 if [ ! -d ./build ]; then mkdir build; fi
 cd build
-if [ ! -f ./Makefile ]; then cmake ..; fi
+if [ ! -f ./Makefile ]; then cmake -G "Unix Makefiles" ..; fi
 cores=`cat /proc/cpuinfo | grep -c processor`
-jobNum=`echo "$cores + 1" | bc`
+jobNum=$(( $cores + 1 ))
 if [ "$1" == "" ]
 then
     make "-j$jobNum"
