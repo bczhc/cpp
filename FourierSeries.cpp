@@ -11,7 +11,6 @@ using namespace concurrent;
 #ifndef M_PI
 #define M_PI (3.14159265358979323846264338327950288)
 #endif
-int ccc = 0;
 
 bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
                                     int32_t _epicyclesCount, int32_t period)
@@ -21,7 +20,6 @@ bczhc::FourierSeries::FourierSeries(ComplexFunctionInterface &functionInterface,
 
 void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
                                 int threadNum) {
-    LongWaitCountDownLatch latch(epicyclesCount);
     ThreadPool *pool = Executors::newFixedThreadPool(threadNum);
     int32_t a = -epicyclesCount / 2;
     int32_t t = a + epicyclesCount;
@@ -48,30 +46,26 @@ void bczhc::FourierSeries::calc(FourierSeriesCallback &callback, int integralD,
         FourierSeriesCallback &callback;
         int32_t n;
         double T;
-        LongWaitCountDownLatch &latch;
 
     public:
         Run(FuncInIntegral &funcInIntegral, ComplexIntegral &complexIntegral,
-            FourierSeriesCallback &callback, int32_t n, double T,
-            LongWaitCountDownLatch &latch)
+            FourierSeriesCallback &callback, int32_t n, double T)
                 : funcInIntegral(funcInIntegral), complexIntegral(complexIntegral),
-                  callback(callback), n(n), T(T), latch(latch) {}
+                  callback(callback), n(n), T(T) {}
 
         void run() override {
             ComplexValue integralResult =
                     complexIntegral.getDefiniteIntegralByTrapezium(0, T, funcInIntegral, n);
             integralResult.selfDivide(T, 0);
             callback.callback(n, integralResult.re, integralResult.im);
-            latch.countDown();
-            cout << ++ccc << endl;
             delete this;
         }
     };
     for (int32_t n = a; n < t; ++n) {
         Run *runnable =
-                new Run(funcInIntegral, complexIntegral, callback, n, T, latch);
+                new Run(funcInIntegral, complexIntegral, callback, n, T);
         pool->execute(runnable);
     }
-    latch.wait();
+    
     delete pool;
 }

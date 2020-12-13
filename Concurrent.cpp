@@ -50,6 +50,12 @@ void CountDownLatch::countDown() {
     lock.unlock();
 }
 
+void CountDownLatch::increaseCount() {
+    lock.lock();
+    ++count;
+    lock.unlock();
+}
+
 CountDownLatch::CountDownLatch() = default;
 
 void CountDownLatch::set(int _count) {
@@ -68,7 +74,14 @@ void LongWaitCountDownLatch::countDown() {
     lock.unlock();
 }
 
+void LongWaitCountDownLatch::increaseCount() {
+    lock.lock();
+    ++count;
+    lock.unlock();
+}
+
 void LongWaitCountDownLatch::wait() {
+    if (count == 0) return;
     lock.lock();
     lock.wait();
     lock.unlock();
@@ -89,11 +102,9 @@ void Thread::sleep(int64_t millis) {
     usleep(millis * 1000);
 }
 
-bool interrupted = false;
-
 Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock,
-                                                                   CountDownLatch *&terminateLatch)
-        : runnables(runnables), lock(lock), terminateLatch(terminateLatch) {}
+                                                                   CountDownLatch *&terminateLatch, bool &interrupted, LongWaitCountDownLatch *&waitAllLatch)
+    : runnables(runnables), lock(lock), terminateLatch(terminateLatch), interrupted(interrupted), waitAllLatch(waitAllLatch) {}
 
 void Executors::FixedThreadPool::CoreThreadRunnable::run() {
     while (true) {
@@ -110,6 +121,7 @@ void Executors::FixedThreadPool::CoreThreadRunnable::run() {
         Runnable *runnable = runnables.dequeue();
         lock.unlock();
         runnable->run();
+        waitAllLatch->countDown();
     }
 }
 
@@ -117,19 +129,22 @@ Executors::FixedThreadPool::FixedThreadPool(int poolSize) {
     this->poolSize = poolSize;
     coreThreads = new Thread *[poolSize];
     terminateLatch = new CountDownLatch(poolSize);
-    coreThreadRunnable = new CoreThreadRunnable(runnables, lock, terminateLatch);
+    waitAllLatch = new LongWaitCountDownLatch(0);
+    coreThreadRunnable = new CoreThreadRunnable(runnables, lock, terminateLatch, interrupted,waitAllLatch);
     for (int i = 0; i < poolSize; ++i) {
         coreThreads[i] = new Thread(coreThreadRunnable);
     }
 }
 
 Executors::FixedThreadPool::~FixedThreadPool() {
+    waitAll();
     if (!interrupted) terminateCoreThreads();
     terminateLatch->await();
     for (int i = 0; i < poolSize; ++i) {
         delete coreThreads[i];
     }
     delete terminateLatch;
+    delete waitAllLatch;
     delete[] coreThreads;
     delete coreThreadRunnable;
 }
@@ -137,12 +152,17 @@ Executors::FixedThreadPool::~FixedThreadPool() {
 void Executors::FixedThreadPool::execute(Runnable *runnable) {
     lock.lock();
     runnables.enqueue(runnable);
+    waitAllLatch->increaseCount();
     lock.notify();
     lock.unlock();
 }
 
 void Executors::FixedThreadPool::shutdown() {
     terminateCoreThreads();
+}
+
+void Executors::FixedThreadPool::waitAll() {
+    waitAllLatch->wait();
 }
 
 void Executors::FixedThreadPool::terminateCoreThreads() {
