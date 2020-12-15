@@ -1,4 +1,5 @@
 #include "Concurrent.h"
+#include <pthread.h>
 
 using namespace bczhc;
 using namespace concurrent;
@@ -100,6 +101,10 @@ void Thread::join() const { pthread_join(t, nullptr); }
 
 void Thread::sleep(int64_t millis) {
     usleep(millis * 1000);
+}
+
+void Thread::terminate() {
+    pthread_cancel(t);
 }
 
 Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock,

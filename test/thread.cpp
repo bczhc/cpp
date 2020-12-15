@@ -10,7 +10,7 @@ int main() {
     public:
         void run() override {
             Thread::sleep(1000);
-            printf("完美的东西啊，你的名字就是女人。\n");
+            printf("脆弱啊，你的名字就是女人。\n");
             delete this;
         }
     };
