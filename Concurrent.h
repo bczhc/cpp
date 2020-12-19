@@ -129,7 +129,9 @@ namespace bczhc::concurrent {
 
         static void sleep(int64_t millis);
 
-        void terminate();
+        void terminate() const;
+
+        void sendSignal(int signal) const;
     };
 
     class ThreadPool {
