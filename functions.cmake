@@ -50,6 +50,11 @@ function(confLib)
     find_path(PTHREAD_INCLUDE_DIR pthread.h)
     include_directories("${PTHREAD_INCLUDE_DIR}")
 
+    #pcre
+    find_library(PCRE_LIB pcre REQUIRED)
+    find_path(PCRE_INCLUDE_DIR pcre.h)
+    include_directories("${PCRE_INCLUDE_DIR}")
+
 
     #zhcLib
     set(
@@ -68,11 +73,16 @@ function(confLib)
             utils.cpp
             File.cpp
             Base128Lib.cpp
+            RegExp.cpp
     )
     add_library(zhcLib SHARED ${zhcLibSrc})
-    target_link_libraries(zhcLib "${SQLITE3_LIB}" "${PTHREAD_LIB}")
+    target_link_libraries(zhcLib "${SQLITE3_LIB}" "${PTHREAD_LIB}" "${PCRE_LIB}")
     add_library(zhcLibStatic STATIC ${zhcLibSrc})
     target_link_libraries(zhcLibStatic "${SQLITE3_LIB}" "${PTHREAD_LIB}")
     set_target_properties(zhcLibStatic PROPERTIES OUTPUT_NAME zhcLib)
-    set_target_properties(zhcLib PROPERTIES LINK_FLAGS "-static-libstdc++ -static-libgcc")
+    if (STATIC_COMPILE)
+        if (STATIC_COMPILE EQUAL 1)
+            set_target_properties(zhcLib PROPERTIES LINK_FLAGS "-static-libstdc++ -static-libgcc")
+        endif ()
+    endif ()
 endfunction()

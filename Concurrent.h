@@ -8,6 +8,10 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#ifndef PTHREAD_CANCELED
+#define PTHREAD_CANCELED ((void *) -1)
+#endif
+
 using namespace bczhc;
 using namespace linearlist;
 
