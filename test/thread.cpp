@@ -28,7 +28,6 @@ int main() {
     Thread::sleep(500);
     //    t.terminate();
     t.sendSignal(SIGTERM);
-    pthread_cancel(t.getPThread());
     t.join();
     return 0;
 }
