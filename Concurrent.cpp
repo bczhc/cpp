@@ -1,6 +1,6 @@
 #include "Concurrent.h"
-#include <pthread.h>
 #include <csignal>
+#include <pthread.h>
 
 using namespace bczhc;
 using namespace concurrent;
@@ -105,11 +105,18 @@ void Thread::sleep(int64_t millis) {
 }
 
 void Thread::terminate() const {
+#ifdef SIGKILL
     sendSignal(SIGKILL);
+#elif SIGTERM
+    sendSignal(SIGTERM);
+#endif
 }
 
 void Thread::sendSignal(int signal) const {
     pthread_kill(t, signal);
+}
+pthread_t Thread::getPThread() const {
+    return this->t;
 }
 
 Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock,
@@ -140,7 +147,7 @@ Executors::FixedThreadPool::FixedThreadPool(int poolSize) {
     coreThreads = new Thread *[poolSize];
     terminateLatch = new CountDownLatch(poolSize);
     waitAllLatch = new LongWaitCountDownLatch(0);
-    coreThreadRunnable = new CoreThreadRunnable(runnables, lock, terminateLatch, interrupted,waitAllLatch);
+    coreThreadRunnable = new CoreThreadRunnable(runnables, lock, terminateLatch, interrupted, waitAllLatch);
     for (int i = 0; i < poolSize; ++i) {
         coreThreads[i] = new Thread(coreThreadRunnable);
     }

@@ -132,6 +132,8 @@ namespace bczhc::concurrent {
         void terminate() const;
 
         void sendSignal(int signal) const;
+
+        pthread_t getPThread() const;
     };
 
     class ThreadPool {

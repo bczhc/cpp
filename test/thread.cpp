@@ -1,6 +1,6 @@
 #include "../Concurrent.h"
-#include <cstdio>
 #include <csignal>
+#include <cstdio>
 
 using namespace bczhc;
 using namespace concurrent;
@@ -14,19 +14,21 @@ int main() {
                 pthread_exit(PTHREAD_CANCELED);
             }
         }
+
     public:
         void run() override {
             signal(SIGTERM, sigHandler);
             Thread::sleep(1000);
-            printf("脆弱啊，你的名字就是女人。\n");
+            printf("Frailty, thy name is woman!\n");
             delete this;
         }
     };
 
     Thread t(new R);
     Thread::sleep(500);
-//    t.terminate();
+    //    t.terminate();
     t.sendSignal(SIGTERM);
+    pthread_cancel(t.getPThread());
     t.join();
     return 0;
 }
