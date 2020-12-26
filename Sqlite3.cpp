@@ -36,6 +36,24 @@ bczhc::Sqlite3::Statement bczhc::Sqlite3::compileStatement(const char *sql) cons
     return r;
 }
 
+bool bczhc::Sqlite3::checkIfCorrupt() {
+    bool r = true;
+    class CB : public SqliteCallback {
+    public:
+        bool &r;
+
+        explicit CB(bool &r) : r(r) {}
+
+        int callback(void *arg, int colNum, char **content, char **colName) override {
+            if (String::equal("ok", content[0])) r = false;
+            return 0;
+        }
+    } cb(r);
+
+    exec("PRAGMA integrity_check", cb);
+    return r;
+}
+
 int bczhc::Sqlite3::Statement::step() const {
     return sqlite3_step(this->stmt);
 }

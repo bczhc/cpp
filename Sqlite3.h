@@ -7,6 +7,9 @@
 
 #include "third_party/sqlite3-single-c/sqlite3.h"
 #include <cstdint>
+#include "String.h"
+
+using namespace bczhc::string;
 
 namespace bczhc {
     class Sqlite3 {
@@ -73,6 +76,8 @@ namespace bczhc {
         int exec(const char *cmd);
 
         int exec(const char *cmd, SqliteCallback &callback, void *arg);
+
+        bool checkIfCorrupt();
 
         ~Sqlite3();
 

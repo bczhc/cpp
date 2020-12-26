@@ -103,6 +103,10 @@ namespace bczhc {
                 }
                 return r;
             }
+
+            bool equals(const String &s);
+
+            static bool equal(const char *s1, const char *s2) ;
         };
     }// namespace string
 }// namespace bczhc

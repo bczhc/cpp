@@ -302,3 +302,16 @@ void String::clear() {
     stringSize = 0;
     data[0] = '\0';
 }
+
+bool String::equals(const String &s) {
+    if (size() != s.size()) return false;
+    return String::equal(data, s.data);
+}
+
+bool String::equal(const char *s1, const char *s2) {
+    for (int i = 0; ; ++i) {
+        if (s1[i] != s2[i]) return false;
+        if (s1[i] == '\0' || s2[i] == '\0') break;
+    }
+    return true;
+}
