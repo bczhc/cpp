@@ -84,7 +84,7 @@ String &String::append(const char *s, size_t size) {
     }
     if (len == -1) len = size;
     if (stringSize + len + 1 > dataSize) {
-        dataSize = 2 * (stringSize + len) + 1;
+        dataSize = 2 * (stringSize + len) + 2;
         resize(dataSize);
     }
     for (int i = 0; i < len; ++i)
@@ -102,7 +102,7 @@ String &String::append(const String &string) {
 
 String &String::append(char c) {
     if (stringSize + 2 > dataSize) {
-        dataSize = 2 * stringSize + 1;
+        dataSize = 2 * stringSize + 2;
         resize(dataSize);
     }
     data[stringSize] = c;
@@ -207,7 +207,7 @@ String String::toString(double a) {
 
 String &String::insert(int index, char c) {
     stringSize += 1;
-    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 1, resize(dataSize);
+    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 2, resize(dataSize);
     for (int i = stringSize; i > index; --i) {
         data[i] = data[i - 1];
     }
@@ -219,7 +219,7 @@ String &String::insert(int index, char c) {
 String &String::insert(int index, const String &string) {
     int len = string.size();
     stringSize += len;
-    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 1, resize(dataSize);
+    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 2, resize(dataSize);
     for (int i = stringSize; i >= index + len; --i) {
         data[i] = data[i - len];
     }
