@@ -9,25 +9,24 @@ using namespace string;
 using namespace utf8;
 
 String::String() {
+    deleteCount = new int(0);
     fromCharsString(nullptr, 0);
 }
 
 String::String(const String &string) {
-    if (copyData)
-        copy(string);
+    copy(string);
+    ++*deleteCount;
 }
 
 void String::copy(const String &string) {
-    size_t oldStringSize = string.size();
-    data = new char[oldStringSize + 1];
-    for (int i = 0; i < oldStringSize; ++i) data[i] = string.data[i];
-    data[oldStringSize] = '\0';
+    deleteCount = string.deleteCount;
+    data = string.data;
+    dataSize = string.dataSize;
     stringSize = string.stringSize;
-    dataSize = oldStringSize + 1;
-    copyData = string.copyData;
 }
 
 String::String(const char *s) {
+    deleteCount = new int(0);
     fromCharsString(s, s == nullptr ? 0 : strlen(s));
 }
 
@@ -64,6 +63,7 @@ void String::fromCharsString(const char *s, size_t size) {
 String &String::operator=(const String &string) {
     if (&string == this) return *this;
     copy(string);
+    ++*deleteCount;
     return *this;
 }
 
@@ -171,8 +171,10 @@ String::String(const std::string &str) {
 }
 
 String::~String() {
-    if (copyData)
+    if (--*deleteCount == -1) {
         delete[] data;
+        delete deleteCount;
+    }
 }
 
 String String::toString(int32_t a) {
@@ -309,7 +311,7 @@ bool String::equals(const String &s) {
 }
 
 bool String::equal(const char *s1, const char *s2) {
-    for (int i = 0; ; ++i) {
+    for (int i = 0;; ++i) {
         if (s1[i] != s2[i]) return false;
         if (s1[i] == '\0' || s2[i] == '\0') break;
     }

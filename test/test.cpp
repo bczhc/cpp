@@ -26,17 +26,14 @@ using namespace regex;
 MutexLock lock; // NOLINT(cert-err58-cpp)
 CountDownLatch latch(2); // NOLINT(cert-err58-cpp)
 
+void f(String s) {
+    cout << s.getCString() << endl;
+}
 
 int main(int argc, char **argv) {
-    auto matched = match("(?<=Cmake version: )[0-9]\\.[0-9]\\.[0-9](\\.[0-9])?", "Cmake version: 1.2.3.1");
-    auto it = matched.getIterator();
-    if (it.moveToFirst()) {
-        do {
-            cout << it.get().getCString() << endl;
-        } while (it.next());
-    }
-
-    cout << test("a...e", "abcde") << endl;
-    cout << test("a...e.", "abcde") << endl;
+    String s = "hello, world";
+    cout << s.getCString() << endl;
+    f(s);
+    cout << s.getCString() << endl;
     return 0;
 }

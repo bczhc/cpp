@@ -30,7 +30,7 @@ namespace bczhc {
 
 
         public:
-            bool copyData = true;
+            int *deleteCount = nullptr;
 
             String();
 
@@ -106,7 +106,7 @@ namespace bczhc {
 
             bool equals(const String &s);
 
-            static bool equal(const char *s1, const char *s2) ;
+            static bool equal(const char *s1, const char *s2);
         };
     }// namespace string
 }// namespace bczhc
