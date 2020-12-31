@@ -7,6 +7,7 @@
 
 #include "./String.h"
 #include <cstdint>
+#include <cstdio>
 
 using namespace bczhc;
 using namespace string;

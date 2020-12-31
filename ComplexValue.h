@@ -7,9 +7,10 @@
 
 #include <cmath>
 #include <cstdint>
-#include <iostream>
+#include "String.h"
 
-using namespace std;
+using namespace bczhc::string;
+
 namespace bczhc {
     class ComplexValue {
     public:
@@ -57,11 +58,11 @@ namespace bczhc {
 
         ComplexValue &setValue(double _re, double _im);
 
-        string toString();
+        String toString();
 
-        static string toString(ComplexValue cv);
+        static String toString(ComplexValue cv);
 
-        static string toString(double _re, double _im);
+        static String toString(double _re, double _im);
     };
 
     typedef void (*OneVariableComplexFunction_t)(ComplexValue &, double);

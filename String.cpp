@@ -9,7 +9,6 @@ using namespace string;
 using namespace utf8;
 
 String::String() {
-    deleteCount = new int(0);
     fromCharsString(nullptr, 0);
 }
 
@@ -26,8 +25,11 @@ void String::copy(const String &string) {
 }
 
 String::String(const char *s) {
-    deleteCount = new int(0);
-    fromCharsString(s, s == nullptr ? 0 : strlen(s));
+    if (s == nullptr) {
+        mIsNull = true;
+        s = "(null)";
+    }
+    fromCharsString(s, strlen(s));
 }
 
 String::String(const char *s, size_t size) {
@@ -53,6 +55,7 @@ size_t String::size() const {
 }
 
 void String::fromCharsString(const char *s, size_t size) {
+    deleteCount = new int(0);
     stringSize = size, dataSize = stringSize + 1;
     data = new char[dataSize];
     for (int i = 0; i < size; ++i) data[i] = s[i];
@@ -164,10 +167,6 @@ SequentialList<String> String::split(const String &str, const String &separator)
     String rest(s + subStart, stringSize - subStart);
     list.insert(rest);
     return list;
-}
-
-String::String(const std::string &str) {
-    fromCharsString(str.c_str(), str.size());
 }
 
 String::~String() {
@@ -316,4 +315,8 @@ bool String::equal(const char *s1, const char *s2) {
         if (s1[i] == '\0' || s2[i] == '\0') break;
     }
     return true;
+}
+
+bool String::isNull() {
+    return mIsNull;
 }

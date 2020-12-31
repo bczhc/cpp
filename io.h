@@ -50,6 +50,16 @@ namespace bczhc {
 
             void close();
         };
+
+        class LineReader {
+        private:
+            InputStream is;
+
+        public:
+            LineReader(InputStream in);
+
+            String readLine();
+        };
     }// namespace io
 }// namespace bczhc
 #endif// BCZHC_IO_H

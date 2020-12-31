@@ -128,34 +128,34 @@ ComplexValue bczhc::ComplexValue::subtract(ComplexValue cv) {
     return r;
 }
 
-string bczhc::ComplexValue::toString() {
+String bczhc::ComplexValue::toString() {
     return ComplexValue::toString(this->re, this->im);
 }
 
-string bczhc::ComplexValue::toString(ComplexValue cv) {
+String bczhc::ComplexValue::toString(ComplexValue cv) {
     return ComplexValue::toString(cv.re, cv.im);
 }
 
-string bczhc::ComplexValue::toString(double _re, double _im) {
+String bczhc::ComplexValue::toString(double _re, double _im) {
     if (_re == 0 && _im == 0) {
-        string s = "0";
+        String s = "0";
         return s;
     } else if (_re == 0) {
-        string s = to_string(_re);
+        String s = String::toString(_re);
         s.append("i");
         return s;
     } else if (_im == 0) {
-        string s = to_string(_re);
+        String s = String::toString(_re);
         return s;
     } else if (_im > 0) {
-        string s = to_string(_re);
-        s.append("+").append(to_string(_im)).append("i");
+        String s = String::toString(_re);
+        s.append("+").append(String::toString(_im)).append("i");
         return s;
     } else if (_im < 0) {
-        string s = to_string(_re);
-        s.append(to_string(_im)).append("i");
+        String s = String::toString(_re);
+        s.append(String::toString(_im)).append("i");
         return s;
     }
-    string s = "0";
+    String s = "0";
     return s;
 }

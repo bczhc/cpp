@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
+#include <cctype>
 
 using namespace bczhc::linearlist;
 
@@ -23,6 +23,7 @@ namespace bczhc {
         private:
             char *data = nullptr;
             size_t stringSize = 0, dataSize = 0;
+            bool mIsNull = false;
 
             void fromCharsString(const char *s, size_t stringSize);
 
@@ -35,8 +36,6 @@ namespace bczhc {
             String();
 
             String(const String &string);
-
-            String(const std::string &str);
 
             String(const char *s, size_t size);
 
@@ -107,6 +106,8 @@ namespace bczhc {
             bool equals(const String &s);
 
             static bool equal(const char *s1, const char *s2);
+
+            bool isNull();
         };
     }// namespace string
 }// namespace bczhc

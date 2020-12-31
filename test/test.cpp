@@ -1,17 +1,17 @@
 #include "../Concurrent.h"
+#include "../File.h"
 #include "../FourierSeries.h"
+#include "../RegExp.h"
 #include "../Sqlite3.h"
 #include "../String.h"
+#include "../io.h"
 #include "../third_party/practice/LinearList.hpp"
+#include "../utils.hpp"
 #include "thread"
 #include <functional>
 #include <iostream>
-#include <string>
-#include "../utils.hpp"
-#include "../File.h"
-#include "../io.h"
 #include <pcre.h>
-#include "../RegExp.h"
+#include <string>
 
 using namespace std;
 using namespace bczhc;
@@ -23,17 +23,22 @@ using namespace file;
 using namespace io;
 using namespace regex;
 
-MutexLock lock; // NOLINT(cert-err58-cpp)
-CountDownLatch latch(2); // NOLINT(cert-err58-cpp)
-
-void f(String s) {
-    cout << s.getCString() << endl;
-}
+MutexLock lock;         // NOLINT(cert-err58-cpp)
+CountDownLatch latch(2);// NOLINT(cert-err58-cpp)
 
 int main(int argc, char **argv) {
-    String s = "hello, world";
-    cout << s.getCString() << endl;
-    f(s);
-    cout << s.getCString() << endl;
+    try {
+        auto is = InputStream(stdin);
+
+        auto lr = LineReader(is);
+
+        for(;;) {
+            auto s = lr.readLine();
+            if (s.isNull()) break;
+            cout << s.getCString() << endl;
+        }
+    } catch (String e) {
+        cout << e.getCString() << endl;
+    }
     return 0;
 }

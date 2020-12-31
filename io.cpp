@@ -1,4 +1,5 @@
 #include "io.h"
+#include "String.h"
 #include <cstdio>
 
 using namespace bczhc;
@@ -68,4 +69,18 @@ InputStream::InputStream(FILE *stream) {
 
 OutputStream::OutputStream(FILE *stream) {
     fp = stream;
+}
+
+LineReader::LineReader(InputStream in) : is(in) {}
+
+String LineReader::readLine() {
+    String line;
+    char c;
+    while (is.read(&c, 1) > 0) {
+        if (c == '\n') {
+            return line;
+        }
+        line.append(c);
+    }
+    return nullptr;
 }
