@@ -100,6 +100,10 @@ Thread::Thread(Runnable *runnable) { pthread_create(&t, nullptr, call, runnable)
 
 void Thread::join() const { pthread_join(t, nullptr); }
 
+void Thread::detach() const {
+    pthread_detach(t);
+}
+
 void Thread::sleep(int64_t millis) {
     usleep(millis * 1000);
 }
@@ -119,9 +123,8 @@ pthread_t Thread::getPThread() const {
     return this->t;
 }
 
-Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock,
-                                                                   CountDownLatch *&terminateLatch, bool &interrupted, LongWaitCountDownLatch *&waitAllLatch)
-    : runnables(runnables), lock(lock), terminateLatch(terminateLatch), interrupted(interrupted), waitAllLatch(waitAllLatch) {}
+Executors::FixedThreadPool::CoreThreadRunnable::CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock, bool &interrupted, LongWaitCountDownLatch *&waitAllLatch)
+    : runnables(runnables), lock(lock), interrupted(interrupted), waitAllLatch(waitAllLatch) {}
 
 void Executors::FixedThreadPool::CoreThreadRunnable::run() {
     while (true) {
@@ -129,7 +132,6 @@ void Executors::FixedThreadPool::CoreThreadRunnable::run() {
         while (runnables.isEmpty()) {
             if (interrupted) {
                 lock.unlock();
-                terminateLatch->countDown();
                 //exit the current thread
                 return;
             }
@@ -145,9 +147,8 @@ void Executors::FixedThreadPool::CoreThreadRunnable::run() {
 Executors::FixedThreadPool::FixedThreadPool(int poolSize) {
     this->poolSize = poolSize;
     coreThreads = new Thread *[poolSize];
-    terminateLatch = new CountDownLatch(poolSize);
     waitAllLatch = new LongWaitCountDownLatch(0);
-    coreThreadRunnable = new CoreThreadRunnable(runnables, lock, terminateLatch, interrupted, waitAllLatch);
+    coreThreadRunnable = new CoreThreadRunnable(runnables, lock, interrupted, waitAllLatch);
     for (int i = 0; i < poolSize; ++i) {
         coreThreads[i] = new Thread(coreThreadRunnable);
     }
@@ -155,11 +156,10 @@ Executors::FixedThreadPool::FixedThreadPool(int poolSize) {
 
 Executors::FixedThreadPool::~FixedThreadPool() {
     if (!interrupted) terminateCoreThreads();
-    terminateLatch->await();
     for (int i = 0; i < poolSize; ++i) {
+        coreThreads[i]->join();
         delete coreThreads[i];
     }
-    delete terminateLatch;
     delete waitAllLatch;
     delete[] coreThreads;
     delete coreThreadRunnable;

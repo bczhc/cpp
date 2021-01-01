@@ -29,5 +29,6 @@ int main(int argc, char **argv) {
         ++index;
     }
     cout << j.dump() << endl;
+    fclose(f);
     return 0;
 }

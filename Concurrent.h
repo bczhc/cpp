@@ -131,6 +131,8 @@ namespace bczhc::concurrent {
 
         void join() const;
 
+        void detach() const;
+
         static void sleep(int64_t millis);
 
         void terminate() const;
@@ -159,12 +161,11 @@ namespace bczhc::concurrent {
             private:
                 Queue<Runnable *> &runnables;
                 MutexLock &lock;
-                CountDownLatch *terminateLatch;
                 bool &interrupted;
                 concurrent::LongWaitCountDownLatch *&waitAllLatch;
 
             public:
-                CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock, CountDownLatch *&terminateLatch, bool &interrupted, concurrent::LongWaitCountDownLatch *&waitAllLatch);
+                CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock, bool &interrupted, concurrent::LongWaitCountDownLatch *&waitAllLatch);
 
                 void run() override;
             };
@@ -174,7 +175,6 @@ namespace bczhc::concurrent {
             int poolSize;
             Thread **coreThreads;
             CoreThreadRunnable *coreThreadRunnable;
-            CountDownLatch *terminateLatch;
             bool interrupted = false;
             concurrent::LongWaitCountDownLatch *waitAllLatch;
 

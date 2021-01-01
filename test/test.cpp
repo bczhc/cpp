@@ -1,17 +1,18 @@
 #include "../Concurrent.h"
-#include "../File.h"
 #include "../FourierSeries.h"
-#include "../RegExp.h"
 #include "../Sqlite3.h"
 #include "../String.h"
-#include "../io.h"
 #include "../third_party/practice/LinearList.hpp"
-#include "../utils.hpp"
 #include "thread"
 #include <functional>
 #include <iostream>
-#include <pcre.h>
+#include <pthread.h>
 #include <string>
+#include "../utils.hpp"
+#include "../File.h"
+#include "../io.h"
+#include <pcre.h>
+#include "../RegExp.h"
 
 using namespace std;
 using namespace bczhc;
@@ -23,22 +24,19 @@ using namespace file;
 using namespace io;
 using namespace regex;
 
-MutexLock lock;         // NOLINT(cert-err58-cpp)
-CountDownLatch latch(2);// NOLINT(cert-err58-cpp)
+MutexLock lock; // NOLINT(cert-err58-cpp)
+CountDownLatch latch(2); // NOLINT(cert-err58-cpp)
 
 int main(int argc, char **argv) {
-    try {
-        auto is = InputStream(stdin);
-
-        auto lr = LineReader(is);
-
-        for(;;) {
-            auto s = lr.readLine();
-            if (s.isNull()) break;
-            cout << s.getCString() << endl;
-        }
-    } catch (String e) {
-        cout << e.getCString() << endl;
+    auto matched = match("(?<=Cmake version: )[0-9]\\.[0-9]\\.[0-9](\\.[0-9])?", "Cmake version: 1.2.3.1");
+    auto it = matched.getIterator();
+    if (it.moveToFirst()) {
+        do {
+            cout << it.get().getCString() << endl;
+        } while (it.next());
     }
+
+    cout << test("a...e", "abcde") << endl;
+    cout << test("a...e.", "abcde") << endl;
     return 0;
 }
