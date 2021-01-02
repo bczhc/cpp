@@ -2,10 +2,10 @@
 #define BCZHC_STRING_H
 
 #include "./third_party/practice/LinearList.hpp"
+#include <cctype>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
 
 using namespace bczhc::linearlist;
 
@@ -109,7 +109,20 @@ namespace bczhc {
 
             bool isNull();
         };
-    }// namespace string
-}// namespace bczhc
+        namespace utf8 {
+            struct SolvedUTF8Properties {
+                int bytesLength;
+                int codepoint;
+            };
 
+            int getUTF8BytesLength(unsigned char firstByte);
+
+            void solveUTF8Bytes(SolvedUTF8Properties &solvedProperties, const char *bytes);
+
+            int getUTF8Size(int codepoint);
+
+            int unicode2UTF8(char *dest, int codepoint);
+        }// namespace utf8
+    }    // namespace string
+}// namespace bczhc
 #endif//BCZHC_STRING_H

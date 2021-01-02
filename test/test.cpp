@@ -1,5 +1,5 @@
 #include "../Concurrent.h"
-#include "../FourierSeries.h"
+#include "../math/FourierSeries.h"
 #include "../Sqlite3.h"
 #include "../String.h"
 #include "../third_party/practice/LinearList.hpp"
@@ -8,9 +8,9 @@
 #include <iostream>
 #include <pthread.h>
 #include <string>
-#include "../utils.hpp"
+#include "../Utils.hpp"
 #include "../File.h"
-#include "../io.h"
+#include "../IO.h"
 #include <pcre.h>
 #include "../RegExp.h"
 

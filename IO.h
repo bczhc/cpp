@@ -2,14 +2,13 @@
 #define BCZHC_IO_H
 
 #include "String.h"
-#include "utf8.h"
 #include <cstdio>
 
 #define BUFFER_SIZE 8192
 
 using namespace bczhc;
-using namespace utf8;
 using namespace string;
+using namespace utf8;
 
 namespace bczhc {
     namespace io {
@@ -24,11 +23,14 @@ namespace bczhc {
         class InputStream {
         private:
             FILE *fp = nullptr;
+            bool closed = false;
 
         public:
             InputStream(String file);
 
             InputStream(FILE *stream);
+
+            ~InputStream();
 
             int read(char *bytes, int size);
 
@@ -38,11 +40,14 @@ namespace bczhc {
         class OutputStream {
         private:
             FILE *fp = nullptr;
+            bool closed = false;
 
         public:
             OutputStream(String file);
 
             OutputStream(FILE *stream);
+
+            ~OutputStream();
 
             int write(const char *bytes, int size);
 

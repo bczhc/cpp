@@ -1,7 +1,9 @@
-#include "../FourierSeries.h"
+#include "../math/FourierSeries.h"
+#include <iostream>
 
 using namespace bczhc;
 using namespace concurrent;
+using namespace std;
 
 int main() {
     class F : public ComplexFunctionInterface {

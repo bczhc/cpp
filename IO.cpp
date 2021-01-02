@@ -1,4 +1,4 @@
-#include "io.h"
+#include "IO.h"
 #include "String.h"
 #include <cstdio>
 
@@ -39,16 +39,25 @@ InputStream::InputStream(String file) {
     if ((fp = fopen(file.getCString(), "rb")) == nullptr) throw String("Open file failed.");
 }
 
+InputStream::~InputStream() {
+    if (!closed) this->close();
+}
+
 int InputStream::read(char *bytes, int size) {
     return fread(bytes, 1, size, fp);
 }
 
 void InputStream::close() {
+    closed = true;
     fclose(fp);
 }
 
 OutputStream::OutputStream(String file) {
     if ((fp = fopen(file.getCString(), "wb")) == nullptr) throw String("Open file failed.");
+}
+
+OutputStream::~OutputStream() {
+    if (!closed) this->close();
 }
 
 int OutputStream::write(const char *bytes, int size) {
@@ -60,6 +69,7 @@ void OutputStream::flush() {
 }
 
 void OutputStream::close() {
+    closed = true;
     fclose(fp);
 }
 

@@ -7,7 +7,7 @@
 
 #include <cmath>
 #include <cstdint>
-#include "String.h"
+#include "../String.h"
 
 using namespace bczhc::string;
 

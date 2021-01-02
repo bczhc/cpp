@@ -12,23 +12,30 @@ confLib()
 
 link_libraries(zhcLib)
 
-add_executable(T1 test/T1.cpp)
-add_executable(T2 test/T2.cpp)
-add_executable(T3 test/T3.cpp)
-add_executable(T4 test/T4.cpp)
-add_executable(diaryCharactersStatistics test/DiaryCharactersStatistics.cpp)
-add_executable(printUnicodeCharacters test/printUnicodeCharacters.cpp)
+add_executable(
+diaryCharactersStatistics
+app/diaryCharactersStatistics.cpp
+app/charactersStatistics/CountCharacters.cpp
+)
+add_executable(printUnicodeCharacters app/printUnicodeCharacters.cpp)
 add_executable(testDev test/test.cpp)
 add_executable(fourierSeriesTest test/fourierSeriesTest.cpp)
 add_executable(sqlite3ToJSON test/sqlite3ToJSON.cpp)
-add_executable(snake snake.cpp)
-add_executable(snake2 snake2.cpp)
+add_executable(snake app/snake.cpp)
 add_executable(sqliteTest test/sqliteTest.cpp)
-add_executable(charactersStatistics CharactersStatistics.cpp)
+add_executable(
+charactersStatistics
+app/charactersStatistics/charactersStatistics.cpp
+app/charactersStatistics/CountCharacters.cpp
+)
 add_executable(thread test/thread.cpp)
-add_executable(producerAndConsumer test/producerAndConsumer.cpp)
-add_executable(reverse test/reverse.cpp)
-add_executable(echoAndWrite test/echoAndWrite.cpp)
-add_executable(shuffleString test/shuffleString.cpp)
-add_executable(bases128 Base128.cpp)
-add_executable(stdinSize test/stdinSize.cpp)
+add_executable(producerAndConsumer test/producerAndConsumerTest.cpp)
+add_executable(
+reverse
+app/characterReverser/reverse.cpp
+app/characterReverser/reverseCharacters.cpp
+)
+add_executable(echoAndWrite app/echoAndWrite.cpp)
+add_executable(shuffleString app/shuffleString.cpp)
+add_executable(bases128 app/base128.cpp)
+add_executable(stdinSize app/stdinSize.cpp)

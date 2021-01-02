@@ -5,14 +5,16 @@
 #ifndef CPP_COUNTCHARACTERS_H
 #define CPP_COUNTCHARACTERS_H
 
-#include "third_party/json-single-header/single_include/nlohmann/json.hpp"
-#include "third_party/sqlite3-single-c/sqlite3.h"
+#include "../../third_party/json-single-header/single_include/nlohmann/json.hpp"
+#include "../../third_party/sqlite3-single-c/sqlite3.h"
 #include <cstdint>
 #include <map>
 #include <vector>
+#include "../../String.h"
 
 using namespace std;
 using json = nlohmann::json;
+using namespace bczhc::string::utf8;
 
 namespace bczhc {
     class CharacterCounter {

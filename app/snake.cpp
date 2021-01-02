@@ -2,7 +2,7 @@
 using namespace std;
 
 #ifndef __WIN32
-#include "third_party/practice/LinearList.hpp"
+#include "../third_party/practice/LinearList.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>

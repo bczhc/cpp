@@ -1,8 +1,7 @@
-#include "../CountCharacters.h"
+#include "../app/charactersStatistics/CountCharacters.h"
 #include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include "../third_party/sqlite3-single-c/sqlite3.h"
-#include "../utf8.h"
-#include <algorithm>
+#include "../String.h"
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -10,7 +9,7 @@
 
 using namespace std;
 using namespace bczhc;
-using namespace utf8;
+using namespace string::utf8;
 
 using json = nlohmann::json;
 

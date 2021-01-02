@@ -6,12 +6,10 @@
 #define BCZHC_FOURIER_SERIES
 
 #include "./ComplexValue.h"
-#include "./Concurrent.h"
+#include "../Concurrent.h"
 #include "./Epicycle.h"
-#include "./third_party/practice/LinearList.hpp"
-#include <iostream>
+#include "../third_party/practice/LinearList.hpp"
 
-using namespace std;
 using namespace bczhc;
 using namespace linearlist;
 

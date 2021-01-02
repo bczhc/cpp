@@ -1,6 +1,5 @@
 #include "CountCharacters.h"
-#include "io.h"
-#include "utf8.h"
+#include "../../IO.h"
 #include <cstdio>
 #include <cstring>
 #include <iostream>
@@ -9,6 +8,7 @@
 using namespace bczhc;
 using namespace io;
 using namespace std;
+using namespace utf8;
 
 inline bool range(int codepoint) {
     if (codepoint >= 0x4e00 && codepoint <= 0x9fff)

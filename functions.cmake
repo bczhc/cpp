@@ -59,21 +59,21 @@ function(confLib)
     #zhcLib
     set(
             zhcLibSrc
-            ComplexIntegral.cpp
-            ComplexValue.cpp
-            Epicycle.cpp
-            FourierSeries.cpp
-            utf8.cpp
-            CountCharacters.cpp
+            math/BigDecimal.cpp
+            math/ComplexIntegral.cpp
+            math/ComplexValue.cpp
+            math/Epicycle.cpp
+            math/FourierSeries.cpp
+            math/ComplexIntegral.cpp
             Concurrent.cpp
             Sqlite3.cpp
-            io.cpp
+            IO.cpp
             String.cpp
-            reverseCharacters.cpp
-            utils.cpp
+            Utils.cpp
             File.cpp
-            Base128Lib.cpp
+            base128/Base128Lib.cpp
             RegExp.cpp
+            UTF8.cpp
     )
     add_library(zhcLib SHARED ${zhcLibSrc})
     target_link_libraries(zhcLib "${SQLITE3_LIB}" "${PTHREAD_LIB}" "${PCRE_LIB}")

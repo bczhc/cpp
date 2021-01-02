@@ -1,9 +1,9 @@
 //
 // Created by bczhc on 2020/3/25.
 //
-#include "utf8.h"
+#include "String.h"
 
-using namespace bczhc;
+using namespace bczhc::string;
 
 int utf8::getUTF8Size(int codepoint) {
     if (codepoint >= 0x0 && codepoint <= 0x7f) {
@@ -45,7 +45,7 @@ int utf8::unicode2UTF8(char *dest, int codepoint) {
     return utf8Size;
 }
 
-int bczhc::utf8::getUTF8BytesLength(const unsigned char firstByte) {
+int utf8::getUTF8BytesLength(const unsigned char firstByte) {
     if (firstByte >> 7 == 0)
         return 1;
     if (firstByte >> 5 == 0b110)
@@ -57,8 +57,8 @@ int bczhc::utf8::getUTF8BytesLength(const unsigned char firstByte) {
     return 0;
 }
 
-void bczhc::utf8::solveUTF8Bytes(utf8::SolvedUTF8Properties &solvedProperties,
-                                 const char *bytes) {
+void utf8::solveUTF8Bytes(utf8::SolvedUTF8Properties &solvedProperties,
+                          const char *bytes) {
     solvedProperties.bytesLength = utf8::getUTF8BytesLength(bytes[0]);
     switch (solvedProperties.bytesLength) {
         case 1:

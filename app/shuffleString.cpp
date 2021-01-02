@@ -1,15 +1,14 @@
 #include "../String.h"
 #include "../third_party/practice/LinearList.hpp"
-#include "../utf8.h"
 #include <iostream>
-#include "../io.h"
+#include "../IO.h"
 #include <sys/time.h>
 
 using namespace std;
 using namespace bczhc;
 using namespace linearlist;
-using namespace utf8;
 using namespace string;
+using namespace utf8;
 using namespace io;
 
 #define RANDOM(a, b) (((double) rand() / RAND_MAX) * ((b) - (a)) + (a))

@@ -2,11 +2,9 @@
 // Created by zhc on 11/21/20.
 //
 
-#include <iostream>
-#include "io.h"
-#include "Base128Lib.h"
+#include "../IO.h"
+#include "../base128/Base128Lib.h"
 
-using namespace std;
 using namespace bczhc;
 using namespace io;
 using namespace base128;
