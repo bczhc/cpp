@@ -21,6 +21,7 @@ void String::copy(const String &string) {
     data = string.data;
     dataSize = string.dataSize;
     stringSize = string.stringSize;
+    mIsNull = string.mIsNull;
 }
 
 String::String(const char *s) {

@@ -81,7 +81,7 @@ OutputStream::OutputStream(FILE *stream) {
     fp = stream;
 }
 
-LineReader::LineReader(InputStream in) : is(in) {}
+LineReader::LineReader(InputStream &in) : is(in) {}
 
 String LineReader::readLine() {
     String line;

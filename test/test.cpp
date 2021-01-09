@@ -1,18 +1,22 @@
 #include "../Concurrent.h"
-#include "../math/FourierSeries.h"
-#include "../Sqlite3.h"
-#include "../String.h"
-#include "../third_party/practice/LinearList.hpp"
-#include "thread"
-#include <functional>
-#include <iostream>
-#include <pthread.h>
-#include <string>
-#include "../Utils.hpp"
 #include "../File.h"
 #include "../IO.h"
-#include <pcre.h>
 #include "../RegExp.h"
+#include "../Sqlite3.h"
+#include "../String.h"
+#include "../Utils.hpp"
+#include "../math/FourierSeries.h"
+#include "../third_party/practice/LinearList.hpp"
+#include "thread"
+#include <cstdio>
+#include <cstdlib>
+#include <functional>
+#include <iostream>
+#include <new>
+#include <pcre.h>
+#include <pthread.h>
+#include <string>
+#include <unistd.h>
 
 using namespace std;
 using namespace bczhc;
@@ -24,19 +28,24 @@ using namespace file;
 using namespace io;
 using namespace regex;
 
-MutexLock lock; // NOLINT(cert-err58-cpp)
-CountDownLatch latch(2); // NOLINT(cert-err58-cpp)
+MutexLock lock;         // NOLINT(cert-err58-cpp)
+CountDownLatch latch(2);// NOLINT(cert-err58-cpp)
 
 int main(int argc, char **argv) {
-    auto matched = match("(?<=Cmake version: )[0-9]\\.[0-9]\\.[0-9](\\.[0-9])?", "Cmake version: 1.2.3.1");
-    auto it = matched.getIterator();
-    if (it.moveToFirst()) {
-        do {
-            cout << it.get().getCString() << endl;
-        } while (it.next());
+    FILE *f = popen("ls", "r");
+    if (f == nullptr) {
+        cout << "popen error" << endl;
+        return 1;
     }
 
-    cout << test("a...e", "abcde") << endl;
-    cout << test("a...e.", "abcde") << endl;
+    auto is = InputStream(f);
+    LineReader reader = LineReader(is);
+    String line;
+    while (true) {
+        line = reader.readLine();
+        if (line.isNull()) break;
+        cout << line.getCString() << endl;
+    }
+    is.close();
     return 0;
 }

@@ -58,10 +58,10 @@ namespace bczhc {
 
         class LineReader {
         private:
-            InputStream is;
+            InputStream &is;
 
         public:
-            LineReader(InputStream in);
+            LineReader(InputStream &in);
 
             String readLine();
         };
