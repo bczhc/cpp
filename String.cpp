@@ -53,13 +53,16 @@ size_t String::utf8Length() {
 size_t String::size() const {
     return stringSize;
 }
-
-void String::fromCharsString(const char *s, size_t size) {
-    deleteCount = new int(0);
+void String::newData(const char *s, size_t size) {
     stringSize = size, dataSize = stringSize + 1;
     data = new char[dataSize];
     for (int i = 0; i < size; ++i) data[i] = s[i];
     data[size] = '\0';
+}
+
+void String::fromCharsString(const char *s, size_t size) {
+    deleteCount = new int(0);
+    newData(s, size);
 }
 
 
@@ -70,10 +73,21 @@ String &String::operator=(const String &string) {
     return *this;
 }
 
+String &String::operator=(const char *s) {
+    if (s == nullptr) {
+        mIsNull = true;
+        s = "(null)";
+    }
+    delete[] data;
+    newData(s, strlen(s));
+    return *this;
+}
+
 void String::resize(int newSize) {
     char *newChars = new char[newSize];
     strcpy(newChars, data);
     delete[] data;
+    data = nullptr;
     data = newChars;
 }
 
@@ -169,11 +183,17 @@ SequentialList<String> String::split(const String &str, const String &separator)
     return list;
 }
 
-String::~String() {
+void String::release() {
+    if (deleteCount == nullptr) return;
     if (--*deleteCount == -1) {
         delete[] data;
+        data = nullptr;
         delete deleteCount;
     }
+}
+
+String::~String() {
+    release();
 }
 
 String String::toString(int32_t a) {

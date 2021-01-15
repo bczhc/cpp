@@ -25,9 +25,13 @@ namespace bczhc {
             size_t stringSize = 0, dataSize = 0;
             bool mIsNull = false;
 
-            void fromCharsString(const char *s, size_t stringSize);
+            void newData(const char *s, size_t size);
+
+            void fromCharsString(const char *s, size_t size);
 
             void resize(int newStringLength);
+
+            void release();
 
 
         public:
@@ -50,6 +54,8 @@ namespace bczhc {
             size_t size() const;
 
             String &operator=(const String &string);
+
+            String &operator=(const char *s);
 
             void copy(const String &string);
 

@@ -20,13 +20,14 @@ int main() {
             signal(SIGTERM, sigHandler);
             Thread::sleep(1000);
             printf("Frailty, thy name is woman!\n");
-            delete this;
         }
     };
 
-    Thread t(new R);
+    auto *r = new R;
+    Thread t(r);
     Thread::sleep(500);
     //    t.terminate();
+    delete r;
     t.sendSignal(SIGTERM);
     t.join();
     return 0;
