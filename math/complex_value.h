@@ -2,12 +2,12 @@
 // Created by root on 2020/4/2.
 //
 
-#ifndef CPP_COMPLEXVALUE_H
-#define CPP_COMPLEXVALUE_H
+#ifndef CPP_COMPLEX_VALUE_H
+#define CPP_COMPLEX_VALUE_H
 
 #include <cmath>
 #include <cstdint>
-#include "../String.h"
+#include "../string.h"
 
 using namespace bczhc::string;
 
@@ -72,4 +72,4 @@ namespace bczhc {
         virtual void x(ComplexValue &dest, double t) = 0;
     };
 }// namespace bczhc
-#endif// CPP_COMPLEXVALUE_H
+#endif// CPP_COMPLEX_VALUE_H

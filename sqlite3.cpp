@@ -1,5 +1,5 @@
 #include <cstdint>
-#include "Sqlite3.h"
+#include "sqlite3.h"
 
 int bczhc::Sqlite3::close() {
     closed = true;

@@ -1,4 +1,4 @@
-#include "../math/FourierSeries.h"
+#include "../math/fourier_series.h"
 #include <iostream>
 
 using namespace bczhc;

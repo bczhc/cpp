@@ -1,12 +1,12 @@
 #include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include <cstdio>
-#include "../String.h"
+#include "../string.h"
 #include <cstdlib>
 #include <iostream>
 
 using json = nlohmann::json;
 using namespace bczhc;
-using namespace string::utf8;
+using namespace utf8;
 using namespace std;
 
 int main(int argc, char **argv) {

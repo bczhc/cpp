@@ -1,7 +1,7 @@
-#include "../String.h"
+#include "../string.h"
 #include "../third_party/practice/LinearList.hpp"
 #include <iostream>
-#include "../IO.h"
+#include "../io.h"
 #include <sys/time.h>
 
 using namespace std;

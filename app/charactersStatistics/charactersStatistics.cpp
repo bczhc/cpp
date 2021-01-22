@@ -1,5 +1,5 @@
 #include "CountCharacters.h"
-#include "../../IO.h"
+#include "../../io.h"
 #include <cstdio>
 #include <cstring>
 #include <iostream>

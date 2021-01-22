@@ -2,7 +2,7 @@
 // Created by root on 2020/4/2.
 //
 
-#include "Epicycle.h"
+#include "epicycle.h"
 
 bczhc::Epicycle::Epicycle(double n, const ComplexValue &c) : n(n), c(c) {}
 

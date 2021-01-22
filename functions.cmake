@@ -1,19 +1,19 @@
 function(setCompiler)
     if (C_COMPILER)
         set(CMAKE_C_COMPILER "${C_COMPILER}" CACHE INTERNAL "CMAKE_C_COMPILER")
-    endif()
+    endif ()
     if (CXX_COMPILER)
         set(CMAKE_CXX_COMPILER "${CXX_COMPILER}" CACHE INTERNAL "CMAKE_CXX_COMPILER")
-    endif()
+    endif ()
 endfunction()
 
 function(setFlags)
     if (C_FLAGS)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS}" CACHE INTERNAL "CMAKE_C_FLAGS")
-    endif()
+    endif ()
     if (CXX_FLAGS)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}" CACHE INTERNAL "CMAKE_CXX_FLAGS")
-    endif()
+    endif ()
 endfunction()
 
 function(confLib)
@@ -52,21 +52,21 @@ function(confLib)
     #zhcLib
     set(
             zhcLibSrc
-            math/BigDecimal.cpp
-            math/ComplexIntegral.cpp
-            math/ComplexValue.cpp
-            math/Epicycle.cpp
-            math/FourierSeries.cpp
-            math/ComplexIntegral.cpp
-            Concurrent.cpp
-            Sqlite3.cpp
-            IO.cpp
-            String.cpp
-            Utils.cpp
-            File.cpp
+            math/big_decimal.cpp
+            math/complex_integral.cpp
+            math/complex_value.cpp
+            math/epicycle.cpp
+            math/fourier_series.cpp
+            math/complex_integral.cpp
+            concurrent.cpp
+            sqlite3.cpp
+            io.cpp
+            string.cpp
+            utils.cpp
+            file.cpp
             base128/Base128Lib.cpp
-            RegExp.cpp
-            UTF8.cpp
+            regex.cpp
+            utf8.cpp
     )
     add_library(zhcLib SHARED ${zhcLibSrc})
     target_link_libraries(zhcLib "${SQLITE3_LIB}" "${PTHREAD_LIB}" "${PCRE_LIB}")

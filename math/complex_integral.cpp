@@ -2,7 +2,7 @@
 // Created by root on 2020/4/2.
 //
 
-#include "ComplexIntegral.h"
+#include "complex_integral.h"
 
 using namespace bczhc;
 

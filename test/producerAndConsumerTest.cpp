@@ -1,4 +1,4 @@
-#include "../Concurrent.h"
+#include "../concurrent.h"
 #include "../third_party/practice/LinearList.hpp"
 #include <ctime>
 #include <unistd.h>

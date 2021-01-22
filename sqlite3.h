@@ -7,7 +7,7 @@
 
 #include "third_party/sqlite3-single-c/sqlite3.h"
 #include <cstdint>
-#include "String.h"
+#include "string.h"
 
 using namespace bczhc::string;
 

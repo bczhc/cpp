@@ -5,7 +5,7 @@
 #ifndef CPP_EPICYCLE_H
 #define CPP_EPICYCLE_H
 
-#include "./ComplexValue.h"
+#include "./complex_value.h"
 
 namespace bczhc {
 

@@ -2,7 +2,7 @@
 // Created by zhc on 12/26/20.
 //
 
-#include "RegExp.h"
+#include "regex.h"
 
 using namespace regex;
 

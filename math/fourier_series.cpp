@@ -2,8 +2,8 @@
 // Created by root on 2020/3/31.
 //
 
-#include "./FourierSeries.h"
-#include "ComplexIntegral.h"
+#include "./fourier_series.h"
+#include "complex_integral.h"
 
 using namespace bczhc;
 using namespace concurrent;

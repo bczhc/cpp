@@ -5,9 +5,9 @@
 #ifndef BCZHC_FOURIER_SERIES
 #define BCZHC_FOURIER_SERIES
 
-#include "./ComplexValue.h"
-#include "../Concurrent.h"
-#include "./Epicycle.h"
+#include "./complex_value.h"
+#include "../concurrent.h"
+#include "./epicycle.h"
 #include "../third_party/practice/LinearList.hpp"
 
 using namespace bczhc;

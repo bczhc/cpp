@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include "utf8.h"
 
 using namespace bczhc::linearlist;
 
@@ -115,20 +116,6 @@ namespace bczhc {
 
             bool isNull();
         };
-        namespace utf8 {
-            struct SolvedUTF8Properties {
-                int bytesLength;
-                int codepoint;
-            };
-
-            int getUTF8BytesLength(unsigned char firstByte);
-
-            void solveUTF8Bytes(SolvedUTF8Properties &solvedProperties, const char *bytes);
-
-            int getUTF8Size(int codepoint);
-
-            int unicode2UTF8(char *dest, int codepoint);
-        }// namespace utf8
-    }    // namespace string
+    }// namespace string
 }// namespace bczhc
 #endif//BCZHC_STRING_H

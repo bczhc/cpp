@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <sys/time.h> // NOLINT(modernize-deprecated-headers)
+#include <cstdio>
 
 namespace bczhc::utils {
     template<typename T>

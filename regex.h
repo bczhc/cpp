@@ -2,12 +2,12 @@
 // Created by zhc on 12/26/20.
 //
 
-#ifndef CPP_REGEXP_H
-#define CPP_REGEXP_H
+#ifndef CPP_REGEX_H
+#define CPP_REGEX_H
 
-#include "Utils.hpp"
+#include "utils.hpp"
 #include "./third_party/practice/LinearList.hpp"
-#include "String.h"
+#include "string.h"
 #include <pcre.h>
 
 using namespace bczhc;
@@ -29,4 +29,4 @@ namespace bczhc::regex {
     bool test(const char *pattern, const char *text, int textSize);
 }
 
-#endif //CPP_REGEXP_H
+#endif //CPP_REGEX_H

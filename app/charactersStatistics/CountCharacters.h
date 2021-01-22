@@ -10,11 +10,11 @@
 #include <cstdint>
 #include <map>
 #include <vector>
-#include "../../String.h"
+#include "../../string.h"
 
 using namespace std;
 using json = nlohmann::json;
-using namespace bczhc::string::utf8;
+using namespace bczhc::utf8;
 
 namespace bczhc {
     class CharacterCounter {

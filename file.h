@@ -5,7 +5,7 @@
 #ifndef CPP_FILE_H
 #define CPP_FILE_H
 
-#include "./String.h"
+#include "./string.h"
 #include <cstdint>
 #include <cstdio>
 
@@ -20,6 +20,8 @@ namespace bczhc::file {
         explicit File(const char *path);
 
         int remove();
+
+        static int move(const char* fileName);
 
         int64_t getFileSize() {
             FILE *fp = fopen(path.getCString(), "rb");

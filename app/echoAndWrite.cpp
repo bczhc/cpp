@@ -1,4 +1,4 @@
-#include "../IO.h"
+#include "../io.h"
 #include <csignal>
 #include <cstdio>
 #include <iostream>

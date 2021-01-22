@@ -7,14 +7,19 @@ setFlags()
 
 project(cpp)
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_BUILD_TYPE DEBUG)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 confLib()
 
 link_libraries(zhcLib)
 
 add_executable(
-diaryCharactersStatistics
-app/diaryCharactersStatistics.cpp
-app/charactersStatistics/CountCharacters.cpp
+        diaryCharactersStatistics
+        app/diaryCharactersStatistics.cpp
+        app/charactersStatistics/CountCharacters.cpp
 )
 add_executable(printUnicodeCharacters app/printUnicodeCharacters.cpp)
 add_executable(testDev test/test.cpp)
@@ -23,16 +28,16 @@ add_executable(sqlite3ToJSON test/sqlite3ToJSON.cpp)
 add_executable(snake app/snake.cpp)
 add_executable(sqliteTest test/sqliteTest.cpp)
 add_executable(
-charactersStatistics
-app/charactersStatistics/charactersStatistics.cpp
-app/charactersStatistics/CountCharacters.cpp
+        charactersStatistics
+        app/charactersStatistics/charactersStatistics.cpp
+        app/charactersStatistics/CountCharacters.cpp
 )
 add_executable(thread test/thread.cpp)
 add_executable(producerAndConsumer test/producerAndConsumerTest.cpp)
 add_executable(
-reverse
-app/characterReverser/reverse.cpp
-app/characterReverser/reverseCharacters.cpp
+        reverse
+        app/characterReverser/reverse.cpp
+        app/characterReverser/reverseCharacters.cpp
 )
 add_executable(echoAndWrite app/echoAndWrite.cpp)
 add_executable(shuffleString app/shuffleString.cpp)

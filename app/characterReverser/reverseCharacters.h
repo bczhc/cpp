@@ -1,9 +1,9 @@
 #ifndef BCZHC_REVERSE_CHARACTERS_H
 #define BCZHC_REVERSE_CHARACTERS_H
 
-#include "../../String.h"
+#include "../../string.h"
 
-using namespace bczhc::string::utf8;
+using namespace bczhc::utf8;
 
 namespace bczhc {
     void reverseCharacters(char *dest, char *s, int length);

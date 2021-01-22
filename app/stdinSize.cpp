@@ -2,7 +2,7 @@
 // Created by zhc on 11/21/20.
 //
 
-#include "../IO.h"
+#include "../io.h"
 #include <cstdint>
 #include <iostream>
 

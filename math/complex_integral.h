@@ -5,7 +5,7 @@
 #ifndef CPP_COMPLEX_INTEGRAL_H
 #define CPP_COMPLEX_INTEGRAL_H
 
-#include "FourierSeries.h"
+#include "fourier_series.h"
 
 namespace bczhc {
     class ComplexIntegral {
