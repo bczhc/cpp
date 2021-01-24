@@ -1,7 +1,7 @@
 #ifndef BCZHC_REVERSE_CHARACTERS_H
 #define BCZHC_REVERSE_CHARACTERS_H
 
-#include "../../string.h"
+#include "../../string.hpp"
 
 using namespace bczhc::utf8;
 

@@ -3,7 +3,7 @@
 #include "../io.h"
 #include "../regex.h"
 #include "../sqlite3.h"
-#include "../string.h"
+#include "../string.hpp"
 #include "../utils.hpp"
 #include "../math/fourier_series.h"
 #include "../third_party/practice/LinearList.hpp"

@@ -1,7 +1,7 @@
 #include "../app/charactersStatistics/CountCharacters.h"
 #include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include "../third_party/sqlite3-single-c/sqlite3.h"
-#include "../string.h"
+#include "../string.hpp"
 #include <iostream>
 #include <iterator>
 #include <map>

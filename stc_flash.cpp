@@ -1,9 +1,9 @@
-#include "./string.h"
+#include "./string.hpp"
 
 using namespace bczhc;
 using namespace string;
 
-static char port[];
+static char *port;
 
 void judgeOS() {
     String platform;

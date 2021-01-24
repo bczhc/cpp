@@ -5,7 +5,7 @@
 #ifndef CPP_FILE_H
 #define CPP_FILE_H
 
-#include "./string.h"
+#include "./string.hpp"
 #include <cstdint>
 #include <cstdio>
 

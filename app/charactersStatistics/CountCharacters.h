@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <map>
 #include <vector>
-#include "../../string.h"
+#include "../../string.hpp"
 
 using namespace std;
 using json = nlohmann::json;

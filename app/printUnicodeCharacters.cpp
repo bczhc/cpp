@@ -1,6 +1,6 @@
 #include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include <cstdio>
-#include "../string.h"
+#include "../string.hpp"
 #include <cstdlib>
 #include <iostream>
 

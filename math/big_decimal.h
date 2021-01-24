@@ -1,7 +1,7 @@
 #ifndef BCZHC_BIG_DECIMAL_H
 #define BCZHC_BIG_DECIMAL_H
 
-#include "../string.h"
+#include "../string.hpp"
 
 using namespace bczhc::string;
 

@@ -1,7 +1,7 @@
 #ifndef BCZHC_IO_H
 #define BCZHC_IO_H
 
-#include "string.h"
+#include "string.hpp"
 #include <cstdio>
 
 #define BUFFER_SIZE 8192

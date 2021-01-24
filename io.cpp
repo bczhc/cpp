@@ -1,5 +1,5 @@
 #include "io.h"
-#include "string.h"
+#include "string.hpp"
 #include <cstdio>
 
 using namespace bczhc;
