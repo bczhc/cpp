@@ -9,10 +9,10 @@ endfunction()
 
 function(setFlags)
     if (C_FLAGS)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS}" CACHE INTERNAL "CMAKE_C_FLAGS")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS} -O0" CACHE INTERNAL "CMAKE_C_FLAGS")
     endif ()
     if (CXX_FLAGS)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}" CACHE INTERNAL "CMAKE_CXX_FLAGS")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS} -O0" CACHE INTERNAL "CMAKE_CXX_FLAGS")
     endif ()
 endfunction()
 
@@ -67,6 +67,7 @@ function(confLib)
             base128/Base128Lib.cpp
             regex.cpp
             utf8.cpp
+            number_parser.cpp
     )
     add_library(zhcLib SHARED ${zhcLibSrc})
     target_link_libraries(zhcLib "${SQLITE3_LIB}" "${PTHREAD_LIB}" "${PCRE_LIB}")

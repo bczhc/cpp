@@ -1,8 +1,7 @@
 #ifndef UTF8_H
 #define UTF8_H
 
-namespace bczhc {
-    namespace utf8 {
+namespace bczhc::utf8 {
         struct SolvedUTF8Properties {
             int bytesLength;
             int codepoint;
@@ -15,6 +14,5 @@ namespace bczhc {
         int getUTF8Size(int codepoint);
 
         int unicode2UTF8(char *dest, int codepoint);
-    } // namespace utf8
-} // namespace bczhc
+    } // namespace bczhc
 #endif // UTF8_H

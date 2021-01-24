@@ -15,3 +15,19 @@ int file::File::remove() {
 int file::File::move(const char *fileName) {
     return ::remove(fileName);
 }
+
+String file::File::getExtension(const String &path) {
+    // "as/adf/dsaf/dasgdasf.aasd"
+    int size = path.size();
+    String r;
+    for (int i = size - 1; i >= 0; --i) {
+        char c = path.charAt(i);
+        if (c != '.')
+            r.insert(0, c);
+        else return r;
+        if (c == '/') break;
+    }
+    return "";
+}
+
+

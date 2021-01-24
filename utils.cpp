@@ -9,3 +9,8 @@ int64_t bczhc::utils::getCurrentTimeMillis() {
     gettimeofday(&t, nullptr);
     return t.tv_sec * 1000 + t.tv_usec / 1000;
 }
+
+int bczhc::utils::min(int a, int b) {
+    return a < b ? a : b;
+}
+

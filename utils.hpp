@@ -8,6 +8,9 @@
 #include <cstdint>
 #include <sys/time.h> // NOLINT(modernize-deprecated-headers)
 #include <cstdio>
+#include "./string.hpp"
+
+using namespace bczhc::string;
 
 namespace bczhc::utils {
     template<typename T>
@@ -17,6 +20,10 @@ namespace bczhc::utils {
     };
 
     int64_t getCurrentTimeMillis();
+
+    int min(int a, int b);
+
+    int parseInt(const String &s, int radix);
 }
 
 #endif //CPP_UTILS_HPP

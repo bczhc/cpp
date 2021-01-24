@@ -139,7 +139,7 @@ namespace bczhc::concurrent {
 
         void sendSignal(int signal) const;
 
-        pthread_t getPThread() const;
+        [[nodiscard]] pthread_t getPThread() const;
     };
 
     class ThreadPool {

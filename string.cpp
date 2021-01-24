@@ -2,6 +2,7 @@
 #include "third_party/practice/LinearList.hpp"
 #include <cstddef>
 #include <cstring>
+#include "utils.hpp"
 
 using namespace bczhc;
 using namespace string;
@@ -53,6 +54,7 @@ size_t String::utf8Length() {
 size_t String::size() const {
     return stringSize;
 }
+
 void String::newData(const char *s, size_t size) {
     stringSize = size, dataSize = stringSize + 1;
     data = new char[dataSize];
@@ -337,6 +339,58 @@ bool String::equal(const char *s1, const char *s2) {
     return true;
 }
 
-bool String::isNull() {
+bool String::isNull() const {
     return mIsNull;
 }
+
+String String::toUpperCase(const char *s) {
+    String r;
+    for (int i = 0; s[i] != '\0'; ++i) {
+        r.append((char) toupper(s[i]));
+    }
+    return r;
+}
+
+char String::charAt(int pos) const {
+    return data[pos];
+}
+
+String String::substring(const char *s, int start, int end) {
+    String r;
+    for (int i = start; i < end; ++i) {
+        r.append(s[i]);
+    }
+    return r;
+}
+
+String String::substring(int start, int end) const {
+    return substring(getCString(), start, end);
+}
+
+String String::substr(const char *s, int start, int length) {
+    return substring(s, start, start + length);
+}
+
+String String::substr(int start, int length) const {
+    return substr(getCString(), start, length);
+}
+
+char *String::toCharArray() const {
+    char *r = new char[stringSize];
+    for (int i = 0; i < stringSize; ++i) {
+        r[i] = data[i];
+    }
+    return r;
+}
+
+String &String::operator+(const String &s) {
+    append(s);
+    return *this;
+}
+
+String String::duplicate() const {
+    return String(*this);
+}
+
+
+

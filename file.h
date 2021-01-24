@@ -37,6 +37,8 @@ namespace bczhc::file {
             fseek(fp, 0L, SEEK_SET);
             return sz;
         }
+
+        static String getExtension(const String &path);
     };
 }
 
