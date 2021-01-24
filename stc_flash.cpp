@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 
     String filename = "/home/zhc/stc/a.hex";
     try {
-        opts.image = new InputStream(filename);
+         opts.image = new InputStream(filename);
     } catch (const String &e) {
         printf("%s\n", e.getCString());
         return 1;
