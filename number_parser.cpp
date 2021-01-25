@@ -1,11 +1,12 @@
 #include "utils.hpp"
 
-static const char *charTable = "0123456789abcdefghijklmnopqrstuvwxyz";
+static const char *lowerCharTable = "0123456789abcdefghijklmnopqrstuvwxyz";
+static const char *upperCharTable = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static char mapTable[128];
 void init() {
     for (int i = 0; i < 36; ++i) {
-        char c = charTable[i];
-        mapTable[c] = i;
+        char c1 = lowerCharTable[i], c2 = upperCharTable[i];
+        mapTable[c1] = i, mapTable[c2] = i;
     }
 }
 

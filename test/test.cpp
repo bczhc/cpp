@@ -21,6 +21,7 @@
 #include <pthread.h>
 #include <string>
 #include "../array.hpp"
+#include <fcntl.h>
 
 using namespace std;
 using namespace bczhc;
@@ -36,15 +37,13 @@ using namespace bczhc::array;
 MutexLock lock;         // NOLINT(cert-err58-cpp)
 CountDownLatch latch(2);// NOLINT(cert-err58-cpp)
 
-Array<String> f() {
-    Array<String> arr(10);
-    for (int i = 0; i < arr.length(); ++i) {
-        arr[i] = String::toString(i);
-    }
-    return arr;
-}
-
 int main(int argc, char **argv) {
-    
+    using fd = int;
+    fd f = open("/dev/ttyUSB0", O_RDONLY | O_NOCTTY | O_NONBLOCK);
+    char c;
+    while (read(f, &c, 1) > 0) {
+        cout << c;
+    }
+    cout << endl;
     return 0;
 }
