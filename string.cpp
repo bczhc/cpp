@@ -63,12 +63,14 @@ void String::newData(const char *s, size_t size) {
 }
 
 void String::fromCharsString(const char *s, size_t size) {
+    release();
     deleteCount = new int(0);
     newData(s, size);
 }
 
 
 String &String::operator=(const String &string) {
+    release();
     if (&string == this) return *this;
     copy(string);
     ++*deleteCount;

@@ -33,3 +33,4 @@ int bczhc::utils::parseInt(const String &s, int radix) {
     }
     return negative ? -r : r;
 }
+

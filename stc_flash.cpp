@@ -99,6 +99,10 @@ char *readToBytes(InputStream &in) {
     return r;
 }
 
+void hex2bytes(const String &hexString) {
+
+}
+
 void hex2bin(const char *code) {
     SequentialList<char> buf;
     int base = 0, line = 0;
@@ -118,7 +122,10 @@ void hex2bin(const char *code) {
     for (int i = 0; i < len; ++i) {
         auto rec = lines.get(i);
         line += 1;
-        String substring = rec.substring(1, 3);
+        String sub1 = rec.substring(1, 3);
+        char n = (char) parseInt(sub1, 16); //TODO
+        String sub2 = rec.substring(1, n * 2 + 11);
+
     }
 }
 
