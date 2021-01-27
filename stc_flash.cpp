@@ -1,8 +1,13 @@
+#include <termios.h>
 #include "./string.hpp"
 #include "file.h"
 #include "io.h"
 #include "utils.hpp"
 #include "array.hpp"
+#include <fcntl.h>
+#include <unistd.h>
+#include "concurrent.h"
+#include <cstdarg>
 //#include "valgrind/valgrind.h"
 
 #pragma clang diagnostic push
@@ -13,6 +18,7 @@ using namespace file;
 using namespace io;
 using namespace utils;
 using namespace bczhc::array;
+using namespace concurrent;
 
 static const char *PROTOCOL_89 = "89";
 static const char *PROTOCOL_12C5A = "12c5a";
@@ -25,7 +31,7 @@ static const char *PROTOSET_PARITY[] = {PROTOCOL_12C5A, PROTOCOL_12C52};
 
 #define COMPARE_CODE0 0;
 
-void getPort(String &port) {
+String getPort() {
     String platform;
 #ifdef _WIN32
     platform = "win32";
@@ -35,13 +41,11 @@ void getPort(String &port) {
 #endif
 
     if (platform.equals("win32")) {
-        port = "COM3";
+        return "COM3";
     } else if (platform.equals("darwin")) {
-        port = "/dev/tty.usbserial";
-    } else port = "/dev/ttyUSB0";
-}
-
-void m() {
+        return "/dev/tty.usbserial";
+    }
+    return "/dev/ttyUSB0";
 }
 
 class Logging {
@@ -51,7 +55,13 @@ public:
     inline static int DEBUG = 10;
 
     inline static int combination[] = {CRITICAL, INFO, DEBUG};
+
+    void debug(const char *format, ...) {
+
+    }
 };
+
+static Logging logging;
 
 class None {
     int code = COMPARE_CODE0;
@@ -189,18 +199,110 @@ Code hex2bin(Code &code) {
     return Code(r);
 }
 
-int main(int argc, char **argv) {
-    OutputStream os = OutputStream("/dev/ttyUSB0");
-    char s[] = "hello";
-    os.write(s, 5);
-    os.close();
-    return 0;
+
+class Serial {
+private:
+    int fd;
+
+    unsigned int baud = 0;
+
+    Serial(int fd) : fd(fd) {}
+
+public:
+    static Serial open(const char *port) {
+        int o = ::open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
+        if (o == -1) throw String("Open failed.");
+        return Serial(o);
+    }
+
+    void setSpeed(unsigned int speed) {
+        unsigned int speedArr[] = {B0, B50, B75, B110, B134, B150, B200, B300, B600, B1200, B1800, B2400, B4800, B9600,
+                                   B19200, B38400, B57600, B115200, B230400, B460800, B500000, B576000, B921600,
+                                   B1000000, B1152000, B1500000, B2000000, B2500000, B3000000, B3500000, B4000000};
+        unsigned int nameArr[] = {0, 50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200, 38400,
+                                  57600, 115200, 230400, 460800, 500000, 576000, 921600, 1000000, 1152000, 1500000,
+                                  2000000, 2500000, 3000000, 3500000, 4000000};
+        termios opt;
+        tcgetattr(fd, &opt);
+        int len = (int) (sizeof(speedArr) / sizeof(speedArr[0]));
+        for (int i = 0; i < len; i++) {
+            if (speed == nameArr[i]) {
+                tcflush(fd, TCIOFLUSH);
+                unsigned int rate = speedArr[i];
+                cfsetispeed(&opt, rate);
+                cfsetospeed(&opt, rate);
+                int status = tcsetattr(fd, TCSANOW, &opt);
+                if (status != 0) throw String("tcsetattr fd1");
+                baud = rate;
+                return;
+            }
+            tcflush(fd, TCIOFLUSH);
+        }
+        throw String("Setting speed failed.");
+    }
+
+    int close() const {
+        return ::close(fd);
+    }
+
+    void read(char *buf, ssize_t size) const {
+        char ch;
+        ssize_t count = 0;
+        for (;;) {
+            ssize_t i = ::read(fd, &ch, size);
+            if (i > 0) {
+                buf[count] = ch;
+                count += i;
+                if (count == size) break;
+            } else if (i == -1) throw String("read error");
+        }
+    }
+
+    ssize_t write(const char *buf, ssize_t size) const {
+        ssize_t i = ::write(fd, buf, size);
+        if (i == -1) throw String("write error");
+        return i;
+    }
+
+    unsigned int getBaudRate() const {
+        return baud;
+    }
+
+    void flush() const {
+        // `::write()` has no cache, so there's no need to "flush".
+    }
+};
+
+void autoisp(Serial &conn, int baud, NonableString magic) {
+    if (magic.isNone) return;
+    uint32_t bak = conn.getBaudRate();
+    conn.setSpeed(baud);
+
+    String &magicStr = magic.var;
+    size_t size = magicStr.size();
+    const char *data = magicStr.getCString();
+    conn.write(data, size);
+    conn.flush();
+    Thread::sleep(500);
+    conn.setSpeed(bak);
+}
+
+class Programmer {
+public:
+    Serial &conn;
+    NonableString &protocol;
+
+    Programmer(Serial &conn, NonableString &aProtocol) : conn(conn), protocol(aProtocol) {}
+
+};
+
+int run() {
     struct Opt {
-        int aispbaud = 4800;
-        void *aispmagic = nullptr;
+        uint32_t aispbaud = 4800;
+        NonableString aispmagic = NonableString(nullptr, true);
         NonableBoolean erase_eeprom = NonableBoolean(false);
         InputStream *image = nullptr;
-        int lowbaud = 2400;
+        uint32_t lowbaud = 2400;
         bool not_erase_eeprom = false;
         String port = "/dev/ttyUSB0";
         NonableString protocol = NonableString("auto");
@@ -208,7 +310,7 @@ int main(int argc, char **argv) {
         int loglevel = 0;
     } opts;
 
-    getPort(opts.port);
+    opts.port = getPort();
 
     String filename = "/home/zhc/stc/a.hex";
     try {
@@ -238,9 +340,23 @@ int main(int argc, char **argv) {
         } else code.isNone = true;
     }
     printf("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
-
-
+    Serial conn = Serial::open(opts.port.getCString());
+    if (!opts.aispmagic.isNone) autoisp(conn, opts.aispbaud, opts.aispmagic);
     return 0;
+}
+
+void m() {
+
+}
+
+int main(int argc, char **argv) {
+    int status = 1;
+    try {
+        status = run();
+    } catch (const String &e) {
+        printf("%s\n", e.getCString());
+    }
+    return status;
 }
 
 #pragma clang diagnostic pop
