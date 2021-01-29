@@ -24,6 +24,8 @@ namespace bczhc::utils {
     int min(int a, int b);
 
     int parseInt(const String &s, int radix);
+
+    int pow(int base, int exponent);
 }
 
 #endif //CPP_UTILS_HPP

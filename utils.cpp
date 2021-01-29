@@ -14,3 +14,11 @@ int bczhc::utils::min(int a, int b) {
     return a < b ? a : b;
 }
 
+int bczhc::utils::pow(int base, int exponent) {
+    int r = 1;
+    for (int i = 0; i < exponent; ++i) {
+        r *= base;
+    }
+    return r;
+}
+

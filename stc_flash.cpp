@@ -1,3 +1,11 @@
+#include <iostream>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+using namespace std;
+
 #include <termios.h>
 #include "./string.hpp"
 #include "file.h"
@@ -73,6 +81,15 @@ public:
             va_end(args);
         }
     }
+
+    void info(const char *format, ...) const {
+        if (mLevel == INFO) {
+            va_list args{};
+            va_start(args, format);
+            vfprintf(stdout, format, args);
+            va_end(args);
+        }
+    }
 };
 
 static Logging logging;
@@ -98,7 +115,7 @@ using NonableBoolean = TypeWithNone<bool>;
 template<typename T>
 using NonableArray = TypeWithNone<Array<T>>;
 using Code = NonableArray<uchar>;
-using ByteArray = Array<uchar>;
+using NonableInt = TypeWithNone<int>;
 
 TypeWithNone<String> chooseProtocol(const char *protocolOrigin) {
     if (String::equal("89", protocolOrigin)) return NonableString(PROTOCOL_89);
@@ -186,7 +203,7 @@ Code hex2bin(Code &code) {
         Array<unsigned char> dat = hex2bytes(rec.substring(1, n * 2 + 11));
         if (rec.charAt(0) != ':')
             throw String("Line ") + String::toString(line) + ": Missing start code \":\"";
-        if ((sum<int, unsigned char>(dat) & 0xFF) != 0)
+        if ((sum<int32_t, unsigned char>(dat) & 0xFF) != 0)
             throw String("Line ") + String::toString(line) + ": Incorrect checksum";
         if (dat[3] == 0) {
             // Data record
@@ -280,10 +297,12 @@ public:
 
 // byte tuple
 using Tuple2B = Tuple2<uchar>;
-//string tuple
+// string tuple
 using Tuple2S = Tuple2<const char *>;
+// Tuple SymbolTable byte-string
+using SymbolTableTupleBS = SymbolTable<Tuple2B, Tuple2S>;
 // SymbolTable byte-string
-using SymbolTableBS = SymbolTable<Tuple2B, Tuple2S>;
+using SymbolTableBS = SymbolTable<uchar, const char *>;
 
 class Serial {
 private:
@@ -344,17 +363,32 @@ public:
         if (::close(fd) != 0) throw String("Close failed.");
     }
 
-    void read(uchar *buf, ssize_t size) const {
-        ssize_t count = 0;
-        while (count < size) {
+    [[nodiscard]] Array<uchar> read(ssize_t size) const {
+        int64_t start = getCurrentTimeMillis();
+        char buf[size];
+        ssize_t haveRead = 0;
+        while (true) {
             bool b = waitReadable(fd, timeout);
             if (b) {
-                count += ::read(fd, buf, size);
+                if (getCurrentTimeMillis() - start >= timeout) {
+                    // timeout occurred
+                    break;
+                }
+                haveRead += ::read(fd, buf + haveRead, size);
+                if (haveRead == size) {
+                    // enough data
+                    break;
+                }
             } else {
                 // timeout occurred
                 break;
             }
         }
+        Array<uchar> r(haveRead);
+        for (int i = 0; i < haveRead; ++i) {
+            r[i] = buf[i];
+        }
+        return r;
     }
 
     ssize_t write(uchar *buf, ssize_t size) const {
@@ -382,6 +416,10 @@ public:
     void setParity(char p) {
         this->parity = p;
     }
+
+    [[nodiscard]] char getParity() const {
+        return parity;
+    }
 };
 
 void autoisp(Serial &conn, int baud, NonableString &magic) {
@@ -406,11 +444,34 @@ bool in(T1 a, T2 *set, uint32_t size) {
     return false;
 }
 
+template<typename T>
+Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
+    SequentialList<T> list;
+    int len = arr.length();
+    if (start < 0) start += len;
+    if (end < 0) end += len;
+    for (int i = start; i < end; i += step) {
+        list.insert(arr[i]);
+    }
+    Array<T> r(list.length());
+    for (int i = 0; i < r.length(); ++i) {
+        r[i] = list[i];
+    }
+    return r;
+}
+
 class Programmer {
 public:
     Serial &conn;
     NonableString &protocol;
     int chkmode = 0;
+    double fosc = 0;
+    Array<uchar> info = Array<uchar>(0);
+    String version;
+    Array<uchar> model = Array<uchar>(0);
+    String name;
+    NonableInt romsize = NonableInt(int{}, true);
+
 
     Programmer(Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
         conn.setTimeout(50);
@@ -421,14 +482,13 @@ public:
         this->chkmode = 0;
     }
 
-    Array<uchar> __conn_read(ssize_t size) {
+    [[nodiscard]] Array<uchar> __conn_read(ssize_t size) const {
         SequentialList<uchar> buf;
         while (buf.length() < size) {
-            ssize_t readLen = size - buf.length();
-            uchar s[readLen];
-            this->conn.read(s, readLen);
-            buf.insert(buf.length(), s, readLen);
+            const Array<uchar> r = this->conn.read(size - buf.length());
+            buf.insert(buf.length(), r.elements, r.length());
             //TODO debug msg
+            if (buf.length() == 0) throw String("io error");
         }
         int len = buf.length();
         Array<uchar> r(len);
@@ -438,7 +498,7 @@ public:
         return r;
     }
 
-    void __conn_write(uchar *buf, ssize_t size) {
+    void __conn_write(uchar *buf, ssize_t size) const {
         //TODO debug msg
         this->conn.write(buf, size);
     }
@@ -463,14 +523,14 @@ public:
         Bean2(T1 a1, T2 a2) : a1(a1), a2(a2) {}
     };
 
-    Bean2<String, int> __model_database(const Array<uchar> &model) {
+    static Bean2<String, int> __model_database(const Array<uchar> &model) {
         class Bean {
         public:
             const char *s = nullptr;
             int i = 0;
-            SymbolTableBS *st = nullptr;
+            SymbolTableTupleBS *st = nullptr;
 
-            Bean(const char *s, int i, SymbolTableBS &st) : s(s), i(i), st(&st) {}
+            Bean(const char *s, int i, SymbolTableTupleBS &st) : s(s), i(i), st(&st) {}
 
             Bean() = default;
         };
@@ -479,7 +539,7 @@ public:
         using SymbolTableBB = SymbolTable<uchar, Bean>;
 
         SymbolTableBB modelMap;
-        SymbolTableBS st[10];
+        SymbolTableTupleBS st[10];
         Bean bean[10];
 
         const char *d1[] = {"12", "12", "11", "12", "12", "10", "11", "89", "89", "12"};
@@ -565,7 +625,7 @@ public:
         if (!result.found) throw String("not found");
         const char *prefix = result.val.s;
         int romratio = result.val.i;
-        SymbolTableBS *fixmap = result.val.st;
+        SymbolTableTupleBS *fixmap = result.val.st;
         if ((model[0] == 0xF0 || model[0] == 0xF1) && (0x20 <= model[1] && model[1] <= 0x30)) {
             prefix = "90";
         }
@@ -585,34 +645,34 @@ public:
             throw String("key error");
         }
         const char *infix = foundVal[0], *postfix = foundVal[1];
-        int romsize = romratio * (model[1] - foundKey[0]);
+        int localRomsize = romratio * (model[1] - foundKey[0]);
 
         try {
             if (model.length() != 2) throw 1;
             if (model.elements[0] != 0xF0 || model.elements[1] != 0x03) throw 1;
-            romsize = 13;
+            localRomsize = 13;
         } catch (...) {
         }
         String romfix;
         if (model[0] == 0xF0 && model[1] == 0xF1) {
             romfix = String::toString(model[1] - foundKey[0]);
-        } else if (model[0] == 0xF2) romfix = String::toString(romsize);
+        } else if (model[0] == 0xF2) romfix = String::toString(localRomsize);
         else {
-            String s = String::toString(romsize);
+            String s = String::toString(localRomsize);
             if (s.utf8Length() == 0) s = String("0") + s;
         }
-        String name = "IAP";
+        String localName = "IAP";
         for (auto &j : iapmcu) {
             if (j[0] != model[0] || j[1] != model[1]) {
-                name = "STC";
+                localName = "STC";
                 break;
             }
         }
-        name = name + prefix + infix + romfix + postfix;
-        return Bean2<String, int>(name, romsize);
+        localName = localName + prefix + infix + romfix + postfix;
+        return Bean2<String, int>(localName, localRomsize);
     }
 
-    Bean2<uchar, Array<uchar>> recv(double timeout = 1.0, Array<uchar> start = Array<uchar>(0)) {
+    [[nodiscard]] Bean2<uchar, Array<uchar>> recv(double timeout = 1.0, Array<uchar> start = Array<uchar>(0)) const {
         if (start.length() == 0) {
             start = Array<uchar>(3);
             start[0] = 0x46, start[1] = 0xB9, start[2] = 0x68;
@@ -642,19 +702,15 @@ public:
             logging.debug("recv(..): Incorrect packet size");
             throw String("io error");
         }
-        chksum += sum<uchar, uchar>(s);
+        chksum += sum<int32_t, uchar>(s);
+
 
         s = __conn_read(n - 3);
         if (s[n - 4] != 0x16) {
             logging.debug("recv(..): Missing terminal symbol");
             throw String("io error");
         }
-        int newLen = s.length() - (1 + this->chkmode);
-        Array<uchar> t(newLen);
-        for (int i = 0; i < newLen; ++i) {
-            t[i] = s[i];
-        }
-        chksum += sum<uchar, uchar>(t);
+        chksum += sum<int32_t, uchar>(cutArray<uchar>(s, 0, -(1 + this->chkmode)));
         if (this->chkmode > 0 && ((chksum & 0xFF) != s[s.length() - 2])) {
             logging.debug("recv(..): Incorrect checksum[0]");
             throw String("io error");
@@ -662,12 +718,7 @@ public:
             logging.debug("recv(..): Incorrect checksum[1]");
             throw String("io error");
         }
-        newLen = s.length() - (1 + this->chkmode) - 1;
-        Array<uchar> r(newLen);
-        for (int i = 0; i < newLen; ++i) {
-            r[i] = s[i + 1];
-        }
-        return Bean2<uchar, Array<uchar>>(s[0], r);
+        return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));
     }
 
     void detect() {
@@ -676,12 +727,13 @@ public:
         const Array<uchar> start(1);
         start[0] = 0x68;
 
+        Array<uchar> dat(0);
         for (int i = 0; i < 1000; ++i) {
             try {
                 __conn_write(buf, 2);
-                const Bean2 <uchar, Array<uchar>> recvBean = recv(0.015, start);
+                const Bean2<uchar, Array<uchar>> recvBean = recv(0.015, start);
                 uchar cmd = recvBean.a1;
-                Array<uchar> dat = recvBean.a2;
+                dat = recvBean.a2;
                 broken = true;
                 break;
             } catch (...) {
@@ -690,14 +742,116 @@ public:
         if (!broken) {
             throw String("io error");
         }
+
+        fosc = ((double) (sum<int32_t, uchar>(cutArray<uchar>(dat, 0, 16, 2)) * 256 +
+                          sum<int32_t, uchar>(cutArray<uchar>(dat, 1, 16, 2)))) / 8 * this->conn.getBaud() / 580974;
+        this->info = cutArray<uchar>(dat, 16, dat.length());
+        this->version = String::toString(info[0] >> 4) + '.' + String::toString(info[0] & 0x0F) + ((char) info[1]);
+        this->model = cutArray<uchar>(info, 3, 5);
+        const Bean2<String, int> bean = __model_database(model);
+        this->name = bean.a1, this->romsize = NonableInt(bean.a2);
+        logging.info("Model ID: %02X %02X", model[0], model[1]);
+        logging.info("Model name: %s", name.getCString());
+        logging.info("ROM size: %d", romsize.var);
+        if (this->protocol.isNone) {
+            try {
+                SymbolTableBS m;
+                m.put(0xF0, PROTOCOL_89);// STC89/90C5xRC
+                m.put(0xF1, PROTOCOL_89);// STC89/90C5xRD+
+                m.put(0xF2, PROTOCOL_12Cx052);// STC12Cx052
+                m.put(0xD1, PROTOCOL_12C5A);// STC12C5Ax
+                m.put(0xD2, PROTOCOL_12C5A);// STC10Fx
+                m.put(0xE1, PROTOCOL_12C52);// STC12C52x
+                m.put(0xE2, PROTOCOL_12C5A);// STC11Fx
+                m.put(0xE6, PROTOCOL_12C52);// STC12C56x
+                const SymbolTableBS::Result result = m.get(model[0]);
+                if (!result.found) throw String("key error");
+                this->protocol = NonableString(result.val);
+            } catch (...) {
+            }
+
+            if (!this->protocol.isNone &&
+                in<String, const char *>(this->protocol.var, PROTOSET_PARITY,
+                                         sizeof(PROTOSET_PARITY) / sizeof(PROTOSET_PARITY[0]))) {
+                this->chkmode = 2, this->conn.setParity(Serial::PARITY_EVEN);
+            } else {
+                this->chkmode = 1, this->conn.setParity(Serial::PARITY_NONE);
+            }
+            if (!this->protocol.isNone) {
+                //del this->info
+                logging.info("Protocol ID: %s", this->protocol.var.getCString());
+                logging.info("Checksum mode: %d", this->chkmode);
+                logging.info("UART Parity: %s", this->conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
+                for (int i = 0; i < this->info.length(); i += 16) {
+                    String s;
+                    const Array<uchar> a = cutArray<uchar>(info, i, i + 16);
+                    for (int j = 0; j < a.length(); ++j) {
+                        String hex = String::toString(a[j], 16);
+                        if (hex.utf8Length() == 1) hex = String("0") + hex;
+                        s += hex;
+                        if (j != a.length() - 1) s += ' ';
+                    }
+                    logging.info("Info string [%d]: %s", i / 16, s.getCString());
+                }
+            }
+        }
+    }
+
+    void print_info() const {
+        printf(" FOSC: %.3fMHz\n", this->fosc);
+        printf(" Model: %s (ver%s) \n", this->name.getCString(), this->version.getCString());
+        if (!this->romsize.isNone) printf(" ROM: %dKB\n", this->romsize.var);
+
+        class Bean {
+        public:
+            int pos{};
+            uchar bit{};
+            const char *desc{};
+
+            Bean() = default;
+
+            Bean(int pos, uchar bit, const char *desc) : pos(pos), bit(bit), desc(desc) {}
+        };
+
+        LinkedList<Bean> switches;
+        if (this->protocol.var == PROTOCOL_89) {
+            switches.insert(Bean(2, 0x80, "Reset stops watchdog"));
+            switches.insert(Bean(2, 0x40, "Internal XRAM"));
+            switches.insert(Bean(2, 0x20, "Normal ALE pin"));
+            switches.insert(Bean(2, 0x10, "Full gain oscillator"));
+            switches.insert(Bean(2, 0x08, "Not erase data EEPROM"));
+            switches.insert(Bean(2, 0x04, "Download regardless of P1"));
+            switches.insert(Bean(2, 0x01, "12T mode"));
+        } else if (this->protocol.var == PROTOCOL_12C5A) {
+            switches.insert(Bean(6, 0x40, "Disable reset2 low level detect"));
+            switches.insert(Bean(6, 0x01, "Reset pin not use as I/O port"));
+            switches.insert(Bean(7, 0x80, "Disable long power-on-reset latency"));
+            switches.insert(Bean(7, 0x40, "Oscillator high gain"));
+            switches.insert(Bean(7, 0x02, "External system clock source"));
+            switches.insert(Bean(8, 0x20, "WDT disable after power-on-reset"));
+            switches.insert(Bean(8, 0x04, "WDT count in idle mode"));
+            switches.insert(Bean(10, 0x02, "Not erase data EEPROM"));
+            switches.insert(Bean(10, 0x01, "Download regardless of P1"));
+            printf(" WDT prescal: %d\n", pow(2, ((this->info[8] & 0x07) + 1)));
+        } else if (in<String, const char *>(this->protocol.var, PROTOSET_12B,
+                                            sizeof(PROTOSET_12B) / sizeof(PROTOSET_12B[0]))) {
+            switches.insert(Bean(8, 0x02, "Not erase data EEPROM"));
+        } else switches.clear();
+
+        LinkedList<Bean>::Iterator it = switches.getIterator();
+        while (it.hasNext()) {
+            Bean bean = it.next();
+            printf(" [%c] %s\n", (this->info[bean.pos] & bean.bit) ? 'X' : ' ', bean.desc);
+        }
     }
 };
 
 void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = NonableBoolean(true, true)) {
     printf("%s", "Detecting target...");
     fflush(stdout);
-
     prog.detect();
+    printf(" done\n");
+    prog.print_info();
 }
 
 int run() {
@@ -741,6 +895,7 @@ int run() {
     } else code.isNone = true;
     printf("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
     Serial conn = Serial::open(opts.port.getCString());
+    conn.setSpeed(opts.lowbaud);
     if (!opts.aispmagic.isNone) autoisp(conn, opts.aispbaud, opts.aispmagic);
     Programmer programmer(conn, opts.protocol);
     program(programmer, code, opts.erase_eeprom);
@@ -748,6 +903,13 @@ int run() {
 }
 
 void m() {
+    auto s = Serial::open("/dev/ttyUSB0", 2000);
+    const Array<uchar> &r = s.read(10);
+    cout << "len: " << r.length() << endl;
+    for (int i = 0; i < r.length(); ++i) {
+        cout << r[i];
+    }
+    cout << endl;
 }
 
 int main(int argc, char **argv) {

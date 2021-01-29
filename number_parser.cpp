@@ -10,14 +10,6 @@ void init() {
     }
 }
 
-int pow(int base, int exponent) {
-    int r = 1;
-    for (int i = 0; i < exponent; ++i) {
-        r *= base;
-    }
-    return r;
-}
-
 int bczhc::utils::parseInt(const String &s, int radix) {
     init();
     String numStr = s;
@@ -34,4 +26,3 @@ int bczhc::utils::parseInt(const String &s, int radix) {
     }
     return negative ? -r : r;
 }
-

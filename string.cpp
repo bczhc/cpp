@@ -41,7 +41,7 @@ const char *String::getCString() const {
     return data;
 }
 
-size_t String::utf8Length() {
+size_t String::utf8Length() const {
     int c = 0;
     int i = 0;
     while (data[i] != '\0') {
@@ -385,13 +385,12 @@ char *String::toCharArray() const {
     return r;
 }
 
-String &String::operator+(const String &s) {
-    append(s);
-    return *this;
+String String::operator+(const String &s) const {
+    return this->duplicate() += s;
 }
 
 String String::duplicate() const {
-    return String(*this);
+    return String(this->data);
 }
 
 bool String::operator==(const char *s) const {
@@ -408,6 +407,20 @@ bool String::operator!=(const char *s) const {
 
 bool String::operator!=(const String &s) const {
     return !(s == *this);
+}
+
+String &String::operator+=(const String &s) {
+    this->append(s);
+    return *this;
+}
+
+String String::operator+(char c) const {
+    return this->duplicate() += c;
+}
+
+String &String::operator+=(char c) {
+    this->append(c);
+    return *this;
 }
 
 

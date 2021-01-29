@@ -60,5 +60,7 @@ Tuple<ReturnType> f(int size, ArgType a...) {
 
 
 int main(int argc, char **argv) {
+    String s = String("6") + '.' + 'C';
+    cout << s.getCString() << endl;
     return 0;
 }

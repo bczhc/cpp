@@ -49,7 +49,7 @@ namespace bczhc::string {
 
         [[nodiscard]] const char *getCString() const;
 
-        size_t utf8Length();
+        size_t utf8Length() const;
 
         [[nodiscard]] size_t size() const;
 
@@ -121,7 +121,9 @@ namespace bczhc::string {
 
         [[nodiscard]] char *toCharArray() const;
 
-        String &operator+(const String &s);
+        String operator+(const String &s) const;
+
+        String operator+(char c) const;
 
         [[nodiscard]] String duplicate() const;
 
@@ -132,6 +134,10 @@ namespace bczhc::string {
         bool operator==(const String &s) const;
 
         bool operator!=(const String &s) const;
+
+        String &operator+=(const String &s);
+
+        String &operator+=(char c);
     };
 }// namespace bczhc
 #endif//BCZHC_STRING_H
