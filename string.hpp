@@ -103,7 +103,7 @@ namespace bczhc::string {
 
         static String toUpperCase(const char *s);
 
-        bool equals(const String &s);
+        bool equals(const String &s) const;
 
         static bool equal(const char *s1, const char *s2);
 
@@ -124,6 +124,14 @@ namespace bczhc::string {
         String &operator+(const String &s);
 
         [[nodiscard]] String duplicate() const;
+
+        bool operator==(const char *s) const;
+
+        bool operator!=(const char *s) const;
+
+        bool operator==(const String &s) const;
+
+        bool operator!=(const String &s) const;
     };
 }// namespace bczhc
 #endif//BCZHC_STRING_H

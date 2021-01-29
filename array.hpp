@@ -59,6 +59,18 @@ namespace bczhc::array {
         T &operator[](int i) const {
             return this->elements[i];
         }
+
+        bool operator==(const Array<T> &a) const {
+            if (a.length() != this->len) return false;
+            for (int i = 0; i < len; ++i) {
+                if (elements[i] != a[i]) return false;
+            }
+            return true;
+        }
+
+        bool operator!=(const Array<T> &a) const {
+            return !(a == *this);
+        }
     };
 }
 

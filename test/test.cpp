@@ -6,6 +6,7 @@
 #include "../sqlite3.h"
 #include "../string.hpp"
 #include "../third_party/practice/LinearList.hpp"
+#include "../third_party/practice/SymbolTable.hpp"
 #include "../utils.hpp"
 #include "thread"
 #include <arpa/inet.h>
@@ -22,6 +23,7 @@
 #include <string>
 #include "../array.hpp"
 #include <fcntl.h>
+#include <cstdarg>
 
 using namespace std;
 using namespace bczhc;
@@ -33,17 +35,30 @@ using namespace file;
 using namespace io;
 using namespace regex;
 using namespace bczhc::array;
+using namespace symboltable;
 
 MutexLock lock;         // NOLINT(cert-err58-cpp)
 CountDownLatch latch(2);// NOLINT(cert-err58-cpp)
 
-int main(int argc, char **argv) {
-    using fd = int;
-    fd f = open("/dev/ttyUSB0", O_RDONLY | O_NOCTTY | O_NONBLOCK);
-    char c;
-    while (read(f, &c, 1) > 0) {
-        cout << c;
+using uchar = uint8_t;
+
+template<typename T>
+using Tuple = Array<T>;
+
+template<typename ArgType, typename ReturnType>
+Tuple<ReturnType> f(int size, ArgType a...) {
+    Tuple<ReturnType> r(size);
+    r[0] = a;
+    va_list args{};
+    va_start(args, a);
+    for (int i = 1; i < size; ++i) {
+        r[i] = va_arg(args, ArgType);
     }
-    cout << endl;
+    va_end(args);
+    return r;
+}
+
+
+int main(int argc, char **argv) {
     return 0;
 }

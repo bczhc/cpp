@@ -328,7 +328,7 @@ void String::clear() {
     data[0] = '\0';
 }
 
-bool String::equals(const String &s) {
+bool String::equals(const String &s) const {
     if (size() != s.size()) return false;
     return String::equal(data, s.data);
 }
@@ -392,6 +392,22 @@ String &String::operator+(const String &s) {
 
 String String::duplicate() const {
     return String(*this);
+}
+
+bool String::operator==(const char *s) const {
+    return String::equal(this->getCString(), s);
+}
+
+bool String::operator==(const String &s) const {
+    return this->equals(s);
+}
+
+bool String::operator!=(const char *s) const {
+    return !(*this == s);
+}
+
+bool String::operator!=(const String &s) const {
+    return !(s == *this);
 }
 
 
