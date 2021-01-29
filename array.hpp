@@ -23,8 +23,16 @@ namespace bczhc::array {
     public:
         T *elements;
 
+        static Array<T> from(T *arr, int size) {
+            Array<T> r(size);
+            for (int i = 0; i < size; ++i) {
+                r[i] = arr[i];
+            }
+            return r;
+        }
+
         explicit Array(int size) {
-            elements = new T[size];
+            if (size != 0) elements = new T[size];
             len = size;
             deleteCount = new int(0);
         }
@@ -37,7 +45,7 @@ namespace bczhc::array {
             ++(*deleteCount);
         }
 
-        int length() const {
+        [[nodiscard]] int length() const {
             return len;
         }
 

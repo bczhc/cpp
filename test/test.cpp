@@ -24,6 +24,7 @@
 #include "../array.hpp"
 #include <fcntl.h>
 #include <cstdarg>
+#include <cassert>
 
 using namespace std;
 using namespace bczhc;
@@ -60,7 +61,6 @@ Tuple<ReturnType> f(int size, ArgType a...) {
 
 
 int main(int argc, char **argv) {
-    String s = String("6") + '.' + 'C';
-    cout << s.getCString() << endl;
+    cout << int(2.3) << endl;
     return 0;
 }
