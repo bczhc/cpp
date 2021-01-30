@@ -124,9 +124,7 @@ public:
     }
 };
 
+
 int main(int argc, char **argv) {
-    Generator g;
-    cout << g.next() << endl;
-    cout << g.next() << endl;
     return 0;
 }

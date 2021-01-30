@@ -201,6 +201,7 @@ String::~String() {
 }
 
 String String::toString(int32_t a) {
+    if (a == 0) return "0";
     String s;
     int x = a;
     while (x != 0) {
@@ -211,6 +212,7 @@ String String::toString(int32_t a) {
 }
 
 String String::toString(int64_t a) {
+    if (a == 0) return "0";
     String s;
     int64_t x = a;
     while (x != 0) {

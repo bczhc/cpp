@@ -1,10 +1,7 @@
-#include <iostream>
-
 #pragma clang diagnostic push
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
-using namespace std;
 
 #include <termios.h>
 #include "./string.hpp"
@@ -60,6 +57,7 @@ String getPort() {
     return "/dev/ttyUSB0";
 }
 
+
 class Logging {
 public:
     inline static int CRITICAL = 50;
@@ -107,6 +105,20 @@ public:
 };
 
 using uchar = unsigned char;
+
+/*String ucharArr2String(const Array<uchar> &arr) {
+    String msg = "[";
+    int len = arr.length();
+    for (int i = 0; i < len; ++i) {
+        msg += String::toString((int) arr[i]);
+        if (i != len - 1) {
+            msg += ", ";
+        }
+    }
+    msg += ']';
+    return msg;
+}*/
+
 using NonableString = TypeWithNone<String>;
 using NonableBoolean = TypeWithNone<bool>;
 template<typename T>
@@ -134,8 +146,22 @@ Array<T> list2arr(SequentialList<T> &sl) {
 }
 
 template<typename T>
+void repeatListInsert(SequentialList<T> &list, T value, int times) {
+    for (int i = 0; i < times; ++i) {
+        list.insert(value);
+    }
+}
+
+template<typename T>
 void insertArrToList(SequentialList<T> &list, T *arr, int size) {
     for (int i = 0; i < size; ++i) {
+        list.insert((T) arr[i]);
+    }
+}
+
+template<typename T>
+void insertArrToList(SequentialList<T> &list, const Array<T> &arr) {
+    for (int i = 0; i < arr.length(); ++i) {
         list.insert((T) arr[i]);
     }
 }
@@ -197,6 +223,19 @@ void sliceAssign(SequentialList<T> &list, int start, int end, const T *valueToAs
     list.insert(start, valueToAssign, length);
 }
 
+Array<uchar> packUnsignedInt32BigEndian(uint32_t a) {
+    bool reverse = false;
+    int i = 0x11223344;
+    reverse = (*((uchar *) &i) != 0x11);
+    int len = (int) sizeof(uint32_t);
+    Array<uchar> r(len);
+    auto *p = (uchar *) &a;
+    for (int j = 0; j < len; ++j) {
+        r[j] = p[reverse ? (len - 1 - j) : j];
+    }
+    return r;
+}
+
 Code hex2bin(Code &code) {
     SequentialList<unsigned char> buf;
     int base = 0, line = 0;
@@ -217,7 +256,7 @@ Code hex2bin(Code &code) {
     for (int i = 0; i < len; ++i) {
         auto rec = lines.get(i);
         line += 1;
-        char n = hex2bytes(rec.substring(1, 3))[0];
+        uchar n = hex2bytes(rec.substring(1, 3))[0];
         Array<unsigned char> dat = hex2bytes(rec.substring(1, n * 2 + 11));
         if (rec.charAt(0) != ':')
             throw String("Line ") + String::toString(line) + ": Missing start code \":\"";
@@ -228,12 +267,12 @@ Code hex2bin(Code &code) {
             int addr = base + (dat[1] << 8) + dat[2];
             // Allocate memory space and fill it with 0xFF
             int size = addr + n - buf.length();
-            size = size < 0 ? 0 : size;
+            if (size < 0) size = 0;
             unsigned char t[size];
             memset(t, 0xFF, size);
             sliceAssign(buf, buf.length(), buf.length(), t, size);
             // Copy data to the buffer
-            sliceAssign(buf, addr, addr + n, dat.elements + 4, dat.length() - 1 - 4);
+            sliceAssign(buf, addr, addr + n, dat.elements + 4 * sizeof(uchar), dat.length() - 1 - 4);
         } else if (dat[3] == 1) {
             // EOF record
             if (n != 0) throw String("Line ") + String::toString(line) + ": Incorrect data length";
@@ -492,7 +531,7 @@ SequentialList<T> cutList(SequentialList<T> &list, int start, int end, int step 
     int len = list.length();
     if (start < 0) start += len;
     if (end < 0) end += len;
-    if (start >= len || start < 0 || end >= len || end < 0)
+    if (start >= len || start < 0 || end > len || end < 0)
         throw String("out of index");
     SequentialList<T> r;
     for (int i = start; i < end; i += step) {
@@ -690,7 +729,7 @@ public:
         } catch (...) {
         }
         String romfix;
-        if (model[0] == 0xF0 && model[1] == 0xF1) {
+        if (model[0] == 0xF0 || model[1] == 0xF1) {
             romfix = String::toString(model[1] - foundKey[0]);
         } else if (model[0] == 0xF2) romfix = String::toString(localRomsize);
         else {
@@ -735,7 +774,7 @@ public:
         Array<uchar> s = __conn_read(2);
         int n = s[0] * 256 + s[1];
         if (n > 64) {
-            logging.debug("recv(..): Incorrect packet size");
+            logging.debug("recv(..): Incorrect packet size\n");
             throw String("io error");
         }
         chksum += sum<int32_t, uchar>(s);
@@ -743,15 +782,15 @@ public:
 
         s = __conn_read(n - 3);
         if (s[n - 4] != 0x16) {
-            logging.debug("recv(..): Missing terminal symbol");
+            logging.debug("recv(..): Missing terminal symbol\n");
             throw String("io error");
         }
         chksum += sum<int32_t, uchar>(cutArray<uchar>(s, 0, -(1 + this->chkmode)));
         if (this->chkmode > 0 && ((chksum & 0xFF) != s[s.length() - 2])) {
-            logging.debug("recv(..): Incorrect checksum[0]");
+            logging.debug("recv(..): Incorrect checksum[0]\n");
             throw String("io error");
         } else if (this->chkmode > 1 && ((chksum >> 8) & 0xFF) != s[s.length() - 3]) {
-            logging.debug("recv(..): Incorrect checksum[1]");
+            logging.debug("recv(..): Incorrect checksum[1]\n");
             throw String("io error");
         }
         return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));
@@ -786,9 +825,9 @@ public:
         this->model = cutArray<uchar>(info, 3, 5);
         const Bean2<String, int> bean = __model_database(model);
         this->name = bean.a1, this->romsize = NonableInt(bean.a2);
-        logging.info("Model ID: %02X %02X", model[0], model[1]);
-        logging.info("Model name: %s", name.getCString());
-        logging.info("ROM size: %d", romsize.val);
+        logging.info("Model ID: %02X %02X\n", model[0], model[1]);
+        logging.info("Model name: %s\n", name.getCString());
+        logging.info("ROM size: %d\n", romsize.val);
         if (this->protocol.isNone) {
             try {
                 SymbolTableBS m;
@@ -814,13 +853,13 @@ public:
             }
             if (!this->protocol.isNone) {
                 //del this->info
-                logging.info("Protocol ID: %s", this->protocol.val.getCString());
-                logging.info("Checksum mode: %d", this->chkmode);
-                logging.info("UART Parity: %s", this->conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
+                logging.info("Protocol ID: %s\n", this->protocol.val.getCString());
+                logging.info("Checksum mode: %d\n", this->chkmode);
+                logging.info("UART Parity: %s\n", this->conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
                 for (int i = 0; i < this->info.length(); i += 16) {
                     const Array<uchar> a = cutArray<uchar>(info, i, i + 16);
                     String s = hexStrJoin<uchar>(' ', a);
-                    logging.info("Info string [%d]: %s", i / 16, s.getCString());
+                    logging.info("Info string [%d]: %s\n", i / 16, s.getCString());
                 }
             }
         }
@@ -890,7 +929,7 @@ public:
 
     void unknown_packet_1() const {
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-            logging.info("Send unknown packet (50 00 00 36 01 ...)");
+            logging.info("Send unknown packet (50 00 00 36 01 ...)\n");
             uchar b[] = {0x00, 0x00, 0x36, 0x01};
             send(0x50, Array<uchar>::from(b, 4));
             const Bean2<uchar, Array<uchar>> recvBean = this->recv();
@@ -916,7 +955,7 @@ public:
             if (!in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
                 t *= 2;
             }
-            if (abs(round(t) - t) / t > 0.03) continue;
+            if (std::abs(round(t) - t) / t > 0.03) continue;
             int tcfg;
             if (in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
                 tcfg = 0x10000 - (int) (t + 0.5);
@@ -927,7 +966,7 @@ public:
             int baudstrT[] = {tcfg >> 8, tcfg & 0xFF, 0xFF - (tcfg >> 8), min((256 - (tcfg & 0xFF)) * 2, 0xFE),
                               (int) (baud0 / 60)};
             baudstr = Array<int>::from(baudstrT, ARR_SIZE(baudstrT));
-            logging.info("Test baudrate %d (accuracy %0.4f) using config %s", baud, abs(round(t) - t) / t,
+            logging.info("Test baudrate %d (accuracy %0.4f) using config %s\n", baud, std::abs(round(t) - t) / t,
                          hexStrJoin<int>(' ', baudstr).getCString());
             Array<int> freqlist(0);
             if (in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
@@ -944,7 +983,7 @@ public:
                     break;
                 };
             }
-            logging.info("Waiting time config %02X", (0x80 + twait));
+            logging.info("Waiting time config %02X\n", (0x80 + twait));
             Array<uchar> b(baudstr.length() + 1);
             for (int j = 0; j < b.length() - 1; ++j) {
                 b[j] = (uchar) baudstr[j];
@@ -960,14 +999,14 @@ public:
                 broken = true;
                 break;
             } catch (...) {
-                logging.info("Cannot use baudrate %d", baud);
+                logging.info("Cannot use baudrate %d\n", baud);
                 Thread::sleep(200);
                 // TODO omit: flushInput()
                 __conn_baudrate(baud0, false);
             }
         }
         if (!broken) throw String("io error");
-        logging.info("Change baudrate to %d", baud);
+        logging.info("Change baudrate to %d\n", baud);
         Array<uchar> b2(baudstr.length());
         for (int i = 0; i < b2.length(); ++i) {
             b2[i] = (uchar) baudstr[i];
@@ -982,11 +1021,19 @@ public:
     }
 
     void unknown_packet_2() const {
-        if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
+        if (!in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
             for (int i = 0; i < 5; ++i) {
-                logging.info("Send unknown packet (80 00 00 36 01 ...)");
+                logging.info("Send unknown packet (80 00 00 36 01 ...)\n");
                 uchar a[] = {0x00, 0x00, 0x36, 0x01};
-                send(0x80, Array<uchar>::from(a, ARR_SIZE(a)));
+                int aSize = (int) ARR_SIZE(a);
+                Array<uchar> s(aSize + this->model.length());
+                for (int j = 0; j < aSize; ++j) {
+                    s[j] = a[j];
+                }
+                for (int j = aSize; j < s.length(); ++j) {
+                    s[j] = this->model[j - aSize];
+                }
+                send(0x80, s);
                 const Bean2<uchar, Array<uchar>> rb = recv();
                 assert(rb.a1 == 0x80 && rb.a2.length() == 0);
             }
@@ -1025,7 +1072,7 @@ public:
         }
     }
 
-    void flash(Code &nonableCode) const {
+    void flash(Code &nonableCode, Consumer<double> *yieldCallback) const {
         Array<uchar> &val = nonableCode.val;
         SequentialList<uchar> codeList(val.length());
         for (int i = 0; i < val.length(); ++i) {
@@ -1038,7 +1085,7 @@ public:
         Array<uchar> code = list2arr<uchar>(codeList);
 
         for (int i = 0; i < code.length(); i += 128) {
-            logging.info("Flash code region (%04X, %04X)", i, i + 127);
+            logging.info("Flash code region (%04X, %04X)\n", i, i + 127);
 
             uchar a[] = {0, 0, (uchar) (i >> 8), (uchar) (i & 0xFF), 0, 128};
             int len = ARR_SIZE(a);
@@ -1052,7 +1099,7 @@ public:
             }
             const Array<uchar> &sent = list2arr<uchar>(b);
             send(0x00, sent);
-            const Bean2 <uchar, Array<uchar>> rb = recv();
+            const Bean2<uchar, Array<uchar>> rb = recv();
             uchar cmd = rb.a1;
             Array<uchar> dat = rb.a2;
 
@@ -1062,7 +1109,88 @@ public:
             }
             assert(dat[0] == sum % 256);
             // TODO yield
+            double r = ((double) (i + 128)) / code.length();
+            yieldCallback->accept(r);
         }
+    }
+
+    void unknown_packet_3() const {
+        if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
+            logging.info("Send unknown packet (69 00 00 36 01 ...)\n");
+            uchar a[] = {0x00, 0x00, 0x36, 0x01};
+            int len = ARR_SIZE(a);
+            Array<uchar> sent(len + this->model.length());
+            for (int i = 0; i < len; ++i) {
+                sent[i] = a[i];
+            }
+            for (int i = len; i < sent.length(); ++i) {
+                sent[i] = this->model[i - len];
+            }
+            send(0x69, sent);
+            const Bean2<uchar, Array<uchar>> &rb = recv();
+            uchar cmd = rb.a1;
+            Array<uchar> dat = rb.a2;
+            assert(cmd == 0x8D && dat.length() == 0);
+        }
+    }
+
+    [[nodiscard]] bool options(NonableBoolean erase_eeprom) const {
+        SequentialList<uchar> dat;
+        const Array<uchar> localFosc = packUnsignedInt32BigEndian((uint32_t) (this->fosc * 1000000));
+        if (this->protocol.val == PROTOCOL_89) {
+            if (!erase_eeprom.isNone) {
+                this->info[2] &= 0xF7;
+                this->info[2] |= erase_eeprom.val ? 0x00 : 0x08;
+            }
+
+            auto cut = cutArray<uchar>(this->info, 2, 3);
+            for (int i = 0; i < cut.length(); ++i) {
+                dat.insert(cut[i]);
+            }
+            for (int i = 0; i < 3; ++i) {
+                dat.insert(0xFF);
+            }
+        } else if (this->protocol.val == PROTOCOL_12C5A) {
+            if (!erase_eeprom.isNone) {
+                this->info[10] &= 0xFD;
+                this->info[10] |= erase_eeprom.val ? 0x00 : 0x02;
+            }
+            insertArrToList<uchar>(dat, cutArray<uchar>(this->info, 6, 9));
+            repeatListInsert<uchar>(dat, 0xFF, 5);
+            insertArrToList<uchar>(dat, cutArray<uchar>(this->info, 10, 11));
+            repeatListInsert<uchar>(dat, 0xFF, 6);
+            insertArrToList<uchar>(dat, localFosc);
+        } else if (in<String, const char *>(this->protocol.val, PROTOSET_12B, ARR_SIZE(PROTOSET_12B))) {
+            if (!erase_eeprom.isNone) {
+                this->info[8] &= 0xFD;
+                this->info[8] |= erase_eeprom.val ? 0x00 : 0x02;
+            }
+            insertArrToList<uchar>(dat, cutArray(this->info, 6, 11));
+            insertArrToList<uchar>(dat, localFosc);
+            insertArrToList<uchar>(dat, cutArray(this->info, 12, 16));
+            repeatListInsert<uchar>(dat, 0xFF, 4);
+            insertArrToList<uchar>(dat, cutArray(this->info, 8, 9));
+            repeatListInsert<uchar>(dat, 0xFF, 7);
+            insertArrToList<uchar>(dat, localFosc);
+            repeatListInsert<uchar>(dat, 0xFF, 3);
+        } else if (!erase_eeprom.isNone) {
+            logging.info("Modifying options is not supported for this target\n");
+            return false;
+        }
+
+        if (dat.length() != 0) {
+            send(0x8D, list2arr<uchar>(dat));
+            const Bean2<uchar, Array<uchar>> rb = recv();
+        }
+        return true;
+    }
+
+    void terminate() const {
+        logging.info("Send termination command\n");
+
+        send(0x82, Array<uchar>(0));
+        this->conn.flush();
+        Thread::sleep(200);
     }
 };
 
@@ -1092,10 +1220,40 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
 
     printf("Programming: "), fflush(stdout);
     int oldbar = 0;
-    prog.flash(code);
+
+    class C : public Consumer<double> {
+    private:
+        int &oldbar;
+    public:
+        void accept(double &progress) override {
+            int bar = (int) (progress * 20);
+            for (int i = 0; i < bar - oldbar; ++i) {
+                putc('#', stdout);
+            }
+            oldbar = bar;
+            fflush(stdout);
+        }
+
+        explicit C(int &oldbar) : oldbar(oldbar) {}
+    } c(oldbar);
+    prog.flash(code, &c);
+
+    printf(" done\n");
+
+    prog.unknown_packet_3();
+
+    printf("Setting options..."), fflush(stdout);
+
+    if (prog.options(erase_eeprom)) {
+        printf(" done\n");
+    } else {
+        printf(" failed\n");
+    }
+
+    prog.terminate();
 }
 
-int run() {
+int run(int argc, char **argv) {
     struct Opt {
         uint32_t aispbaud = 4800;
         NonableString aispmagic = NonableString(nullptr, true);
@@ -1111,7 +1269,11 @@ int run() {
 
     opts.port = getPort();
 
-    String filename = "/home/zhc/stc/a.hex";
+    if (argc != 2) {
+        printf("stc_flash <hex-file-path>\n");
+        return 0;
+    }
+    String filename = argv[1];
     opts.image = new InputStream(filename);
 
     opts.loglevel = Logging::combination[min(2, opts.verbose)];
@@ -1143,33 +1305,13 @@ int run() {
     return 0;
 }
 
-void m() {
-    auto s = Serial::open("/dev/ttyUSB0", 2000);
-    const Array<uchar> &r = s.read(10);
-    cout << "len: " << r.length() << endl;
-    for (int i = 0; i < r.length(); ++i) {
-        cout << r[i];
-    }
-    cout << endl;
-}
-
 int main(int argc, char **argv) {
-    goto a;
-    try {
-        m();
-    } catch (const String &e) {
-        printf("%s\n", e.getCString());
-    }
-    return 0;
-    a:;
     int status = 1;
     try {
-        status = run();
+        status = run(argc, argv);
     } catch (const String &e) {
         fprintf(stderr, "%s\n", e.getCString());
         return status;
     }
     return status;
 }
-
-#pragma clang diagnostic pop
