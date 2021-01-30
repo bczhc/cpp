@@ -21,7 +21,7 @@ namespace bczhc::array {
         }
 
     public:
-        T *elements;
+        T *elements = nullptr;
 
         static Array<T> from(T *arr, int size) {
             Array<T> r(size);
@@ -32,9 +32,12 @@ namespace bczhc::array {
         }
 
         explicit Array(int size) {
-            if (size != 0) elements = new T[size];
+            // Won't allocated when size is zero
+            if (size != 0) {
+                elements = new T[size];
+                deleteCount = new int(0);
+            }
             len = size;
-            deleteCount = new int(0);
         }
 
         Array(const Array<T> &arr) {
@@ -42,7 +45,7 @@ namespace bczhc::array {
             this->len = arr.len;
             this->elements = arr.elements;
             this->deleteCount = arr.deleteCount;
-            ++(*deleteCount);
+            if (deleteCount != nullptr) ++(*deleteCount);
         }
 
         [[nodiscard]] int length() const {
@@ -60,7 +63,7 @@ namespace bczhc::array {
             this->len = arr.len;
             this->elements = arr.elements;
             this->deleteCount = arr.deleteCount;
-            ++(*deleteCount);
+            if (deleteCount != nullptr) ++(*deleteCount);
             return *this;
         }
 

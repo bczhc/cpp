@@ -199,3 +199,39 @@ void *bczhc::concurrent::call(void *arg) {
     runnable->run();
     return nullptr;
 }
+
+void Latch::wait() {
+    lock.lock();
+    if (latched) lock.wait();
+    lock.unlock();
+}
+
+void Latch::latch() {
+    lock.lock();
+    latched = true;
+    lock.unlock();
+}
+
+void Latch::unlatch() {
+    lock.lock();
+    latched = false;
+    lock.unlock();
+}
+
+void Latch::notify() {
+    lock.lock();
+    lock.notify();
+    lock.unlock();
+}
+
+void Latch::unlatchAndNotify() {
+    lock.lock();
+    latched = false, lock.notify();
+    lock.unlock();
+}
+
+Latch::Latch(bool latched) : latched(latched) {}
+
+bool Latch::isLatched() const {
+    return latched;
+}

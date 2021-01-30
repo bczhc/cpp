@@ -98,12 +98,12 @@ static Logging logging;
 template<typename T>
 class TypeWithNone {
 public:
-    T var;
+    T val;
     bool isNone = false;
 
-    explicit TypeWithNone(T a) : var(a) {}
+    explicit TypeWithNone(T a) : val(a) {}
 
-    explicit TypeWithNone(T a, bool isNone) : var(a), isNone(isNone) {}
+    explicit TypeWithNone(T a, bool isNone) : val(a), isNone(isNone) {}
 };
 
 using uchar = unsigned char;
@@ -131,6 +131,13 @@ Array<T> list2arr(SequentialList<T> &sl) {
         r[i] = sl[i];
     }
     return r;
+}
+
+template<typename T>
+void insertArrToList(SequentialList<T> &list, T *arr, int size) {
+    for (int i = 0; i < size; ++i) {
+        list.insert((T) arr[i]);
+    }
 }
 
 /**
@@ -176,7 +183,7 @@ ReturnType sum(ElementType *arr, int start, int end) {
 
 template<typename ReturnType, typename ElementType>
 ReturnType sum(Array<ElementType> arr, int start, int end) {
-    sum<ReturnType, ElementType>(arr.elements, start, end);
+    return sum<ReturnType, ElementType>(arr.elements, start, end);
 }
 
 template<typename ReturnType, typename ElementType>
@@ -196,9 +203,9 @@ Code hex2bin(Code &code) {
 
     SequentialList<String> lines;
     String lineStr = String();
-    int codeLen = code.var.length();
+    int codeLen = code.val.length();
     for (int j = 0; j < codeLen; ++j) {
-        char c = code.var[j];
+        char c = code.val[j];
         if (c != '\n') lineStr.append(c);
         else {
             lines.insert(lineStr);
@@ -256,6 +263,7 @@ String hexStrJoin(char joinMark, const Array<T> &arr) {
         r += hex;
         if (i != length - 1) r += joinMark;
     }
+    return r;
 }
 
 timespec timespec_from_ms(const uint32_t millis) {
@@ -450,7 +458,7 @@ void autoisp(Serial &conn, int baud, NonableString &magic) {
     uint32_t bak = conn.getBaud();
     conn.setSpeed(baud);
 
-    String &magicStr = magic.var;
+    String &magicStr = magic.val;
     size_t size = magicStr.size();
     const char *data = magicStr.getCString();
     conn.write((uchar *) data, size);
@@ -479,6 +487,20 @@ Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
     return list2arr<T>(list);
 }
 
+template<typename T>
+SequentialList<T> cutList(SequentialList<T> &list, int start, int end, int step = 1) {
+    int len = list.length();
+    if (start < 0) start += len;
+    if (end < 0) end += len;
+    if (start >= len || start < 0 || end >= len || end < 0)
+        throw String("out of index");
+    SequentialList<T> r;
+    for (int i = start; i < end; i += step) {
+        r.insert(list.get(i));
+    }
+    return r;
+}
+
 class Programmer {
 public:
     Serial &conn;
@@ -490,11 +512,12 @@ public:
     Array<uchar> model = Array<uchar>(0);
     String name;
     NonableInt romsize = NonableInt(int{}, true);
+    uint32_t bundrate = 0;
 
 
     Programmer(Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
         conn.setTimeout(50);
-        if (in<String, const char *>(this->protocol.var, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
+        if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
             conn.setParity(Serial::PARITY_EVEN);
         } else conn.setParity(Serial::PARITY_NONE);
         this->chkmode = 0;
@@ -765,7 +788,7 @@ public:
         this->name = bean.a1, this->romsize = NonableInt(bean.a2);
         logging.info("Model ID: %02X %02X", model[0], model[1]);
         logging.info("Model name: %s", name.getCString());
-        logging.info("ROM size: %d", romsize.var);
+        logging.info("ROM size: %d", romsize.val);
         if (this->protocol.isNone) {
             try {
                 SymbolTableBS m;
@@ -784,14 +807,14 @@ public:
             }
 
             if (!this->protocol.isNone &&
-                in<String, const char *>(this->protocol.var, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
+                in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
                 this->chkmode = 2, this->conn.setParity(Serial::PARITY_EVEN);
             } else {
                 this->chkmode = 1, this->conn.setParity(Serial::PARITY_NONE);
             }
             if (!this->protocol.isNone) {
                 //del this->info
-                logging.info("Protocol ID: %s", this->protocol.var.getCString());
+                logging.info("Protocol ID: %s", this->protocol.val.getCString());
                 logging.info("Checksum mode: %d", this->chkmode);
                 logging.info("UART Parity: %s", this->conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
                 for (int i = 0; i < this->info.length(); i += 16) {
@@ -806,7 +829,7 @@ public:
     void print_info() const {
         printf(" FOSC: %.3fMHz\n", this->fosc);
         printf(" Model: %s (ver%s) \n", this->name.getCString(), this->version.getCString());
-        if (!this->romsize.isNone) printf(" ROM: %dKB\n", this->romsize.var);
+        if (!this->romsize.isNone) printf(" ROM: %dKB\n", this->romsize.val);
 
         class Bean {
         public:
@@ -820,7 +843,7 @@ public:
         };
 
         LinkedList<Bean> switches;
-        if (this->protocol.var == PROTOCOL_89) {
+        if (this->protocol.val == PROTOCOL_89) {
             switches.insert(Bean(2, 0x80, "Reset stops watchdog"));
             switches.insert(Bean(2, 0x40, "Internal XRAM"));
             switches.insert(Bean(2, 0x20, "Normal ALE pin"));
@@ -828,7 +851,7 @@ public:
             switches.insert(Bean(2, 0x08, "Not erase data EEPROM"));
             switches.insert(Bean(2, 0x04, "Download regardless of P1"));
             switches.insert(Bean(2, 0x01, "12T mode"));
-        } else if (this->protocol.var == PROTOCOL_12C5A) {
+        } else if (this->protocol.val == PROTOCOL_12C5A) {
             switches.insert(Bean(6, 0x40, "Disable reset2 low level detect"));
             switches.insert(Bean(6, 0x01, "Reset pin not use as I/O port"));
             switches.insert(Bean(7, 0x80, "Disable long power-on-reset latency"));
@@ -839,7 +862,7 @@ public:
             switches.insert(Bean(10, 0x02, "Not erase data EEPROM"));
             switches.insert(Bean(10, 0x01, "Download regardless of P1"));
             printf(" WDT prescal: %d\n", pow(2, ((this->info[8] & 0x07) + 1)));
-        } else if (in<String, const char *>(this->protocol.var, PROTOSET_12B, ARR_SIZE(PROTOSET_12B))) {
+        } else if (in<String, const char *>(this->protocol.val, PROTOSET_12B, ARR_SIZE(PROTOSET_12B))) {
             switches.insert(Bean(8, 0x02, "Not erase data EEPROM"));
         } else switches.clear();
 
@@ -858,7 +881,7 @@ public:
         buf.insert(buf.length(), dat.elements, dat.length());
 
         int chksum = sum<int, uchar>(buf.data, 2, buf.length());
-        if (chksum > 1) {
+        if (this->chkmode > 1) {
             buf.insert((chksum >> 8) & 0xFF);
         }
         buf.insert(chksum & 0xFF).insert(0x16);
@@ -866,7 +889,7 @@ public:
     }
 
     void unknown_packet_1() const {
-        if (in<String, const char *>(this->protocol.var, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
+        if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
             logging.info("Send unknown packet (50 00 00 36 01 ...)");
             uchar b[] = {0x00, 0x00, 0x36, 0x01};
             send(0x50, Array<uchar>::from(b, 4));
@@ -890,24 +913,24 @@ public:
         for (int i = 0; i < len; ++i) {
             baud = bauds[i];
             double t = this->fosc * 1000000 / baud / 32;
-            if (!in<String, const char *>(this->protocol.var, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
+            if (!in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
                 t *= 2;
             }
             if (abs(round(t) - t) / t > 0.03) continue;
             int tcfg;
-            if (in<String, const char *>(this->protocol.var, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
+            if (in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
                 tcfg = 0x10000 - (int) (t + 0.5);
             } else {
                 if (t > 0xFF) continue;
                 tcfg = 0xC000 + 0x100 - (int) (t + 0.5);
             }
             int baudstrT[] = {tcfg >> 8, tcfg & 0xFF, 0xFF - (tcfg >> 8), min((256 - (tcfg & 0xFF)) * 2, 0xFE),
-                             (int) (baud0 / 60)};
+                              (int) (baud0 / 60)};
             baudstr = Array<int>::from(baudstrT, ARR_SIZE(baudstrT));
             logging.info("Test baudrate %d (accuracy %0.4f) using config %s", baud, abs(round(t) - t) / t,
                          hexStrJoin<int>(' ', baudstr).getCString());
             Array<int> freqlist(0);
-            if (in<String, const char *>(this->protocol.var, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
+            if (in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
                 int a[] = {40, 20, 10, 5};
                 freqlist = Array<int>::from(a, ARR_SIZE(a));
             } else {
@@ -922,8 +945,7 @@ public:
                 };
             }
             logging.info("Waiting time config %02X", (0x80 + twait));
-            //            self.send(0x8F, baudstr + [0x80 + twait])
-            Array<uchar> b(ARR_SIZE(baudstr) + 1);
+            Array<uchar> b(baudstr.length() + 1);
             for (int j = 0; j < b.length() - 1; ++j) {
                 b[j] = (uchar) baudstr[j];
             }
@@ -946,16 +968,101 @@ public:
         }
         if (!broken) throw String("io error");
         logging.info("Change baudrate to %d", baud);
-        Array<uchar> b2(ARR_SIZE(baudstr));
+        Array<uchar> b2(baudstr.length());
         for (int i = 0; i < b2.length(); ++i) {
             b2[i] = (uchar) baudstr[i];
         }
         send(0x8E, b2);
         __conn_baudrate(baud);
-        this->conn.setSpeed(baud); // origin: self.baudrate = baud (?????)
+        this->conn.setSpeed(baud);
+        this->bundrate = baud;
         const Bean2<uchar, Array<uchar>> rb = recv();
         uchar cmd = rb.a1;
         Array<uchar> dat = rb.a2;
+    }
+
+    void unknown_packet_2() const {
+        if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
+            for (int i = 0; i < 5; ++i) {
+                logging.info("Send unknown packet (80 00 00 36 01 ...)");
+                uchar a[] = {0x00, 0x00, 0x36, 0x01};
+                send(0x80, Array<uchar>::from(a, ARR_SIZE(a)));
+                const Bean2<uchar, Array<uchar>> rb = recv();
+                assert(rb.a1 == 0x80 && rb.a2.length() == 0);
+            }
+        }
+    }
+
+    void erase() const {
+        if (in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
+            uchar a[] = {0x01, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33};
+            send(0x84, Array<uchar>::from(a, ARR_SIZE(a)));
+            const Bean2<uchar, Array<uchar>> rb = recv(10);
+            assert(rb.a1 == 0x80);
+        } else {
+            uchar a[] = {0x00, 0x00, (uchar) (this->romsize.val * 4), 0x00, 0x00, (uchar) (this->romsize.val * 4)};
+            int len = ARR_SIZE(a);
+            SequentialList<uchar> b(len);
+            for (int i = 0; i < len; ++i) {
+                b.insert(a[i]);
+            }
+            for (int i = 0; i < 12; ++i) {
+                b.insert(0);
+            }
+            for (int i = 0x80; i > 0x0D; --i) {
+                b.insert(i);
+            }
+
+            const Array<uchar> c = list2arr<uchar>(b);
+            send(0x84, c);
+            const Bean2<uchar, Array<uchar>> rb = recv(10);
+            Array<uchar> dat = rb.a2;
+            if (dat.length() != 0) {
+                String msg = "Serial number: ";
+                msg += hexStrJoin<uchar>(' ', dat);
+                logging.info("%s\n", msg.getCString());
+            }
+        }
+    }
+
+    void flash(Code &nonableCode) const {
+        Array<uchar> &val = nonableCode.val;
+        SequentialList<uchar> codeList(val.length());
+        for (int i = 0; i < val.length(); ++i) {
+            codeList.insert(val[i]);
+        }
+        int repeatCount = 511 - (val.length() - 1) % 512;
+        for (int i = 0; i < repeatCount; ++i) {
+            codeList.insert(0x00);
+        }
+        Array<uchar> code = list2arr<uchar>(codeList);
+
+        for (int i = 0; i < code.length(); i += 128) {
+            logging.info("Flash code region (%04X, %04X)", i, i + 127);
+
+            uchar a[] = {0, 0, (uchar) (i >> 8), (uchar) (i & 0xFF), 0, 128};
+            int len = ARR_SIZE(a);
+            SequentialList<uchar> b(len);
+            for (int j = 0; j < len; ++j) {
+                b.insert(a[j]);
+            }
+            SequentialList<uchar> cut = cutList(codeList, i, i + 128);
+            for (int j = 0; j < cut.length(); ++j) {
+                b.insert(cut[j]);
+            }
+            const Array<uchar> &sent = list2arr<uchar>(b);
+            send(0x00, sent);
+            const Bean2 <uchar, Array<uchar>> rb = recv();
+            uchar cmd = rb.a1;
+            Array<uchar> dat = rb.a2;
+
+            int sum = 0;
+            for (int j = 0; j < cut.length(); ++j) {
+                sum += cut[j];
+            }
+            assert(dat[0] == sum % 256);
+            // TODO yield
+        }
     }
 };
 
@@ -972,6 +1079,20 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
 
     printf("Baudrate: "), fflush(stdout);
     prog.handshake();
+    printf("%u\n", prog.bundrate);
+
+    prog.unknown_packet_2();
+
+    printf("Erasing target..."), fflush(stdout);
+
+    prog.erase();
+
+    printf(" done\n");
+    printf("Size of the binary: %d\n", code.val.length());
+
+    printf("Programming: "), fflush(stdout);
+    int oldbar = 0;
+    prog.flash(code);
 }
 
 int run() {
@@ -994,9 +1115,9 @@ int run() {
     opts.image = new InputStream(filename);
 
     opts.loglevel = Logging::combination[min(2, opts.verbose)];
-    opts.protocol = chooseProtocol(opts.protocol.var.getCString());
+    opts.protocol = chooseProtocol(opts.protocol.val.getCString());
 
-    if (!opts.erase_eeprom.var && !opts.not_erase_eeprom) {
+    if (!opts.erase_eeprom.val && !opts.not_erase_eeprom) {
         opts.erase_eeprom.isNone = true;
     }
 
@@ -1011,7 +1132,7 @@ int run() {
         if (extension.equals("hex") || extension.equals("ihx")) {
             localCode = hex2bin(localCode);
         }
-        code.var = localCode.var;
+        code.val = localCode.val;
     } else code.isNone = true;
     printf("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
     Serial conn = Serial::open(opts.port.getCString());

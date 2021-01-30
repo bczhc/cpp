@@ -90,6 +90,26 @@ namespace bczhc::concurrent {
         void interruptAndReset();
     };
 
+    class Latch {
+    private:
+        MutexLock lock;
+        bool latched = false;
+    public:
+        explicit Latch(bool latched);
+
+        void wait();
+
+        void latch();
+
+        void unlatch();
+
+        void notify();
+
+        void unlatchAndNotify();
+
+        bool isLatched() const;
+    };
+
     class Runnable {
     public:
         virtual void run() = 0;

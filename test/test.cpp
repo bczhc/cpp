@@ -38,9 +38,6 @@ using namespace regex;
 using namespace bczhc::array;
 using namespace symboltable;
 
-MutexLock lock;         // NOLINT(cert-err58-cpp)
-CountDownLatch latch(2);// NOLINT(cert-err58-cpp)
-
 using uchar = uint8_t;
 
 template<typename T>
@@ -59,8 +56,77 @@ Tuple<ReturnType> f(int size, ArgType a...) {
     return r;
 }
 
+class Generator {
+public:
+    int r{};
+    Latch continueLatch = Latch(true);
+    Latch returnLatch = Latch(true);
+    Thread *t = nullptr;
+    Latch startedLatch = Latch(true);
+    bool threadEnd = false;
+    Latch receivedReturnNotifyLatch = Latch(true);
+
+    void startThread() {
+        class R : public Runnable {
+        public:
+            Generator *g;
+
+            void run() override {
+                g->startedLatch.unlatchAndNotify();
+                for (int i = 0; i < 10; ++i) {
+                    //cout << "yield " << i << endl;
+                    g->yield(i);
+                }
+                g->returnLatch.unlatchAndNotify();
+                g->threadEnd = true;
+                delete this;
+            }
+
+            explicit R(Generator *g) : g(g) {}
+        };
+
+        auto *run = new R(this);
+        t = new Thread(run);
+    }
+
+    int next() {
+        //cout << "next" << endl;
+        returnLatch.latch();
+        if (t == nullptr) {
+            //cout << "start thread" << endl;
+            startThread();
+        }
+        //cout << "notify continueLatch" << endl;
+        continueLatch.unlatchAndNotify();
+        //cout << "wait for result" << endl;
+        returnLatch.wait();
+        receivedReturnNotifyLatch.unlatchAndNotify();
+        if (this->threadEnd) throw String("no more yield");
+        //cout << "return result" << endl;
+        return this->r;
+    }
+
+    void yield(int i) {
+        //cout << "set result" << endl;
+        this->r = i;
+        //cout << "notify returnLatch" << endl;
+        receivedReturnNotifyLatch.latch();
+        returnLatch.unlatchAndNotify();
+        receivedReturnNotifyLatch.wait();
+        //cout << "wait for continue" << endl;
+        continueLatch.wait();
+        //cout << "continue" << endl;
+        continueLatch.latch();
+    }
+
+    ~Generator() {
+
+    }
+};
 
 int main(int argc, char **argv) {
-    cout << int(2.3) << endl;
+    Generator g;
+    cout << g.next() << endl;
+    cout << g.next() << endl;
     return 0;
 }
