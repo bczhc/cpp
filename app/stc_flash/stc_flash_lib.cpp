@@ -72,7 +72,7 @@ public:
 
 void echoPrint(const char *format, ...) {
     va_list args{};
-    va_start(args,format);
+    va_start(args, format);
     char *s = nullptr;
     vasprintf(&s, format, args);
     echo->print(s);
@@ -202,6 +202,10 @@ ReturnType sum(Array<ElementType> arr) {
 
 template<typename T>
 void sliceAssign(SequentialList<T> &list, int start, int end, const T *valueToAssign, int length) {
+    if (start < 0) start += length;
+    if (end < 0) end += length;
+    if (start < 0) start = 0;
+    if (end >= length) end = length;
     list.remove(start, end);
     list.insert(start, valueToAssign, length);
 }
@@ -349,6 +353,8 @@ Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
     int len = arr.length();
     if (start < 0) start += len;
     if (end < 0) end += len;
+    if (start < 0) start = 0;
+    if (end >= len) end = len;
     for (int i = start; i < end; i += step) {
         list.insert(arr[i]);
     }
@@ -360,6 +366,8 @@ SequentialList<T> cutList(SequentialList<T> &list, int start, int end, int step 
     int len = list.length();
     if (start < 0) start += len;
     if (end < 0) end += len;
+    if (start < 0) start = 0;
+    if (end >= len) end = len;
     if (start >= len || start < 0 || end > len || end < 0)
         throw String("out of index");
     SequentialList<T> r;
