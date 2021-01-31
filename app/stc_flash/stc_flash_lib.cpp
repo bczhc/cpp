@@ -34,6 +34,8 @@ String getPort() {
     return "/dev/ttyUSB0";
 }
 
+static char echoMsg[100];
+static EchoCallback *echo;
 
 class Logging {
 public:
@@ -67,6 +69,17 @@ public:
         }
     }
 };
+
+void echoPrint(const char *format, ...) {
+    va_list args{};
+    va_start(args,format);
+    char *s = nullptr;
+    vasprintf(&s, format, args);
+    echo->print(s);
+    free(s);
+    va_end(args);
+
+}
 
 static Logging logging;
 
@@ -682,9 +695,11 @@ public:
     }
 
     void print_info() const {
-        printf(" FOSC: %.3fMHz\n", this->fosc);
-        printf(" Model: %s (ver%s) \n", this->name.getCString(), this->version.getCString());
-        if (!this->romsize.isNone) printf(" ROM: %dKB\n", this->romsize.val);
+        echoPrint(" FOSC: %.3fMHz\n", this->fosc);
+        echoPrint(" Model: %s (ver%s) \n", this->name.getCString(), this->version.getCString());
+        if (!this->romsize.isNone) {
+            echoPrint(" ROM: %dKB\n", this->romsize.val);
+        }
 
         class Bean {
         public:
@@ -716,7 +731,7 @@ public:
             switches.insert(Bean(8, 0x04, "WDT count in idle mode"));
             switches.insert(Bean(10, 0x02, "Not erase data EEPROM"));
             switches.insert(Bean(10, 0x01, "Download regardless of P1"));
-            printf(" WDT prescal: %d\n", pow(2, ((this->info[8] & 0x07) + 1)));
+            echoPrint(" WDT prescal: %d\n", pow(2, ((this->info[8] & 0x07) + 1)));
         } else if (in<String, const char *>(this->protocol.val, PROTOSET_12B, ARR_SIZE(PROTOSET_12B))) {
             switches.insert(Bean(8, 0x02, "Not erase data EEPROM"));
         } else switches.clear();
@@ -724,7 +739,7 @@ public:
         LinkedList<Bean>::Iterator it = switches.getIterator();
         while (it.hasNext()) {
             Bean bean = it.next();
-            printf(" [%c] %s\n", (this->info[bean.pos] & bean.bit) ? 'X' : ' ', bean.desc);
+            echoPrint(" [%c] %s\n", (this->info[bean.pos] & bean.bit) ? 'X' : ' ', bean.desc);
         }
     }
 
@@ -1007,30 +1022,33 @@ public:
 };
 
 void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = NonableBoolean(true, true)) {
-    printf("%s", "Detecting target...");
-    fflush(stdout);
+    echoPrint("%s", "Detecting target...");
+    echo->flush();
     prog.detect();
-    printf(" done\n");
+    echoPrint(" done\n");
     prog.print_info();
 
     if (prog.protocol.isNone) throw String("Unsupported target");
     if (code.isNone) return;
     prog.unknown_packet_1();
 
-    printf("Baudrate: "), fflush(stdout);
+    echoPrint("Baudrate: ");
+    echo->flush();
     prog.handshake();
-    printf("%u\n", prog.bundrate);
+    echoPrint("%u\n", prog.bundrate);
 
     prog.unknown_packet_2();
 
-    printf("Erasing target..."), fflush(stdout);
+    echoPrint("Erasing target...");
+    echo->flush();
 
     prog.erase();
 
-    printf(" done\n");
-    printf("Size of the binary: %d\n", code.val.length());
+    echoPrint(" done\n");
+    echoPrint("Size of the binary: %d\n", code.val.length());
 
-    printf("Programming: "), fflush(stdout);
+    echoPrint("Programming: ");
+    echo->flush();
     int oldbar = 0;
 
     class C : public Consumer<double> {
@@ -1043,29 +1061,31 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
                 putc('#', stdout);
             }
             oldbar = bar;
-            fflush(stdout);
+            echo->flush();
         }
 
         explicit C(int &oldbar) : oldbar(oldbar) {}
     } c(oldbar);
     prog.flash(code, &c);
 
-    printf(" done\n");
+    echoPrint(" done\n");
 
     prog.unknown_packet_3();
 
-    printf("Setting options..."), fflush(stdout);
+    echoPrint("Setting options...");
+    echo->flush();
 
     if (prog.options(erase_eeprom)) {
-        printf(" done\n");
+        echoPrint(" done\n");
     } else {
-        printf(" failed\n");
+        echoPrint(" failed\n");
     }
 
     prog.terminate();
 }
 
-int run(const String &hexFile) {
+int bczhc::run(const String &hexFile, EchoCallback *echoCallback) {
+    echo = echoCallback;
     struct Opt {
         uint32_t aispbaud = 4800;
         NonableString aispmagic = NonableString(nullptr, true);
@@ -1104,7 +1124,7 @@ int run(const String &hexFile) {
         }
         code.val = localCode.val;
     } else code.isNone = true;
-    printf("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
+    echoPrint("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
     Serial conn = Serial::open(opts.port.getCString());
     Serial::setSpeed(opts.lowbaud);
     if (!opts.aispmagic.isNone) autoisp(conn, opts.aispbaud, opts.aispmagic);

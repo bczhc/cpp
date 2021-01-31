@@ -33,42 +33,51 @@ using namespace symboltable;
 
 using uchar = unsigned char;
 
-int run(const String &hexFile);
+namespace bczhc {
+    class EchoCallback {
+    public:
+        virtual void print(const char *s) = 0;
 
-timespec timespec_from_ms(uint32_t millis);
+        virtual void flush() = 0;
+    };
 
-bool waitReadable(int fd, uint32_t timeout);
+    int run(const String &hexFile, EchoCallback *echoCallback);
 
-class Serial {
-private:
-    explicit Serial(int fd, uint32_t baud, uint32_t timeout);
+    timespec timespec_from_ms(uint32_t millis);
 
-public:
-    static inline char PARITY_NONE = 'N';
-    static inline char PARITY_EVEN = 'E';
-    static inline char PARITY_ODD = 'O';
-    static inline char PARITY_MARK = 'M';
-    static inline char PARITY_SPACE = 'S';
+    bool waitReadable(int fd, uint32_t timeout);
 
-    static Serial open(const char *port, uint32_t timeout = -1);
+    class Serial {
+    private:
+        explicit Serial(int fd, uint32_t baud, uint32_t timeout);
 
-    static void setSpeed(unsigned int speed);
+    public:
+        static inline char PARITY_NONE = 'N';
+        static inline char PARITY_EVEN = 'E';
+        static inline char PARITY_ODD = 'O';
+        static inline char PARITY_MARK = 'M';
+        static inline char PARITY_SPACE = 'S';
 
-    static void close() ;
+        static Serial open(const char *port, uint32_t timeout = -1);
 
-    [[nodiscard]] static Array<uchar> read(ssize_t size) ;
+        static void setSpeed(unsigned int speed);
 
-    static ssize_t write(uchar *buf, ssize_t size) ;
+        static void close();
 
-    [[nodiscard]] static unsigned int getBaud() ;
+        [[nodiscard]] static Array<uchar> read(ssize_t size);
 
-    void flush() const;
+        static ssize_t write(uchar *buf, ssize_t size);
 
-    static void setTimeout(uint32_t t);
+        [[nodiscard]] static unsigned int getBaud();
 
-    static void setParity(char p);
+        void flush() const;
 
-    [[nodiscard]] static char getParity() ;
-};
+        static void setTimeout(uint32_t t);
+
+        static void setParity(char p);
+
+        [[nodiscard]] static char getParity();
+    };
+}
 
 #endif //CPP_STC_FLASH_LIB_H

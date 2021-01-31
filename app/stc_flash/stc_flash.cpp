@@ -14,9 +14,20 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    class CB : public EchoCallback {
+    public:
+        void print(const char *s) override {
+            cout << s;
+        }
+
+        void flush() override {
+            cout.flush();
+        }
+    } callback;
+
     int status = 1;
     try {
-        status = run(argv[1]);
+        status = run(argv[1], &callback);
     } catch (const String &e) {
         cerr << e.getCString() << endl;
         return status;

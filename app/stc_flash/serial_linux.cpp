@@ -11,14 +11,15 @@ namespace properties {
     static char parity = Serial::PARITY_NONE;
 }
 
-timespec timespec_from_ms(const uint32_t millis) {
+timespec bczhc::timespec_from_ms(const uint32_t millis) {
     timespec time{};
     time.tv_sec = millis / 1e3;
     time.tv_nsec = (millis - (time.tv_sec * 1e3)) * 1e6;
     return time;
 }
 
-bool waitReadable(int fd, uint32_t timeout) {
+
+bool bczhc::waitReadable(int fd, uint32_t timeout) {
     // Setup a select call to block for serial data or a timeout
     fd_set readfds;
     FD_ZERO(&readfds);

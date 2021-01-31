@@ -35,6 +35,28 @@ using namespace symboltable;
 
 int main() {
     int fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NONBLOCK);
+    termios options{};
+    tcgetattr(fd, &options);
+    options.c_cflag |= (tcflag_t) (CLOCAL | CREAD);
+    options.c_lflag &= (tcflag_t) ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL |
+                                    IEXTEN); //|ECHOPRT
+
+    options.c_oflag &= (tcflag_t) ~(OPOST);
+    options.c_iflag &= (tcflag_t) ~(INLCR | IGNCR | ICRNL | IGNBRK);
+#ifdef IUCLC
+    options.c_iflag &= (tcflag_t) ~IUCLC;
+#endif
+#ifdef PARMRK
+    options.c_iflag &= (tcflag_t) ~PARMRK;
+#endif
+    tcsetattr(fd, TCSANOW, &options);
+
+    cout << "hello\n";
+    cout << "hello... ";
+    char a[] = {1, 2, 3, 4, 5};
+    write(fd, a, 5);
+    cout << "done\n";
+    cout << "hello\n";
 
     close(fd);
     return 0;
