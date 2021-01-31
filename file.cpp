@@ -17,7 +17,6 @@ int file::File::move(const char *fileName) {
 }
 
 String file::File::getExtension(const String &path) {
-    // "as/adf/dsaf/dasgdasf.aasd"
     int size = path.size();
     String r;
     for (int i = size - 1; i >= 0; --i) {
@@ -30,4 +29,8 @@ String file::File::getExtension(const String &path) {
     return "";
 }
 
+String file::File::getFileName(const String &path) {
+    ssize_t i = path.lastIndexOf(separator);
+    return path.substring(i + 1, path.size());
+}
 

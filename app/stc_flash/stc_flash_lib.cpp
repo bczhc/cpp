@@ -3,31 +3,10 @@
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
-#include <termios.h>
-#include "./string.hpp"
-#include "file.h"
-#include "io.h"
-#include "utils.hpp"
-#include "array.hpp"
-#include <fcntl.h>
-#include <unistd.h>
-#include "concurrent.h"
-#include <cstdarg>
-#include <cerrno>
-#include "./third_party/practice/SymbolTable.hpp"
-#include <cassert>
-#include <cmath>
+#include "stc_flash_lib.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
-using namespace bczhc;
-using namespace string;
-using namespace file;
-using namespace io;
-using namespace utils;
-using namespace bczhc::array;
-using namespace concurrent;
-using namespace symboltable;
 
 static const char *PROTOCOL_89 = "89";
 static const char *PROTOCOL_12C5A = "12c5a";
@@ -37,8 +16,6 @@ static const char *PROTOSET_89[] = {PROTOCOL_89};
 static const char *PROTOSET_12[] = {PROTOCOL_12C5A, PROTOCOL_12C52, PROTOCOL_12Cx052};
 static const char *PROTOSET_12B[] = {PROTOCOL_12C52, PROTOCOL_12Cx052};
 static const char *PROTOSET_PARITY[] = {PROTOCOL_12C5A, PROTOCOL_12C52};
-
-#define ARR_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 String getPort() {
     String platform;
@@ -104,8 +81,6 @@ public:
     explicit TypeWithNone(T a, bool isNone) : val(a), isNone(isNone) {}
 };
 
-using uchar = unsigned char;
-
 /*String ucharArr2String(const Array<uchar> &arr) {
     String msg = "[";
     int len = arr.length();
@@ -166,11 +141,6 @@ void insertArrToList(SequentialList<T> &list, const Array<T> &arr) {
     }
 }
 
-/**
- * TODO optimize
- * @param in
- * @return
- */
 Code readToBytes(InputStream &in) {
     SequentialList<unsigned char> b;
     char buf[4096];
@@ -305,42 +275,6 @@ String hexStrJoin(char joinMark, const Array<T> &arr) {
     return r;
 }
 
-timespec timespec_from_ms(const uint32_t millis) {
-    timespec time{};
-    time.tv_sec = millis / 1e3;
-    time.tv_nsec = (millis - (time.tv_sec * 1e3)) * 1e6;
-    return time;
-}
-
-bool waitReadable(int fd, uint32_t timeout) {
-    // Setup a select call to block for serial data or a timeout
-    fd_set readfds;
-    FD_ZERO(&readfds);
-    FD_SET(fd, &readfds);
-    timespec timeout_ts(timespec_from_ms(timeout));
-    int r = pselect(fd + 1, &readfds, nullptr, nullptr, &timeout_ts, nullptr);
-
-    if (r < 0) {
-        // Select was interrupted
-        if (errno == EINTR) {
-            return false;
-        }
-        // Otherwise there was some error
-        throw String("errno: ") + String::toString(errno);
-    }
-    // Timeout occurred
-    if (r == 0) {
-        return false;
-    }
-    // This shouldn't happen, if r > 0 our fd has to be in the list!
-    if (!FD_ISSET (fd, &readfds)) {
-        throw String("select reports ready to read, but our fd isn't"
-                     " in the list, this shouldn't happen!");
-    }
-    // Data available to read.
-    return true;
-}
-
 template<typename T>
 class Tuple2 {
 public:
@@ -373,124 +307,6 @@ using Tuple2S = Tuple2<const char *>;
 using SymbolTableTupleBS = SymbolTable<Tuple2B, Tuple2S>;
 // SymbolTable byte-string
 using SymbolTableBS = SymbolTable<uchar, const char *>;
-
-class Serial {
-private:
-    int fd;
-    uint32_t baud = 0;
-    uint32_t timeout;
-    char parity = Serial::PARITY_NONE;
-
-
-    explicit Serial(int fd, uint32_t baud, uint32_t timeout) {
-        this->fd = fd;
-        setSpeed(9600);
-        setSpeed(baud);
-        this->timeout = timeout;
-    }
-
-public:
-    static inline char PARITY_NONE = 'N';
-    static inline char PARITY_EVEN = 'E';
-    static inline char PARITY_ODD = 'O';
-    static inline char PARITY_MARK = 'M';
-    static inline char PARITY_SPACE = 'S';
-
-    static Serial open(const char *port, uint32_t timeout = -1) {
-        int o = ::open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
-        if (o == -1) throw String("Open port failed.");
-        auto s = Serial(o, 9600, timeout);
-        return s;
-    }
-
-    void setSpeed(unsigned int speed) {
-        unsigned int speedArr[] = {B0, B50, B75, B110, B134, B150, B200, B300, B600, B1200, B1800, B2400, B4800, B9600,
-                                   B19200, B38400, B57600, B115200, B230400, B460800, B500000, B576000, B921600,
-                                   B1000000, B1152000, B1500000, B2000000, B2500000, B3000000, B3500000, B4000000};
-        unsigned int nameArr[] = {0, 50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200, 38400,
-                                  57600, 115200, 230400, 460800, 500000, 576000, 921600, 1000000, 1152000, 1500000,
-                                  2000000, 2500000, 3000000, 3500000, 4000000};
-        termios opt{};
-        tcgetattr(fd, &opt);
-        int len = ARR_SIZE(speedArr);
-        for (int i = 0; i < len; i++) {
-            if (speed == nameArr[i]) {
-                tcflush(fd, TCIOFLUSH);
-                unsigned int rate = speedArr[i];
-                cfsetispeed(&opt, rate);
-                cfsetospeed(&opt, rate);
-                int status = tcsetattr(fd, TCSANOW, &opt);
-                if (status != 0) throw String("tcsetattr fd1");
-                baud = speed;
-                return;
-            }
-            tcflush(fd, TCIOFLUSH);
-        }
-        throw String("Setting speed failed.");
-    }
-
-    void close() const {
-        if (::close(fd) != 0) throw String("Close failed.");
-    }
-
-    [[nodiscard]] Array<uchar> read(ssize_t size) const {
-        int64_t start = getCurrentTimeMillis();
-        char buf[size];
-        ssize_t haveRead = 0;
-        while (true) {
-            bool b = waitReadable(fd, timeout);
-            if (b) {
-                if (getCurrentTimeMillis() - start >= timeout) {
-                    // timeout occurred
-                    break;
-                }
-                haveRead += ::read(fd, buf + haveRead, size);
-                if (haveRead == size) {
-                    // enough data
-                    break;
-                }
-            } else {
-                // timeout occurred
-                break;
-            }
-        }
-        Array<uchar> r(haveRead);
-        for (int i = 0; i < haveRead; ++i) {
-            r[i] = buf[i];
-        }
-        return r;
-    }
-
-    ssize_t write(uchar *buf, ssize_t size) const {
-        ssize_t i = ::write(fd, buf, size);
-        if (i == -1) throw String("write error");
-        return i;
-    }
-
-    [[nodiscard]] unsigned int getBaud() const {
-        return baud;
-    }
-
-    [[nodiscard]] int getFileDescriptor() const {
-        return fd;
-    }
-
-    void flush() const {
-        // `::write()` has no cache, so there's no need to "flush".
-    }
-
-    void setTimeout(uint32_t t) {
-        this->timeout = t;
-    }
-
-    void setParity(char p) {
-        this->parity = p;
-    }
-
-    [[nodiscard]] char getParity() const {
-        return parity;
-    }
-};
 
 void autoisp(Serial &conn, int baud, NonableString &magic) {
     if (magic.isNone) return;
@@ -939,9 +755,6 @@ public:
         }
     }
 
-    /**
-     * TODO
-     */
     void handshake() {
         uint32_t baud0 = this->conn.getBaud();
         uint32_t bauds[] = {115200, 57600, 38400, 28800, 19200, 14400, 9600, 4800, 2400, 1200},
@@ -1001,7 +814,7 @@ public:
             } catch (...) {
                 logging.info("Cannot use baudrate %d\n", baud);
                 Thread::sleep(200);
-                // TODO omit: flushInput()
+                // TODO omit: `flushInput()`
                 __conn_baudrate(baud0, false);
             }
         }
@@ -1108,7 +921,6 @@ public:
                 sum += cut[j];
             }
             assert(dat[0] == sum % 256);
-            // TODO yield
             double r = ((double) (i + 128)) / code.length();
             yieldCallback->accept(r);
         }
@@ -1253,7 +1065,7 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
     prog.terminate();
 }
 
-int run(int argc, char **argv) {
+int run(const String &hexFile) {
     struct Opt {
         uint32_t aispbaud = 4800;
         NonableString aispmagic = NonableString(nullptr, true);
@@ -1269,11 +1081,7 @@ int run(int argc, char **argv) {
 
     opts.port = getPort();
 
-    if (argc != 2) {
-        printf("stc_flash <hex-file-path>\n");
-        return 0;
-    }
-    String filename = argv[1];
+    const String& filename = hexFile;
     opts.image = new InputStream(filename);
 
     opts.loglevel = Logging::combination[min(2, opts.verbose)];
@@ -1303,15 +1111,4 @@ int run(int argc, char **argv) {
     Programmer programmer(conn, opts.protocol);
     program(programmer, code, opts.erase_eeprom);
     return 0;
-}
-
-int main(int argc, char **argv) {
-    int status = 1;
-    try {
-        status = run(argc, argv);
-    } catch (const String &e) {
-        fprintf(stderr, "%s\n", e.getCString());
-        return status;
-    }
-    return status;
 }

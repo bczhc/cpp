@@ -29,7 +29,7 @@ namespace bczhc::string {
 
         void fromCharsString(const char *s, size_t size);
 
-        void resize(int newStringLength);
+        void resize(size_t newStringLength);
 
         void release();
 
@@ -43,13 +43,13 @@ namespace bczhc::string {
 
         String(const char *s, size_t size);
 
-        String(const char *s);
+        String(const char *s); // NOLINT(google-explicit-constructor)
 
         ~String();
 
         [[nodiscard]] const char *getCString() const;
 
-        size_t utf8Length() const;
+        [[nodiscard]] size_t utf8Length() const;
 
         [[nodiscard]] size_t size() const;
 
@@ -65,15 +65,15 @@ namespace bczhc::string {
 
         String &append(const char *s, size_t size);
 
-        int indexOf(char c);
+        ssize_t indexOf(char c);
 
-        int indexOf(const char *s);
+        ssize_t indexOf(const char *s);
 
-        int indexOf(const String &string);
+        ssize_t indexOf(const String &string);
 
-        static int indexOf(const char *s, char c);
+        static ssize_t indexOf(const char *s, char c);
 
-        static int indexOf(const char *haystack, const char *needle);
+        static ssize_t indexOf(const char *haystack, const char *needle);
 
         [[nodiscard]] SequentialList<String> split(const String &separator) const;
 
@@ -87,9 +87,9 @@ namespace bczhc::string {
 
         static String toString(double a);
 
-        String &insert(int index, char c);
+        String &insert(size_t index, char c);
 
-        String &insert(int index, const String &string);
+        String &insert(size_t index, const String &string);
 
         static String toString(int32_t i, int radix);
 
@@ -97,27 +97,27 @@ namespace bczhc::string {
 
         static String toString(char c);
 
-        String(int capacity);
+        explicit String(size_t capacity);
 
         void clear();
 
         static String toUpperCase(const char *s);
 
-        bool equals(const String &s) const;
+        [[nodiscard]] bool equals(const String &s) const;
 
         static bool equal(const char *s1, const char *s2);
 
         [[nodiscard]] bool isNull() const;
 
-        [[nodiscard]] char charAt(int pos) const;
+        [[nodiscard]] char charAt(size_t pos) const;
 
-        static String substr(const char *s, int start, int length);
+        static String substr(const char *s, size_t start, size_t length);
 
-        [[nodiscard]] String substr(int start, int length) const;
+        [[nodiscard]] String substr(size_t start, size_t length) const;
 
-        static String substring(const char *s, int start, int end);
+        static String substring(const char *s, size_t start, size_t end);
 
-        [[nodiscard]] String substring(int start, int end) const;
+        [[nodiscard]] String substring(size_t start, size_t end) const;
 
         [[nodiscard]] char *toCharArray() const;
 
@@ -138,6 +138,12 @@ namespace bczhc::string {
         String &operator+=(const String &s);
 
         String &operator+=(char c);
+
+        [[nodiscard]] ssize_t lastIndexOf(char c) const;
+
+        [[nodiscard]] ssize_t firstIndexOf(char c) const;
+
+        char &operator[](size_t index);
     };
 }// namespace bczhc
 #endif//BCZHC_STRING_H

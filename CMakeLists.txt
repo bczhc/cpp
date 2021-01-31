@@ -43,4 +43,9 @@ add_executable(echo_and_write app/echoAndWrite.cpp)
 add_executable(shuffle_string app/shuffleString.cpp)
 add_executable(bases128 app/base128.cpp)
 add_executable(stdin_size app/stdinSize.cpp)
-add_executable(stc_flash stc_flash.cpp)
+add_executable(
+        stc_flash
+        app/stc_flash/stc_flash.cpp
+        app/stc_flash/stc_flash_lib.cpp
+        app/stc_flash/serial_linux.cpp
+)

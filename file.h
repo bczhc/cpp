@@ -17,11 +17,17 @@ namespace bczhc::file {
     private:
         String path;
     public:
+#ifdef _WIN32
+        static inline char separator = '\\';
+#else
+        static inline char separator = '/';
+#endif
+
         explicit File(const char *path);
 
         int remove();
 
-        static int move(const char* fileName);
+        static int move(const char *fileName);
 
         int64_t getFileSize() {
             FILE *fp = fopen(path.getCString(), "rb");
@@ -39,6 +45,8 @@ namespace bczhc::file {
         }
 
         static String getExtension(const String &path);
+
+        static String getFileName(const String &path);
     };
 }
 
