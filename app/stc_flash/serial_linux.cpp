@@ -5,9 +5,9 @@
 #include "stc_flash_lib.h"
 
 namespace properties {
-    static int fd;
-    static uint32_t baud = 0;
-    static uint32_t timeout;
+    static int fd{};
+    static uint32_t baud{};
+    static uint32_t timeout{};
     static char parity = Serial::PARITY_NONE;
 }
 

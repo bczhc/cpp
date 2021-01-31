@@ -49,3 +49,9 @@ add_executable(
         app/stc_flash/stc_flash_lib.cpp
         app/stc_flash/serial_linux.cpp
 )
+
+add_library(
+        serial
+        app/stc_flash/stc_flash_lib.cpp
+        app/stc_flash/serial_jni.cpp
+)
