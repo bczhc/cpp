@@ -310,16 +310,16 @@ using SymbolTableBS = SymbolTable<uchar, const char *>;
 
 void autoisp(Serial &conn, int baud, NonableString &magic) {
     if (magic.isNone) return;
-    uint32_t bak = conn.getBaud();
-    conn.setSpeed(baud);
+    uint32_t bak = Serial::getBaud();
+    Serial::setSpeed(baud);
 
     String &magicStr = magic.val;
     size_t size = magicStr.size();
     const char *data = magicStr.getCString();
-    conn.write((uchar *) data, size);
+    Serial::write((uchar *) data, size);
     conn.flush();
     Thread::sleep(500);
-    conn.setSpeed(bak);
+    Serial::setSpeed(bak);
 }
 
 template<typename T1, typename T2>
@@ -371,17 +371,17 @@ public:
 
 
     Programmer(Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
-        conn.setTimeout(50);
+        Serial::setTimeout(50);
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-            conn.setParity(Serial::PARITY_EVEN);
-        } else conn.setParity(Serial::PARITY_NONE);
+            Serial::setParity(Serial::PARITY_EVEN);
+        } else Serial::setParity(Serial::PARITY_NONE);
         this->chkmode = 0;
     }
 
-    [[nodiscard]] Array<uchar> __conn_read(ssize_t size) const {
+    [[nodiscard]] static Array<uchar> __conn_read(ssize_t size) {
         SequentialList<uchar> buf;
         while (buf.length() < size) {
-            const Array<uchar> r = this->conn.read(size - buf.length());
+            const Array<uchar> r = Serial::read(size - buf.length());
             buf.insert(buf.length(), r.elements, r.length());
             //TODO debug msg
             if (buf.length() == 0) throw String("io error");
@@ -389,18 +389,18 @@ public:
         return list2arr<uchar>(buf);
     }
 
-    void __conn_write(uchar *buf, ssize_t size) const {
+    static void __conn_write(uchar *buf, ssize_t size) {
         //TODO debug msg
-        this->conn.write(buf, size);
+        Serial::write(buf, size);
     }
 
-    void __conn_baudrate(uint32_t baud, bool flush = true) {
+    void __conn_baudrate(uint32_t baud, bool flush = true) const {
         //TODO debug msg
         if (flush) {
             conn.flush();
             Thread::sleep(200);
         }
-        conn.setSpeed(baud);
+        Serial::setSpeed(baud);
     }
 
     template<typename T1, typename T2>
@@ -635,7 +635,7 @@ public:
         }
 
         fosc = ((double) (sum<int32_t, uchar>(cutArray<uchar>(dat, 0, 16, 2)) * 256 +
-                          sum<int32_t, uchar>(cutArray<uchar>(dat, 1, 16, 2)))) / 8 * this->conn.getBaud() / 580974;
+                          sum<int32_t, uchar>(cutArray<uchar>(dat, 1, 16, 2)))) / 8 * Serial::getBaud() / 580974;
         this->info = cutArray<uchar>(dat, 16, dat.length());
         this->version = String::toString(info[0] >> 4) + '.' + String::toString(info[0] & 0x0F) + ((char) info[1]);
         this->model = cutArray<uchar>(info, 3, 5);
@@ -663,15 +663,15 @@ public:
 
             if (!this->protocol.isNone &&
                 in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-                this->chkmode = 2, this->conn.setParity(Serial::PARITY_EVEN);
+                this->chkmode = 2, Serial::setParity(Serial::PARITY_EVEN);
             } else {
-                this->chkmode = 1, this->conn.setParity(Serial::PARITY_NONE);
+                this->chkmode = 1, Serial::setParity(Serial::PARITY_NONE);
             }
             if (!this->protocol.isNone) {
                 //del this->info
                 logging.info("Protocol ID: %s\n", this->protocol.val.getCString());
                 logging.info("Checksum mode: %d\n", this->chkmode);
-                logging.info("UART Parity: %s\n", this->conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
+                logging.info("UART Parity: %s\n", Serial::getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
                 for (int i = 0; i < this->info.length(); i += 16) {
                     const Array<uchar> a = cutArray<uchar>(info, i, i + 16);
                     String s = hexStrJoin<uchar>(' ', a);
@@ -756,7 +756,7 @@ public:
     }
 
     void handshake() {
-        uint32_t baud0 = this->conn.getBaud();
+        uint32_t baud0 = Serial::getBaud();
         uint32_t bauds[] = {115200, 57600, 38400, 28800, 19200, 14400, 9600, 4800, 2400, 1200},
                 len = ARR_SIZE(bauds);
         bool broken = false;
@@ -826,7 +826,7 @@ public:
         }
         send(0x8E, b2);
         __conn_baudrate(baud);
-        this->conn.setSpeed(baud);
+        Serial::setSpeed(baud);
         this->bundrate = baud;
         const Bean2<uchar, Array<uchar>> rb = recv();
         uchar cmd = rb.a1;
@@ -1081,7 +1081,7 @@ int run(const String &hexFile) {
 
     opts.port = getPort();
 
-    const String& filename = hexFile;
+    const String &filename = hexFile;
     opts.image = new InputStream(filename);
 
     opts.loglevel = Logging::combination[min(2, opts.verbose)];
@@ -1106,7 +1106,7 @@ int run(const String &hexFile) {
     } else code.isNone = true;
     printf("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
     Serial conn = Serial::open(opts.port.getCString());
-    conn.setSpeed(opts.lowbaud);
+    Serial::setSpeed(opts.lowbaud);
     if (!opts.aispmagic.isNone) autoisp(conn, opts.aispbaud, opts.aispmagic);
     Programmer programmer(conn, opts.protocol);
     program(programmer, code, opts.erase_eeprom);

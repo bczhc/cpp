@@ -47,8 +47,28 @@ bool waitReadable(int fd, uint32_t timeout) {
     return true;
 }
 
+void init() {
+    termios options{};
+    tcgetattr(properties::fd, &options);
+    // set up raw mode / no echo / binary
+    options.c_cflag |= (tcflag_t) (CLOCAL | CREAD);
+    options.c_lflag &= (tcflag_t) ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL |
+                                    ISIG | IEXTEN); //|ECHOPRT
+
+    options.c_oflag &= (tcflag_t) ~(OPOST);
+    options.c_iflag &= (tcflag_t) ~(INLCR | IGNCR | ICRNL | IGNBRK);
+#ifdef IUCLC
+    options.c_iflag &= (tcflag_t) ~IUCLC;
+#endif
+#ifdef PARMRK
+    options.c_iflag &= (tcflag_t) ~PARMRK;
+#endif
+    tcsetattr(properties::fd, TCSANOW, &options);
+}
+
 Serial::Serial(int fd, uint32_t baud, uint32_t timeout) {
     properties::fd = fd;
+    init();
     setSpeed(9600);
     setSpeed(baud);
     properties::timeout = timeout;
