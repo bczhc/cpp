@@ -1,9 +1,14 @@
+#include <iostream>
+
+using namespace std;
+
 #pragma clang diagnostic push
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 #include "stc_flash_lib.h"
+#include "serial_linux.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
@@ -93,19 +98,6 @@ public:
 
     explicit TypeWithNone(T a, bool isNone) : val(a), isNone(isNone) {}
 };
-
-/*String ucharArr2String(const Array<uchar> &arr) {
-    String msg = "[";
-    int len = arr.length();
-    for (int i = 0; i < len; ++i) {
-        msg += String::toString((int) arr[i]);
-        if (i != len - 1) {
-            msg += ", ";
-        }
-    }
-    msg += ']';
-    return msg;
-}*/
 
 using NonableString = TypeWithNone<String>;
 using NonableBoolean = TypeWithNone<bool>;
@@ -327,16 +319,16 @@ using SymbolTableBS = SymbolTable<uchar, const char *>;
 
 void autoisp(Serial &conn, int baud, NonableString &magic) {
     if (magic.isNone) return;
-    uint32_t bak = Serial::getBaud();
-    Serial::setSpeed(baud);
+    uint32_t bak = conn.getBaud();
+    conn.setSpeed(baud);
 
     String &magicStr = magic.val;
     size_t size = magicStr.size();
     const char *data = magicStr.getCString();
-    Serial::write((uchar *) data, size);
+    conn.write((uchar *) data, size);
     conn.flush();
     Thread::sleep(500);
-    Serial::setSpeed(bak);
+    conn.setSpeed(bak);
 }
 
 template<typename T1, typename T2>
@@ -392,17 +384,17 @@ public:
 
 
     Programmer(Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
-        Serial::setTimeout(50);
+        conn.setTimeout(50);
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-            Serial::setParity(Serial::PARITY_EVEN);
-        } else Serial::setParity(Serial::PARITY_NONE);
+            conn.setParity(Serial::PARITY_EVEN);
+        } else conn.setParity(Serial::PARITY_NONE);
         this->chkmode = 0;
     }
 
-    [[nodiscard]] static Array<uchar> __conn_read(ssize_t size) {
+    [[nodiscard]] Array<uchar> __conn_read(ssize_t size) const {
         SequentialList<uchar> buf;
         while (buf.length() < size) {
-            const Array<uchar> r = Serial::read(size - buf.length());
+            const Array<uchar> r = conn.read(size - buf.length());
             buf.insert(buf.length(), r.elements, r.length());
             //TODO debug msg
             if (buf.length() == 0) throw String("io error");
@@ -410,9 +402,9 @@ public:
         return list2arr<uchar>(buf);
     }
 
-    static void __conn_write(uchar *buf, ssize_t size) {
+    void __conn_write(uchar *buf, ssize_t size) const {
         //TODO debug msg
-        Serial::write(buf, size);
+        conn.write(buf, size);
     }
 
     void __conn_baudrate(uint32_t baud, bool flush = true) const {
@@ -421,7 +413,7 @@ public:
             conn.flush();
             Thread::sleep(200);
         }
-        Serial::setSpeed(baud);
+        conn.setSpeed(baud);
     }
 
     template<typename T1, typename T2>
@@ -594,6 +586,7 @@ public:
         while (time() < timeout) {
             try {
                 const Array<uchar> connRead = __conn_read(start.length());
+                cout << connRead.toString().getCString() << endl;
                 if (connRead == start) {
                     broken = true;
                     break;
@@ -656,7 +649,7 @@ public:
         }
 
         fosc = ((double) (sum<int32_t, uchar>(cutArray<uchar>(dat, 0, 16, 2)) * 256 +
-                          sum<int32_t, uchar>(cutArray<uchar>(dat, 1, 16, 2)))) / 8 * Serial::getBaud() / 580974;
+                          sum<int32_t, uchar>(cutArray<uchar>(dat, 1, 16, 2)))) / 8 * conn.getBaud() / 580974;
         this->info = cutArray<uchar>(dat, 16, dat.length());
         this->version = String::toString(info[0] >> 4) + '.' + String::toString(info[0] & 0x0F) + ((char) info[1]);
         this->model = cutArray<uchar>(info, 3, 5);
@@ -684,15 +677,15 @@ public:
 
             if (!this->protocol.isNone &&
                 in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-                this->chkmode = 2, Serial::setParity(Serial::PARITY_EVEN);
+                this->chkmode = 2, conn.setParity(Serial::PARITY_EVEN);
             } else {
-                this->chkmode = 1, Serial::setParity(Serial::PARITY_NONE);
+                this->chkmode = 1, conn.setParity(Serial::PARITY_NONE);
             }
             if (!this->protocol.isNone) {
                 //del this->info
                 logging.info("Protocol ID: %s\n", this->protocol.val.getCString());
                 logging.info("Checksum mode: %d\n", this->chkmode);
-                logging.info("UART Parity: %s\n", Serial::getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
+                logging.info("UART Parity: %s\n", conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
                 for (int i = 0; i < this->info.length(); i += 16) {
                     const Array<uchar> a = cutArray<uchar>(info, i, i + 16);
                     String s = hexStrJoin<uchar>(' ', a);
@@ -779,7 +772,7 @@ public:
     }
 
     void handshake() {
-        uint32_t baud0 = Serial::getBaud();
+        uint32_t baud0 = conn.getBaud();
         uint32_t bauds[] = {115200, 57600, 38400, 28800, 19200, 14400, 9600, 4800, 2400, 1200},
                 len = ARR_SIZE(bauds);
         bool broken = false;
@@ -849,7 +842,7 @@ public:
         }
         send(0x8E, b2);
         __conn_baudrate(baud);
-        Serial::setSpeed(baud);
+        conn.setSpeed(baud);
         this->bundrate = baud;
         const Bean2<uchar, Array<uchar>> rb = recv();
         uchar cmd = rb.a1;
@@ -1133,8 +1126,8 @@ int bczhc::run(const String &hexFile, EchoCallback *echoCallback) {
         code.val = localCode.val;
     } else code.isNone = true;
     echoPrint("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
-    Serial conn = Serial::open(opts.port.getCString());
-    Serial::setSpeed(opts.lowbaud);
+    SerialLinux serialLinux(opts.port.getCString());
+    Serial &conn = serialLinux;
     if (!opts.aispmagic.isNone) autoisp(conn, opts.aispbaud, opts.aispmagic);
     Programmer programmer(conn, opts.protocol);
     program(programmer, code, opts.erase_eeprom);

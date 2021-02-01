@@ -2,14 +2,7 @@
 // Created by zhc on 1/31/21.
 //
 
-#include "stc_flash_lib.h"
-
-namespace properties {
-    static int fd{};
-    static uint32_t baud{};
-    static uint32_t timeout{};
-    static char parity = Serial::PARITY_NONE;
-}
+#include "serial_linux.h"
 
 timespec bczhc::timespec_from_ms(const uint32_t millis) {
     timespec time{};
@@ -48,9 +41,9 @@ bool bczhc::waitReadable(int fd, uint32_t timeout) {
     return true;
 }
 
-void init() {
+void setFlags(int fd) {
     termios options{};
-    tcgetattr(properties::fd, &options);
+    tcgetattr(fd, &options);
     // set up raw mode / no echo / binary
     options.c_cflag |= (tcflag_t) (CLOCAL | CREAD);
     options.c_lflag &= (tcflag_t) ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL |
@@ -64,25 +57,23 @@ void init() {
 #ifdef PARMRK
     options.c_iflag &= (tcflag_t) ~PARMRK;
 #endif
-    tcsetattr(properties::fd, TCSANOW, &options);
+    tcsetattr(fd, TCSANOW, &options);
 }
 
-Serial::Serial(int fd, uint32_t baud, uint32_t timeout) {
-    properties::fd = fd;
-    init();
-    setSpeed(9600);
-    setSpeed(baud);
-    properties::timeout = timeout;
+
+SerialLinux::SerialLinux(int fd, uint32_t baud, uint32_t timeout) : fd(fd), baud(baud), timeout(timeout) {
+    setSpeed(baud), setTimeout(timeout);
 }
 
-Serial Serial::open(const char *port, uint32_t timeout) {
+SerialLinux::SerialLinux(const char *port, uint32_t baud, uint32_t timeout) {
     int o = ::open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (o == -1) throw String("Open port failed.");
-    auto s = Serial(o, 9600, timeout);
-    return s;
+    this->fd = o;
+    setSpeed(baud);
+    setTimeout(timeout);
 }
 
-void Serial::setSpeed(unsigned int speed) {
+void SerialLinux::setSpeed(unsigned int speed) {
     unsigned int speedArr[] = {B0, B50, B75, B110, B134, B150, B200, B300, B600, B1200, B1800, B2400, B4800, B9600,
                                B19200, B38400, B57600, B115200, B230400, B460800, B500000, B576000, B921600,
                                B1000000, B1152000, B1500000, B2000000, B2500000, B3000000, B3500000, B4000000};
@@ -90,40 +81,40 @@ void Serial::setSpeed(unsigned int speed) {
                               57600, 115200, 230400, 460800, 500000, 576000, 921600, 1000000, 1152000, 1500000,
                               2000000, 2500000, 3000000, 3500000, 4000000};
     termios opt{};
-    tcgetattr(properties::fd, &opt);
+    tcgetattr(this->fd, &opt);
     int len = ARR_SIZE(speedArr);
     for (int i = 0; i < len; i++) {
         if (speed == nameArr[i]) {
-            tcflush(properties::fd, TCIOFLUSH);
+            tcflush(this->fd, TCIOFLUSH);
             unsigned int rate = speedArr[i];
             cfsetispeed(&opt, rate);
             cfsetospeed(&opt, rate);
-            int status = tcsetattr(properties::fd, TCSANOW, &opt);
+            int status = tcsetattr(this->fd, TCSANOW, &opt);
             if (status != 0) throw String("tcsetattr fd1");
-            properties::baud = speed;
+            this->baud = speed;
             return;
         }
-        tcflush(properties::fd, TCIOFLUSH);
+        tcflush(this->fd, TCIOFLUSH);
     }
     throw String("Setting speed failed.");
 }
 
-void Serial::close() {
-    if (::close(properties::fd) != 0) throw String("Close failed.");
+void SerialLinux::close() {
+    if (::close(this->fd) != 0) throw String("Close failed.");
 }
 
-Array<uchar> Serial::read(ssize_t size) {
+Array<uchar> SerialLinux::read(ssize_t size) {
     int64_t start = getCurrentTimeMillis();
     char buf[size];
     ssize_t haveRead = 0;
     while (true) {
-        bool b = waitReadable(properties::fd, properties::timeout);
+        bool b = waitReadable(this->fd, this->timeout);
         if (b) {
-            if (getCurrentTimeMillis() - start >= properties::timeout) {
+            if (getCurrentTimeMillis() - start >= this->timeout) {
                 // timeout occurred
                 break;
             }
-            haveRead += ::read(properties::fd, buf + haveRead, size);
+            haveRead += ::read(this->fd, buf + haveRead, size - haveRead);
             if (haveRead == size) {
                 // enough data
                 break;
@@ -140,28 +131,36 @@ Array<uchar> Serial::read(ssize_t size) {
     return r;
 }
 
-ssize_t Serial::write(uchar *buf, ssize_t size) {
-    ssize_t i = ::write(properties::fd, buf, size);
+ssize_t SerialLinux::write(uchar *buf, ssize_t size) {
+    ssize_t i = ::write(this->fd, buf, size);
     if (i == -1) throw String("write error");
     return i;
 }
 
-unsigned int Serial::getBaud() {
-    return properties::baud;
+unsigned int SerialLinux::getBaud() {
+    return this->baud;
 }
 
-void Serial::flush() const {
+void SerialLinux::flush() const {
     // `::write()` has no cache, so there's no need to "flush".
 }
 
-void Serial::setTimeout(uint32_t t) {
-    properties::timeout = t;
+void SerialLinux::setTimeout(uint32_t t) {
+    this->timeout = t;
 }
 
-void Serial::setParity(char p) {
-    properties::parity = p;
+void SerialLinux::setParity(char p) {
+    this->parity = p;
 }
 
-char Serial::getParity() {
-    return properties::parity;
+char SerialLinux::getParity() {
+    return this->parity;
+}
+
+uint32_t SerialLinux::getTimeout() {
+    return this->timeout;
+}
+
+void SerialLinux::flush() {
+    // empty implementation
 }

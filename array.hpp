@@ -82,6 +82,18 @@ namespace bczhc::array {
         bool operator!=(const Array<T> &a) const {
             return !(a == *this);
         }
+
+        [[nodiscard]] String toString() const {
+            String msg = "[";
+            for (int i = 0; i < len; ++i) {
+                msg += String::toString(elements[i]);
+                if (i != len - 1) {
+                    msg += ", ";
+                }
+            }
+            msg += ']';
+            return msg;
+        }
     };
 }
 

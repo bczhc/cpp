@@ -22,7 +22,12 @@ add_executable(
         app/charactersStatistics/CountCharacters.cpp
 )
 add_executable(print_unicode_characters app/printUnicodeCharacters.cpp)
-add_executable(test_demo test/test.cpp app/stc_flash/serial_linux.cpp)
+add_executable(
+        test_demo
+        test/test.cpp
+        app/stc_flash/serial_linux.cpp
+        app/stc_flash/stc_flash_lib.cpp
+)
 add_executable(fourier_seriesTest test/fourierSeriesTest.cpp)
 add_executable(sqlite3_to_JSON test/sqlite3ToJSON.cpp)
 add_executable(snake app/snake.cpp)

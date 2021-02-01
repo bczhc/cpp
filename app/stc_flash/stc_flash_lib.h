@@ -48,9 +48,6 @@ namespace bczhc {
     bool waitReadable(int fd, uint32_t timeout);
 
     class Serial {
-    private:
-        explicit Serial(int fd, uint32_t baud, uint32_t timeout);
-
     public:
         static inline char PARITY_NONE = 'N';
         static inline char PARITY_EVEN = 'E';
@@ -58,26 +55,29 @@ namespace bczhc {
         static inline char PARITY_MARK = 'M';
         static inline char PARITY_SPACE = 'S';
 
-        static Serial open(const char *port, uint32_t timeout = -1);
+        virtual void setSpeed(unsigned int speed) = 0;
 
-        static void setSpeed(unsigned int speed);
+        virtual void close() = 0;
 
-        static void close();
+        [[nodiscard]] virtual Array<uchar> read(ssize_t size) = 0;
 
-        [[nodiscard]] static Array<uchar> read(ssize_t size);
+        virtual ssize_t write(uchar *buf, ssize_t size) = 0;
 
-        static ssize_t write(uchar *buf, ssize_t size);
+        [[nodiscard]] virtual unsigned int getBaud() = 0;
 
-        [[nodiscard]] static unsigned int getBaud();
+        virtual void flush() = 0;
 
-        void flush() const;
+        virtual void setTimeout(uint32_t t) = 0;
 
-        static void setTimeout(uint32_t t);
+        virtual void setParity(char p) = 0;
 
-        static void setParity(char p);
+        [[nodiscard]] virtual char getParity() = 0;
 
-        [[nodiscard]] static char getParity();
+        [[nodiscard]] virtual uint32_t getTimeout() = 0;
     };
 }
+
+String ucharArr2String(const Array<uchar> &arr);
+
 
 #endif //CPP_STC_FLASH_LIB_H
