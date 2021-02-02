@@ -382,7 +382,7 @@ public:
 
 
     Programmer(serial::Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
-        conn.setTimeout(100);
+        conn.setTimeout(50);
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
             conn.setParity(serial::Serial::PARITY_EVEN);
         } else conn.setParity(serial::Serial::PARITY_NONE);
