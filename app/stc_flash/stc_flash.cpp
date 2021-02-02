@@ -4,8 +4,10 @@
 
 #include <iostream>
 #include "stc_flash_lib.h"
+#include "serial_linux.h"
 
 using namespace std;
+using namespace bczhc::serial;
 
 int main(int argc, char **argv) {
     String name = File::getFileName(argv[0]);
@@ -25,9 +27,11 @@ int main(int argc, char **argv) {
         }
     } callback;
 
+    SerialLinux serialImpl("/dev/ttyUSB0");
+
     int status = 1;
     try {
-        status = run(argv[1], &callback);
+        status = run(argv[1], &callback, &serialImpl);
     } catch (const String &e) {
         cerr << e.getCString() << endl;
         return status;

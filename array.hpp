@@ -2,8 +2,12 @@
 // Created by zhc on 1/25/21.
 //
 
-#ifndef CPP_ARRAY_HPP
-#define CPP_ARRAY_HPP
+#ifndef BCZHC_ARRAY_ARRAY_HPP
+#define BCZHC_ARRAY_ARRAY_HPP
+
+#include "./string.hpp"
+
+using namespace bczhc::string;
 
 namespace bczhc::array {
     template<typename T>
@@ -97,4 +101,4 @@ namespace bczhc::array {
     };
 }
 
-#endif //CPP_ARRAY_HPP
+#endif //BCZHC_ARRAY_ARRAY_HPP

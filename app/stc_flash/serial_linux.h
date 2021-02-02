@@ -2,43 +2,49 @@
 // Created by zhc on 2/1/21.
 //
 
-#ifndef CPP_SERIAL_LINUX_H
-#define CPP_SERIAL_LINUX_H
+#ifndef BCZHC_SERIAL_SERIAL_LINUX_H
+#define BCZHC_SERIAL_SERIAL_LINUX_H
 
-#include "stc_flash_lib.h"
+#include "serial.h"
 
-class SerialLinux : public Serial {
-private:
-    int fd{};
-    uint32_t baud{};
-    uint32_t timeout{};
-    char parity = Serial::PARITY_NONE;
-public:
-    SerialLinux(int fd, uint32_t baud, uint32_t timeout);
+namespace bczhc::serial {
+    class SerialLinux : public Serial {
+    private:
+        int fd{};
+        uint32_t baud{};
+        uint32_t timeout{};
+        char parity = PARITY_NONE;
 
-    explicit SerialLinux(const char *port, uint32_t baud = 9600, uint32_t timeout = -1);
+        static timespec timespec_from_ms(uint32_t millis);
 
-    void setSpeed(unsigned int speed) override;
+        [[nodiscard]] bool waitReadable(uint32_t timeoutMillis) const;
 
-    void close() override;
+        void setFlags() const;
+    public:
+        SerialLinux(int fd, uint32_t baud, uint32_t timeout);
 
-    Array<uchar> read(ssize_t size) override;
+        explicit SerialLinux(const char *port, uint32_t baud = 9600, uint32_t timeout = -1);
 
-    ssize_t write(uchar *buf, ssize_t size) override;
+        void setSpeed(unsigned int speed) override;
 
-    unsigned int getBaud() override;
+        void close() const override;
 
-    void flush() const;
+        [[nodiscard]] Array<uchar> read(ssize_t size) const override;
 
-    void setTimeout(uint32_t t) override;
+        ssize_t write(uchar *buf, ssize_t size) const override;
 
-    void setParity(char p) override;
+        [[nodiscard]] unsigned int getBaud() const override;
 
-    char getParity() override;
+        void flush() const override;
 
-    uint32_t getTimeout() override;
+        void setTimeout(uint32_t t) override;
 
-    void flush() override;
-};
+        void setParity(char p) override;
 
-#endif //CPP_SERIAL_LINUX_H
+        [[nodiscard]] char getParity() const override;
+
+        [[nodiscard]] uint32_t getTimeout() const override;
+    };
+}
+
+#endif //BCZHC_SERIAL_SERIAL_LINUX_H

@@ -1,14 +1,13 @@
 #include <iostream>
 
 using namespace std;
-
 #pragma clang diagnostic push
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 #include "stc_flash_lib.h"
-#include "serial_linux.h"
+#include "serial.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
@@ -317,7 +316,7 @@ using SymbolTableTupleBS = SymbolTable<Tuple2B, Tuple2S>;
 // SymbolTable byte-string
 using SymbolTableBS = SymbolTable<uchar, const char *>;
 
-void autoisp(Serial &conn, int baud, NonableString &magic) {
+void autoisp(serial::Serial &conn, int baud, NonableString &magic) {
     if (magic.isNone) return;
     uint32_t bak = conn.getBaud();
     conn.setSpeed(baud);
@@ -371,7 +370,7 @@ SequentialList<T> cutList(SequentialList<T> &list, int start, int end, int step 
 
 class Programmer {
 public:
-    Serial &conn;
+    serial::Serial &conn;
     NonableString &protocol;
     int chkmode = 0;
     double fosc = 0;
@@ -383,11 +382,11 @@ public:
     uint32_t bundrate = 0;
 
 
-    Programmer(Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
+    Programmer(serial::Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
         conn.setTimeout(50);
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-            conn.setParity(Serial::PARITY_EVEN);
-        } else conn.setParity(Serial::PARITY_NONE);
+            conn.setParity(serial::Serial::PARITY_EVEN);
+        } else conn.setParity(serial::Serial::PARITY_NONE);
         this->chkmode = 0;
     }
 
@@ -586,7 +585,6 @@ public:
         while (time() < timeout) {
             try {
                 const Array<uchar> connRead = __conn_read(start.length());
-                cout << connRead.toString().getCString() << endl;
                 if (connRead == start) {
                     broken = true;
                     break;
@@ -623,7 +621,10 @@ public:
             logging.debug("recv(..): Incorrect checksum[1]\n");
             throw String("io error");
         }
-        return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));
+        const Bean2 <uchar, Array<uchar>> &r = Bean2<uchar, Array<uchar>>(s[0],
+                                                                          cutArray<uchar>(s, 1, -(1 + this->chkmode)));
+        cout << r.a2.toString().getCString() << endl;
+        return r;
     }
 
     void detect() {
@@ -677,15 +678,15 @@ public:
 
             if (!this->protocol.isNone &&
                 in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-                this->chkmode = 2, conn.setParity(Serial::PARITY_EVEN);
+                this->chkmode = 2, conn.setParity(serial::Serial::PARITY_EVEN);
             } else {
-                this->chkmode = 1, conn.setParity(Serial::PARITY_NONE);
+                this->chkmode = 1, conn.setParity(serial::Serial::PARITY_NONE);
             }
             if (!this->protocol.isNone) {
                 //del this->info
                 logging.info("Protocol ID: %s\n", this->protocol.val.getCString());
                 logging.info("Checksum mode: %d\n", this->chkmode);
-                logging.info("UART Parity: %s\n", conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
+                logging.info("UART Parity: %s\n", conn.getParity() == serial::Serial::PARITY_EVEN ? "EVEN" : "NONE");
                 for (int i = 0; i < this->info.length(); i += 16) {
                     const Array<uchar> a = cutArray<uchar>(info, i, i + 16);
                     String s = hexStrJoin<uchar>(' ', a);
@@ -1085,7 +1086,7 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
     prog.terminate();
 }
 
-int bczhc::run(const String &hexFile, EchoCallback *echoCallback) {
+int bczhc::run(const String &hexFile, EchoCallback *echoCallback, serial::Serial *serialImpl) {
     echo = echoCallback;
     struct Opt {
         uint32_t aispbaud = 4800;
@@ -1126,8 +1127,7 @@ int bczhc::run(const String &hexFile, EchoCallback *echoCallback) {
         code.val = localCode.val;
     } else code.isNone = true;
     echoPrint("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
-    SerialLinux serialLinux(opts.port.getCString());
-    Serial &conn = serialLinux;
+    serial::Serial &conn = *serialImpl;
     if (!opts.aispmagic.isNone) autoisp(conn, opts.aispbaud, opts.aispmagic);
     Programmer programmer(conn, opts.protocol);
     program(programmer, code, opts.erase_eeprom);

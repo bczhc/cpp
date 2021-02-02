@@ -10,6 +10,8 @@
 #include <cstdio>
 #include "./string.hpp"
 
+#define ARR_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 using namespace bczhc::string;
 
 namespace bczhc::utils {
