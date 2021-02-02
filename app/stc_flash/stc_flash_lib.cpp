@@ -191,12 +191,19 @@ ReturnType sum(Array<ElementType> arr) {
     return sum<ReturnType, ElementType>(arr, 0, arr.length());
 }
 
-template<typename T>
-void sliceAssign(SequentialList<T> &list, int start, int end, const T *valueToAssign, int length) {
+void checkAndSetBoundary(int &start, int &end, int length) {
     if (start < 0) start += length;
     if (end < 0) end += length;
+
     if (start < 0) start = 0;
-    if (end >= length) end = length;
+    else if (start > length) start = length;
+    if (end < 0) end = 0;
+    else if (end > length) end = length;
+}
+
+template<typename T>
+void sliceAssign(SequentialList<T> &list, int start, int end, const T *valueToAssign, int length) {
+    checkAndSetBoundary(start, end, list.length());
     list.remove(start, end);
     list.insert(start, valueToAssign, length);
 }
@@ -342,10 +349,7 @@ template<typename T>
 Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
     SequentialList<T> list;
     int len = arr.length();
-    if (start < 0) start += len;
-    if (end < 0) end += len;
-    if (start < 0) start = 0;
-    if (end >= len) end = len;
+    checkAndSetBoundary(start, end, len);
     for (int i = start; i < end; i += step) {
         list.insert(arr[i]);
     }
@@ -355,12 +359,7 @@ Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
 template<typename T>
 SequentialList<T> cutList(SequentialList<T> &list, int start, int end, int step = 1) {
     int len = list.length();
-    if (start < 0) start += len;
-    if (end < 0) end += len;
-    if (start < 0) start = 0;
-    if (end >= len) end = len;
-    if (start >= len || start < 0 || end > len || end < 0)
-        throw String("out of index");
+    checkAndSetBoundary(start, end, len);
     SequentialList<T> r;
     for (int i = start; i < end; i += step) {
         r.insert(list.get(i));
@@ -621,8 +620,8 @@ public:
             logging.debug("recv(..): Incorrect checksum[1]\n");
             throw String("io error");
         }
-        const Bean2 <uchar, Array<uchar>> &r = Bean2<uchar, Array<uchar>>(s[0],
-                                                                          cutArray<uchar>(s, 1, -(1 + this->chkmode)));
+        const Bean2<uchar, Array<uchar>> &r = Bean2<uchar, Array<uchar>>(s[0],
+                                                                         cutArray<uchar>(s, 1, -(1 + this->chkmode)));
         cout << r.a2.toString().getCString() << endl;
         return r;
     }
@@ -1128,6 +1127,7 @@ int bczhc::run(const String &hexFile, EchoCallback *echoCallback, serial::Serial
     } else code.isNone = true;
     echoPrint("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
     serial::Serial &conn = *serialImpl;
+    conn.setSpeed(opts.lowbaud);
     if (!opts.aispmagic.isNone) autoisp(conn, opts.aispbaud, opts.aispmagic);
     Programmer programmer(conn, opts.protocol);
     program(programmer, code, opts.erase_eeprom);
