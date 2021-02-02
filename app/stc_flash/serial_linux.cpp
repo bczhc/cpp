@@ -131,12 +131,14 @@ Array<uchar> bczhc::serial::SerialLinux::read(ssize_t size) const {
     for (int i = 0; i < haveRead; ++i) {
         r[i] = buf[i];
     }
+    printf("size: %zd, read: %s\n", size, r.toString().getCString());
     return r;
 }
 
 ssize_t bczhc::serial::SerialLinux::write(uchar *buf, ssize_t size) const {
     ssize_t i = ::write(this->fd, buf, size);
     if (i == -1) throw String("write error");
+    printf("size: %zd, write: %s\n", size, Array<uchar>::toString(buf, size).getCString());
     return i;
 }
 

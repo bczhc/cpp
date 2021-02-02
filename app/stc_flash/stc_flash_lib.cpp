@@ -382,7 +382,7 @@ public:
 
 
     Programmer(serial::Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
-        conn.setTimeout(50);
+        conn.setTimeout(100);
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
             conn.setParity(serial::Serial::PARITY_EVEN);
         } else conn.setParity(serial::Serial::PARITY_NONE);
@@ -622,7 +622,7 @@ public:
         }
         const Bean2<uchar, Array<uchar>> &r = Bean2<uchar, Array<uchar>>(s[0],
                                                                          cutArray<uchar>(s, 1, -(1 + this->chkmode)));
-        cout << r.a2.toString().getCString() << endl;
+//        cout << r.a2.toString().getCString() << endl;
         return r;
     }
 
@@ -1059,7 +1059,7 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
         void accept(double &progress) override {
             int bar = (int) (progress * 20);
             for (int i = 0; i < bar - oldbar; ++i) {
-                putc('#', stdout);
+                echoPrint("#");
             }
             oldbar = bar;
             echo->flush();

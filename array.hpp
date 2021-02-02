@@ -88,10 +88,14 @@ namespace bczhc::array {
         }
 
         [[nodiscard]] String toString() const {
+            return Array<T>::toString(this->elements, this->len);
+        }
+
+        [[nodiscard]] static String toString(T *arr, size_t size) {
             String msg = "[";
-            for (int i = 0; i < len; ++i) {
-                msg += String::toString(elements[i]);
-                if (i != len - 1) {
+            for (int i = 0; i < size; ++i) {
+                msg += String::toString(arr[i]);
+                if (i != size - 1) {
                     msg += ", ";
                 }
             }

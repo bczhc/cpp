@@ -27,10 +27,9 @@ int main(int argc, char **argv) {
         }
     } callback;
 
-    SerialLinux serialImpl("/dev/ttyUSB0");
-
     int status = 1;
     try {
+        SerialLinux serialImpl("/dev/ttyUSB0");
         status = run(argv[1], &callback, &serialImpl);
     } catch (const String &e) {
         cerr << e.getCString() << endl;

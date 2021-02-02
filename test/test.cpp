@@ -22,8 +22,6 @@
 #include "../app/stc_flash/stc_flash_lib.h"
 #include <fcntl.h>
 #include "../app/stc_flash/serial_linux.h"
-#include "serial.h"
-#include "serial_linux.h"
 
 using namespace std;
 using namespace bczhc;
