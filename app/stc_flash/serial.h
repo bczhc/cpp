@@ -45,6 +45,8 @@ namespace bczhc::serial {
         [[nodiscard]] virtual char getParity() const= 0;
 
         [[nodiscard]] virtual uint32_t getTimeout() const= 0;
+
+        [[nodiscard]] virtual String getPortName() const = 0;
     };
 }
 

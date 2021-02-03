@@ -14,6 +14,7 @@ namespace bczhc::serial {
         uint32_t baud{};
         uint32_t timeout{};
         char parity = PARITY_NONE;
+        String portName = nullptr;
 
         static timespec timespec_from_ms(uint32_t millis);
 
@@ -44,6 +45,8 @@ namespace bczhc::serial {
         [[nodiscard]] char getParity() const override;
 
         [[nodiscard]] uint32_t getTimeout() const override;
+
+        [[nodiscard]] String getPortName() const override;
     };
 }
 

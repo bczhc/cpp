@@ -70,6 +70,7 @@ bczhc::serial::SerialLinux::SerialLinux(int fd, uint32_t baud, uint32_t timeout)
 }
 
 bczhc::serial::SerialLinux::SerialLinux(const char *port, uint32_t baud, uint32_t timeout) {
+    this->portName = port;
     int o = ::open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (o == -1) throw String("Open port failed.");
     this->fd = o;
@@ -131,14 +132,12 @@ Array<uchar> bczhc::serial::SerialLinux::read(ssize_t size) const {
     for (int i = 0; i < haveRead; ++i) {
         r[i] = buf[i];
     }
-    printf("size: %zd, read: %s\n", size, r.toString().getCString());
     return r;
 }
 
 ssize_t bczhc::serial::SerialLinux::write(uchar *buf, ssize_t size) const {
     ssize_t i = ::write(this->fd, buf, size);
     if (i == -1) throw String("write error");
-    printf("size: %zd, write: %s\n", size, Array<uchar>::toString(buf, size).getCString());
     return i;
 }
 
@@ -164,4 +163,8 @@ char bczhc::serial::SerialLinux::getParity() const {
 
 uint32_t bczhc::serial::SerialLinux::getTimeout() const {
     return this->timeout;
+}
+
+String bczhc::serial::SerialLinux::getPortName() const {
+    return this->portName;
 }

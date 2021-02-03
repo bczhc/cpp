@@ -9,6 +9,23 @@
 using namespace std;
 using namespace bczhc::serial;
 
+String getPort() {
+    String platform;
+#ifdef _WIN32
+    platform = "win32";
+#endif
+#ifdef __APPLE__
+    platform = "darwin";
+#endif
+
+    if (platform.equals("win32")) {
+        return "COM3";
+    } else if (platform.equals("darwin")) {
+        return "/dev/tty.usbserial";
+    }
+    return "/dev/ttyUSB0";
+}
+
 int main(int argc, char **argv) {
     String name = File::getFileName(argv[0]);
     if (argc != 2 || (String::equal(argv[1], "--help") || String::equal(argv[1], "-h"))) {
@@ -29,7 +46,7 @@ int main(int argc, char **argv) {
 
     int status = 1;
     try {
-        SerialLinux serialImpl("/dev/ttyUSB0");
+        SerialLinux serialImpl(getPort().getCString());
         status = run(argv[1], &callback, &serialImpl);
     } catch (const String &e) {
         cerr << e.getCString() << endl;

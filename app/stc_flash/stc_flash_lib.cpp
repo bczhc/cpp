@@ -21,23 +21,6 @@ static const char *PROTOSET_12[] = {PROTOCOL_12C5A, PROTOCOL_12C52, PROTOCOL_12C
 static const char *PROTOSET_12B[] = {PROTOCOL_12C52, PROTOCOL_12Cx052};
 static const char *PROTOSET_PARITY[] = {PROTOCOL_12C5A, PROTOCOL_12C52};
 
-String getPort() {
-    String platform;
-#ifdef _WIN32
-    platform = "win32";
-#endif
-#ifdef __APPLE__
-    platform = "darwin";
-#endif
-
-    if (platform.equals("win32")) {
-        return "COM3";
-    } else if (platform.equals("darwin")) {
-        return "/dev/tty.usbserial";
-    }
-    return "/dev/ttyUSB0";
-}
-
 static char echoMsg[100];
 static EchoCallback *echo;
 
@@ -382,7 +365,7 @@ public:
 
 
     Programmer(serial::Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
-        conn.setTimeout(100);
+        conn.setTimeout(50);
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
             conn.setParity(serial::Serial::PARITY_EVEN);
         } else conn.setParity(serial::Serial::PARITY_NONE);
@@ -620,10 +603,7 @@ public:
             logging.debug("recv(..): Incorrect checksum[1]\n");
             throw String("io error");
         }
-        const Bean2<uchar, Array<uchar>> &r = Bean2<uchar, Array<uchar>>(s[0],
-                                                                         cutArray<uchar>(s, 1, -(1 + this->chkmode)));
-//        cout << r.a2.toString().getCString() << endl;
-        return r;
+        return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));;
     }
 
     void detect() {
@@ -1094,13 +1074,13 @@ int bczhc::run(const String &hexFile, EchoCallback *echoCallback, serial::Serial
         InputStream *image = nullptr;
         uint32_t lowbaud = 2400;
         bool not_erase_eeprom = false;
-        String port = "/dev/ttyUSB0";
+        String port = nullptr;
         NonableString protocol = NonableString("auto");
         int verbose = 0;
         int loglevel = 0;
     } opts;
 
-    opts.port = getPort();
+    opts.port = serialImpl->getPortName();
 
     const String &filename = hexFile;
     opts.image = new InputStream(filename);
