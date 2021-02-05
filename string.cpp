@@ -51,7 +51,7 @@ size_t String::utf8Length() const {
     return c;
 }
 
-size_t String::size() const {
+size_t String::length() const {
     return stringSize;
 }
 
@@ -100,7 +100,7 @@ String &String::append(const char *s, size_t size) {
     String *t = nullptr;
     if (s == this->data) {
         t = new String(s);
-        len = t->size();
+        len = t->length();
         s = t->data;
     }
     if (len == -1) len = size;
@@ -117,7 +117,7 @@ String &String::append(const char *s, size_t size) {
 }
 
 String &String::append(const String &string) {
-    append(string.data, string.size());
+    append(string.data, string.length());
     return *this;
 }
 
@@ -162,10 +162,10 @@ SequentialList<String> String::split(const String &separator) const {
 
 SequentialList<String> String::split(const String &str, const String &separator) {
     const char *s = str.getCString();
-    size_t stringSize = str.size();
+    size_t stringSize = str.length();
     SequentialList<String> list;
     SequentialList<size_t> indexes;
-    size_t length = separator.size();
+    size_t length = separator.length();
     const char *found;
     const char *start = s;
     while (start - s <= stringSize && (found = strstr(start, separator.getCString())) != nullptr) {
@@ -244,7 +244,7 @@ String &String::insert(size_t index, char c) {
 }
 
 String &String::insert(size_t index, const String &string) {
-    size_t len = string.size();
+    size_t len = string.length();
     stringSize += len;
     if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 2, resize(dataSize);
     for (size_t i = stringSize; i >= index + len; --i) {
@@ -331,7 +331,7 @@ void String::clear() {
 }
 
 bool String::equals(const String &s) const {
-    if (size() != s.size()) return false;
+    if (length() != s.length()) return false;
     return String::equal(data, s.data);
 }
 
@@ -426,7 +426,7 @@ String &String::operator+=(char c) {
 }
 
 ssize_t String::lastIndexOf(char c) const {
-    for (ssize_t i = size() - 1; i >= 0; --i) {
+    for (ssize_t i = length() - 1; i >= 0; --i) {
         if (data[i] == c) return i;
     }
     return -1;
@@ -437,7 +437,7 @@ char &String::operator[](size_t index) {
 }
 
 ssize_t String::firstIndexOf(char c) const {
-    for (size_t i = 0; i < size(); ++i) {
+    for (size_t i = 0; i < length(); ++i) {
         if (data[i] == c) return i;
     }
     return -1;

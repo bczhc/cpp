@@ -18,7 +18,7 @@ int main() {
             s.append(buf[i]);
     }
     const char *sp = s.getCString();
-    int len = s.size();
+    int len = s.length();
     int bytesLength;
     for (int i = len - 1; i >= 0; --i) {
         if ((bytesLength = getUTF8BytesLength(sp[i])) != -1) {

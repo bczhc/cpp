@@ -18,8 +18,8 @@ int bczhc::utils::parseInt(const String &s, int radix) {
     String numStr = s;
     if (s.isNull()) throw String("null");
     bool negative = s.charAt(0) == '-';
-    if (negative) numStr = s.substring(1, s.size());
-    int size = numStr.size();
+    if (negative) numStr = s.substring(1, s.length());
+    int size = numStr.length();
     if (size == 0) return 0;
 
     int r = 0;

@@ -145,7 +145,7 @@ double time() {
 }
 
 Array<unsigned char> hex2bytes(const String &hexString) {
-    int i = (int) hexString.size();
+    int i = (int) hexString.length();
     int len = i / 2;
     Array<unsigned char> dat(len);
     for (int j = 0; j < len; ++j) {
@@ -312,7 +312,7 @@ void autoisp(serial::Serial &conn, int baud, NonableString &magic) {
     conn.setSpeed(baud);
 
     String &magicStr = magic.val;
-    size_t size = magicStr.size();
+    size_t size = magicStr.length();
     const char *data = magicStr.getCString();
     conn.write((uchar *) data, size);
     conn.flush();

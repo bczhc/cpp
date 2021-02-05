@@ -51,7 +51,7 @@ namespace bczhc::string {
 
         [[nodiscard]] size_t utf8Length() const;
 
-        [[nodiscard]] size_t size() const;
+        [[nodiscard]] size_t length() const;
 
         String &operator=(const String &string);
 

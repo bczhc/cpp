@@ -36,5 +36,7 @@ using namespace bczhc::array;
 using namespace symboltable;
 
 int main() {
+    String s = "abc";
+    cout << s.utf8Length() << endl;
     return 0;
 }

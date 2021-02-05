@@ -23,7 +23,7 @@ add_executable(
 )
 add_executable(print_unicode_characters app/printUnicodeCharacters.cpp)
 add_executable(
-        test_demo
+        testCpp
         test/test.cpp
         app/stc_flash/serial_linux.cpp
         app/stc_flash/stc_flash_lib.cpp
@@ -54,6 +54,7 @@ add_executable(
         app/stc_flash/stc_flash_lib.cpp
         app/stc_flash/serial_linux.cpp
 )
+add_executable(testC test/test.c test/api.cpp)
 
 add_library(
         serial
