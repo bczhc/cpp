@@ -13,15 +13,17 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#ifdef __WIN32
+#include <windows.h>
+#endif
+#ifdef CMAKE_PCRE_FOUND
 #include <pcre.h>
-#include <pthread.h>
+#endif
 #include "../array.hpp"
-#include <fcntl.h>
-#include <cstdarg>
 #include <cassert>
-#include "../app/stc_flash/stc_flash_lib.h"
+#include <cstdarg>
 #include <fcntl.h>
-#include "../app/stc_flash/serial_linux.h"
+#include <pthread.h>
 
 using namespace std;
 using namespace bczhc;
@@ -31,12 +33,25 @@ using namespace concurrent;
 using namespace utils;
 using namespace file;
 using namespace io;
-using namespace regex;
 using namespace bczhc::array;
 using namespace symboltable;
 
 int main() {
-    String s = "abc";
-    cout << s.utf8Length() << endl;
+    class CB : public FourierSeriesCallback {
+    public:
+        void callback(double n, double re, double im) override {
+            cout << String::toString(n).getCString() << ' ' << String::toString(re).getCString() << ' ' << String::toString(im).getCString() << endl;
+        }
+    } cb;
+
+    class F : public ComplexFunctionInterface {
+    public:
+        void x(ComplexValue &dest, double t) override {
+            dest.setValue(sin(t), cos(t) * sin(t));
+        }
+    } f;
+
+    FourierSeries fd(f, 100, 100);
+    fd.calc(cb, 100000, 10);
     return 0;
 }

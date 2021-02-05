@@ -1,5 +1,4 @@
 #include "string.hpp"
-#include "third_party/practice/LinearList.hpp"
 #include <cstddef>
 #include <cstring>
 #include "utils.hpp"
@@ -224,12 +223,16 @@ String String::toString(int64_t a) {
 
 String String::toString(float a) {
     //TODO float toString
-    return String();
+    char s[50] = {0};
+    sprintf(s, "%.7f", a);
+    return String(s);
 }
 
 String String::toString(double a) {
     //TODO double toString
-    return String();
+    char s[50] = {0};
+    sprintf(s, "%.23lf", a);
+    return String(s);
 }
 
 String &String::insert(size_t index, char c) {

@@ -11,6 +11,7 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE DEBUG)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+list(APPEND MACRO_DEFINITIONS TEST00)
 
 confLib()
 
@@ -25,8 +26,6 @@ add_executable(print_unicode_characters app/printUnicodeCharacters.cpp)
 add_executable(
         testCpp
         test/test.cpp
-        app/stc_flash/serial_linux.cpp
-        app/stc_flash/stc_flash_lib.cpp
 )
 add_executable(fourier_seriesTest test/fourierSeriesTest.cpp)
 add_executable(sqlite3_to_JSON test/sqlite3ToJSON.cpp)
@@ -48,15 +47,15 @@ add_executable(echo_and_write app/echoAndWrite.cpp)
 add_executable(shuffle_string app/shuffleString.cpp)
 add_executable(bases128 app/base128.cpp)
 add_executable(stdin_size app/stdinSize.cpp)
-add_executable(
-        stc_flash
-        app/stc_flash/stc_flash.cpp
-        app/stc_flash/stc_flash_lib.cpp
-        app/stc_flash/serial_linux.cpp
-)
+if (UNIX)
+    add_executable(
+            stc_flash
+            app/stc_flash/stc_flash.cpp
+            app/stc_flash/stc_flash_lib.cpp
+            app/stc_flash/serial_linux.cpp
+    )
+endif ()
+
 add_executable(testC test/test.c test/api.cpp)
 
-add_library(
-        serial
-        app/stc_flash/stc_flash_lib.cpp
-)
+add_compile_definitions("${MACRO_DEFINITIONS}")

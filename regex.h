@@ -5,6 +5,7 @@
 #ifndef CPP_REGEX_H
 #define CPP_REGEX_H
 
+#ifdef CMAKE_PCRE_FOUND
 #include "utils.hpp"
 #include "./third_party/practice/LinearList.hpp"
 #include "string.hpp"
@@ -28,5 +29,7 @@ namespace bczhc::regex {
 
     bool test(const char *pattern, const char *text, int textSize);
 }
+
+#endif //CMAKE_PCRE_FOUND
 
 #endif //CPP_REGEX_H

@@ -6,8 +6,8 @@ using namespace std;
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
-#include "stc_flash_lib.h"
 #include "serial.h"
+#include "stc_flash_lib.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
@@ -60,12 +60,11 @@ public:
 void echoPrint(const char *format, ...) {
     va_list args{};
     va_start(args, format);
-    char *s = nullptr;
-    vasprintf(&s, format, args);
+    char s[201];
+    vsnprintf(s, 200, format, args);
+    s[200] = '\0';
     echo->print(s);
-    free(s);
     va_end(args);
-
 }
 
 static Logging logging;
@@ -179,9 +178,11 @@ void checkAndSetBoundary(int &start, int &end, int length) {
     if (end < 0) end += length;
 
     if (start < 0) start = 0;
-    else if (start > length) start = length;
+    else if (start > length)
+        start = length;
     if (end < 0) end = 0;
-    else if (end > length) end = length;
+    else if (end > length)
+        end = length;
 }
 
 template<typename T>
@@ -251,7 +252,8 @@ Code hex2bin(Code &code) {
         } else if (dat[3] == 4) {
             if (n != 2) throw String("Line ") + String::toString(line) + ": Incorrect data length";
             base = ((dat[4] << 8) + dat[5]) << 16;
-        } else throw String("Line ") + String::toString(line) + ": Unsupported record type";
+        } else
+            throw String("Line ") + String::toString(line) + ": Unsupported record type";
     }
     Array<unsigned char> r(buf.length());
     for (int i = 0; i < r.length(); ++i) {
@@ -368,7 +370,8 @@ public:
         conn.setTimeout(50);
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
             conn.setParity(serial::Serial::PARITY_EVEN);
-        } else conn.setParity(serial::Serial::PARITY_NONE);
+        } else
+            conn.setParity(serial::Serial::PARITY_NONE);
         this->chkmode = 0;
     }
 
@@ -541,7 +544,8 @@ public:
         String romfix;
         if (model[0] == 0xF0 || model[1] == 0xF1) {
             romfix = String::toString(model[1] - foundKey[0]);
-        } else if (model[0] == 0xF2) romfix = String::toString(localRomsize);
+        } else if (model[0] == 0xF2)
+            romfix = String::toString(localRomsize);
         else {
             String s = String::toString(localRomsize);
             if (s.utf8Length() == 0) s = String("0") + s;
@@ -603,7 +607,8 @@ public:
             logging.debug("recv(..): Incorrect checksum[1]\n");
             throw String("io error");
         }
-        return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));;
+        return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));
+        ;
     }
 
     void detect() {
@@ -629,7 +634,8 @@ public:
         }
 
         fosc = ((double) (sum<int32_t, uchar>(cutArray<uchar>(dat, 0, 16, 2)) * 256 +
-                          sum<int32_t, uchar>(cutArray<uchar>(dat, 1, 16, 2)))) / 8 * conn.getBaud() / 580974;
+                          sum<int32_t, uchar>(cutArray<uchar>(dat, 1, 16, 2)))) /
+               8 * conn.getBaud() / 580974;
         this->info = cutArray<uchar>(dat, 16, dat.length());
         this->version = String::toString(info[0] >> 4) + '.' + String::toString(info[0] & 0x0F) + ((char) info[1]);
         this->model = cutArray<uchar>(info, 3, 5);
@@ -641,14 +647,14 @@ public:
         if (this->protocol.isNone) {
             try {
                 SymbolTableBS m;
-                m.put(0xF0, PROTOCOL_89);// STC89/90C5xRC
-                m.put(0xF1, PROTOCOL_89);// STC89/90C5xRD+
+                m.put(0xF0, PROTOCOL_89);     // STC89/90C5xRC
+                m.put(0xF1, PROTOCOL_89);     // STC89/90C5xRD+
                 m.put(0xF2, PROTOCOL_12Cx052);// STC12Cx052
-                m.put(0xD1, PROTOCOL_12C5A);// STC12C5Ax
-                m.put(0xD2, PROTOCOL_12C5A);// STC10Fx
-                m.put(0xE1, PROTOCOL_12C52);// STC12C52x
-                m.put(0xE2, PROTOCOL_12C5A);// STC11Fx
-                m.put(0xE6, PROTOCOL_12C52);// STC12C56x
+                m.put(0xD1, PROTOCOL_12C5A);  // STC12C5Ax
+                m.put(0xD2, PROTOCOL_12C5A);  // STC10Fx
+                m.put(0xE1, PROTOCOL_12C52);  // STC12C52x
+                m.put(0xE2, PROTOCOL_12C5A);  // STC11Fx
+                m.put(0xE6, PROTOCOL_12C52);  // STC12C56x
                 const SymbolTableBS::Result result = m.get(model[0]);
                 if (!result.found) throw String("key error");
                 this->protocol = NonableString(result.val);
@@ -715,7 +721,8 @@ public:
             echoPrint(" WDT prescal: %d\n", pow(2, ((this->info[8] & 0x07) + 1)));
         } else if (in<String, const char *>(this->protocol.val, PROTOSET_12B, ARR_SIZE(PROTOSET_12B))) {
             switches.insert(Bean(8, 0x02, "Not erase data EEPROM"));
-        } else switches.clear();
+        } else
+            switches.clear();
 
         LinkedList<Bean>::Iterator it = switches.getIterator();
         while (it.hasNext()) {
@@ -754,7 +761,7 @@ public:
     void handshake() {
         uint32_t baud0 = conn.getBaud();
         uint32_t bauds[] = {115200, 57600, 38400, 28800, 19200, 14400, 9600, 4800, 2400, 1200},
-                len = ARR_SIZE(bauds);
+                 len = ARR_SIZE(bauds);
         bool broken = false;
         uint32_t baud;
         Array<int> baudstr(0);
@@ -856,7 +863,7 @@ public:
             const Bean2<uchar, Array<uchar>> rb = recv(10);
             assert(rb.a1 == 0x80);
         } else {
-            uchar a[] = {0x00, 0x00, (uchar) (this->romsize.val * 4), 0x00, 0x00, (uchar) (this->romsize.val * 4)};
+            uchar a[] = {0x00, 0x00, (uchar)(this->romsize.val * 4), 0x00, 0x00, (uchar)(this->romsize.val * 4)};
             int len = ARR_SIZE(a);
             SequentialList<uchar> b(len);
             for (int i = 0; i < len; ++i) {
@@ -896,7 +903,7 @@ public:
         for (int i = 0; i < code.length(); i += 128) {
             logging.info("Flash code region (%04X, %04X)\n", i, i + 127);
 
-            uchar a[] = {0, 0, (uchar) (i >> 8), (uchar) (i & 0xFF), 0, 128};
+            uchar a[] = {0, 0, (uchar)(i >> 8), (uchar)(i & 0xFF), 0, 128};
             int len = ARR_SIZE(a);
             SequentialList<uchar> b(len);
             for (int j = 0; j < len; ++j) {
@@ -944,7 +951,7 @@ public:
 
     [[nodiscard]] bool options(NonableBoolean erase_eeprom) const {
         SequentialList<uchar> dat;
-        const Array<uchar> localFosc = packUnsignedInt32BigEndian((uint32_t) (this->fosc * 1000000));
+        const Array<uchar> localFosc = packUnsignedInt32BigEndian((uint32_t)(this->fosc * 1000000));
         if (this->protocol.val == PROTOCOL_89) {
             if (!erase_eeprom.isNone) {
                 this->info[2] &= 0xF7;
@@ -1035,6 +1042,7 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
     class C : public Consumer<double> {
     private:
         int &oldbar;
+
     public:
         void accept(double &progress) override {
             int bar = (int) (progress * 20);
@@ -1104,7 +1112,8 @@ int bczhc::run(const String &hexFile, EchoCallback *echoCallback, serial::Serial
             localCode = hex2bin(localCode);
         }
         code.val = localCode.val;
-    } else code.isNone = true;
+    } else
+        code.isNone = true;
     echoPrint("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
     serial::Serial &conn = *serialImpl;
     conn.setSpeed(opts.lowbaud);

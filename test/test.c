@@ -3,13 +3,16 @@
 //
 
 #include <stdio.h>
-#include "api.h"
-#include <malloc.h>
+#include <pthread.h>
+
+void* f() {
+    printf("%s\n", "hello, world");
+    return NULL;
+}
 
 int main() {
-    char *s = NULL;
-    toString(&s, 54321);
-    printf("%s\n", s);
-    free(s);
+    pthread_t t;
+    pthread_create(&t, NULL, f, NULL);
+    pthread_join(t, NULL);
     return 0;
 }

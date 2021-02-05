@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <cstring>
 #include "utf8.h"
+#include <cstdint>
+#include <sys/types.h>
 
 using namespace bczhc::linearlist;
 
