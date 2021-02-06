@@ -92,8 +92,8 @@ int bczhc::Sqlite3::Statement::bindText(int row, const char *s, int size) const 
     return sqlite3_bind_text(stmt, row, s, size, SQLITE_STATIC);
 }
 
-void bczhc::Sqlite3::Statement::release() const {
-    sqlite3_finalize(this->stmt);
+int bczhc::Sqlite3::Statement::release() const {
+    return sqlite3_finalize(this->stmt);
 }
 
 bczhc::Sqlite3::Statement::Statement(const bczhc::Sqlite3::Statement &stat) {

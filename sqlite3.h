@@ -47,7 +47,7 @@ namespace bczhc {
 
             [[nodiscard]] int bindNull(int row) const;
 
-            void release() const;
+            int release() const;
         };
 
     private:
