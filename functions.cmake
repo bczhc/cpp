@@ -35,7 +35,7 @@ function(confLib)
             string.cpp
             utils.cpp
             file.cpp
-            base128/Base128Lib.cpp
+            app/base128/Base128Lib.cpp
             utf8.cpp
             number_parser.cpp
     )

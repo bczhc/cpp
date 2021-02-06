@@ -23,19 +23,21 @@ namespace bczhc {
         public:
             sqlite3_stmt *stmt;
 
-            int step() const;
+            [[nodiscard]] int step() const;
 
             int status{};
 
             Statement(sqlite3_stmt *stmt, int status);
 
-            int reset() const;
+            Statement(const Sqlite3::Statement &stat);
 
-            int bind(int row, int a) const;
+            [[nodiscard]] int reset() const;
 
-            int bind(int row, int64_t a) const;
+            [[nodiscard]] int bind(int row, int32_t a) const;
 
-            int bind(int row, double a) const;
+            [[nodiscard]] int bind(int row, int64_t a) const;
+
+            [[nodiscard]] int bind(int row, double a) const;
 
             int bindText(int row, const char *s) const;
 
@@ -43,7 +45,9 @@ namespace bczhc {
 
             int bindBlob(int row, const char *bytes, int size) const;
 
-            int bindNull(int row) const;
+            [[nodiscard]] int bindNull(int row) const;
+
+            void release() const;
         };
 
     private:

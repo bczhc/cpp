@@ -60,7 +60,7 @@ int bczhc::Sqlite3::Statement::step() const {
 
 bczhc::Sqlite3::Statement::Statement(sqlite3_stmt *stmt, int status) : stmt(stmt), status(status) {}
 
-int bczhc::Sqlite3::Statement::bind(int row, int i) const {
+int bczhc::Sqlite3::Statement::bind(int row, int32_t i) const {
     return sqlite3_bind_int(stmt, row, i);
 }
 
@@ -90,4 +90,13 @@ int bczhc::Sqlite3::Statement::bindBlob(int row, const char *bytes, int size) co
 
 int bczhc::Sqlite3::Statement::bindText(int row, const char *s, int size) const {
     return sqlite3_bind_text(stmt, row, s, size, SQLITE_STATIC);
+}
+
+void bczhc::Sqlite3::Statement::release() const {
+    sqlite3_finalize(this->stmt);
+}
+
+bczhc::Sqlite3::Statement::Statement(const bczhc::Sqlite3::Statement &stat) {
+    this->stmt = stat.stmt;
+    this->status = stat.status;
 }

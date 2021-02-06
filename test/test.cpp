@@ -37,21 +37,17 @@ using namespace bczhc::array;
 using namespace symboltable;
 
 int main() {
-    class CB : public FourierSeriesCallback {
-    public:
-        void callback(double n, double re, double im) override {
-            cout << String::toString(n).getCString() << ' ' << String::toString(re).getCString() << ' ' << String::toString(im).getCString() << endl;
-        }
-    } cb;
-
-    class F : public ComplexFunctionInterface {
-    public:
-        void x(ComplexValue &dest, double t) override {
-            dest.setValue(sin(t), cos(t) * sin(t));
-        }
-    } f;
-
-    FourierSeries fd(f, 100, 100);
-    fd.calc(cb, 100000, 10);
+    Sqlite3 db;
+    db.open("/home/zhc/code/cpp/test/a.db");
+    db.exec("CREATE TABLE IF NOT EXISTS a\n(\n    a,\n    b,\n    c\n)");
+    Sqlite3::Statement statement = db.compileStatement("INSERT INTO a\nVALUES (?,?,?)");
+    for (int i = 0; i < 50; ++i) {
+        statement.reset();
+         String string1 = String::toString(i);
+        statement.bindText(1, string1.getCString());
+        statement.bind(2, i);
+        statement.bindNull(3);
+        statement.step();
+    }
     return 0;
 }

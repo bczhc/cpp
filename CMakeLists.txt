@@ -45,7 +45,7 @@ add_executable(
 )
 add_executable(echo_and_write app/echoAndWrite.cpp)
 add_executable(shuffle_string app/shuffleString.cpp)
-add_executable(bases128 app/base128.cpp)
+add_executable(bases128 app/base128/base128.cpp)
 add_executable(stdin_size app/stdinSize.cpp)
 if (UNIX)
     add_executable(
