@@ -13,8 +13,8 @@
 #include <sys/select.h>
 #include <cerrno>
 #include "../../utils.hpp"
+#include "../../def.h"
 
-using uchar = uint8_t;
 using namespace bczhc::array;
 
 namespace bczhc::serial {

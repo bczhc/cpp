@@ -26,6 +26,7 @@ add_executable(print_unicode_characters app/printUnicodeCharacters.cpp)
 add_executable(
         demoCpp
         demo/demo.cpp
+        third_party/crypto-algorithms/sha256.c
 )
 add_executable(fourier_seriesTest demo/fourierSeriesTest.cpp)
 add_executable(sqlite3_to_JSON demo/sqlite3ToJSON.cpp)
@@ -56,7 +57,7 @@ if (UNIX)
     )
 endif ()
 
-add_executable(demoC demo/demo.c demo/api.cpp)
+add_executable(demoC demo/demo.c demo/api.cpp third_party/crypto-algorithms/base64.c)
 add_executable(
         test
         test/test.cpp

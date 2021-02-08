@@ -7,3 +7,6 @@
 [submodule "third_party/practice"]
 	path = third_party/practice
 	url = https://hub.fastgit.org/bczhc/practice.git
+[submodule "third_party/crypto-algorithms"]
+	path = third_party/crypto-algorithms
+	url = https://hub.fastgit.org/lcn2/crypto-algorithms

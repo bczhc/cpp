@@ -4,23 +4,23 @@
 
 #include "Base128Lib.h"
 
-void bczhc::base128::encode7bytes(char *dest, const char *src) {
-    dest[0] = (char) ((src[0] & 255) >> 1);
-    dest[1] = (char) (((src[0] & 1) << 6) | ((src[1] & 255) >> 2));
-    dest[2] = (char) (((src[1] & 3) << 5) | ((src[2] & 255) >> 3));
-    dest[3] = (char) (((src[2] & 7) << 4) | ((src[3] & 255) >> 4));
-    dest[4] = (char) (((src[3] & 15) << 3) | ((src[4] & 255) >> 5));
-    dest[5] = (char) (((src[4] & 31) << 2) | ((src[5] & 255) >> 6));
-    dest[6] = (char) (((src[5] & 63) << 1) | ((src[6] & 255) >> 7));
-    dest[7] = (char) (src[6] & 127);
+void bczhc::base128::encode7bytes(uchar *dest, const uchar *src) {
+    dest[0] = ((src[0] & 255U) >> 1U);
+    dest[1] = (((src[0] & 1U) << 6U) | ((src[1] & 255U) >> 2U));
+    dest[2] = (((src[1] & 3U) << 5U) | ((src[2] & 255U) >> 3U));
+    dest[3] = (((src[2] & 7U) << 4U) | ((src[3] & 255U) >> 4U));
+    dest[4] = (((src[3] & 15U) << 3U) | ((src[4] & 255U) >> 5U));
+    dest[5] = (((src[4] & 31U) << 2U) | ((src[5] & 255U) >> 6U));
+    dest[6] = (((src[5] & 63U) << 1U) | ((src[6] & 255U) >> 7U));
+    dest[7] = (src[6] & 127U);
 }
 
-void bczhc::base128::decode8bytes(char *dest, const char *src) {
-    dest[0] = (char) (((src[0] & 255) << 1) | ((src[1] & 255) >> 6));
-    dest[1] = (char) (((src[1] & 255) << 2) | ((src[2] & 255) >> 5));
-    dest[2] = (char) (((src[2] & 255) << 3) | ((src[3] & 255) >> 4));
-    dest[3] = (char) (((src[3] & 255) << 4) | ((src[4] & 255) >> 3));
-    dest[4] = (char) (((src[4] & 255) << 5) | ((src[5] & 255) >> 2));
-    dest[5] = (char) (((src[5] & 255) << 6) | ((src[6] & 255) >> 1));
-    dest[6] = (char) (((src[6] & 255) << 7) | (src[7] & 255));
+void bczhc::base128::decode8bytes(uchar *dest, const uchar *src) {
+    dest[0] = (((src[0] & 255U) << 1U) | ((src[1] & 255U) >> 6U));
+    dest[1] = (((src[1] & 255U) << 2U) | ((src[2] & 255U) >> 5U));
+    dest[2] = (((src[2] & 255U) << 3U) | ((src[3] & 255U) >> 4U));
+    dest[3] = (((src[3] & 255U) << 4U) | ((src[4] & 255U) >> 3U));
+    dest[4] = (((src[4] & 255U) << 5U) | ((src[5] & 255U) >> 2U));
+    dest[5] = (((src[5] & 255U) << 6U) | ((src[6] & 255U) >> 1U));
+    dest[6] = (((src[6] & 255U) << 7U) | (src[7] & 255U));
 }

@@ -88,15 +88,27 @@ namespace bczhc::array {
         }
 
         [[nodiscard]] String toString() const {
-            return Array<T>::toString(this->elements, this->len);
+            return Array<T>::toString(this->elements, this->len, 10);
         }
 
-        [[nodiscard]] static String toString(T *arr, size_t size) {
+        [[nodiscard]] String toString(int radix) const {
+            return Array<T>::toString(this->elements, this->len, radix);
+        }
+
+        [[nodiscard]] String toString(int radix, const char *separator) const {
+            return Array<T>::toString(this->elements, this->len, radix, separator);
+        }
+
+        [[nodiscard]] static String toString(T *arr, size_t size, int radix) {
+            return toString(arr, size, radix, ", ");
+        }
+
+        [[nodiscard]] static String toString(T *arr, size_t size, int radix, const char *separator) {
             String msg = "[";
             for (int i = 0; i < size; ++i) {
-                msg += String::toString(arr[i]);
+                msg += String::toString(arr[i], radix);
                 if (i != size - 1) {
-                    msg += ", ";
+                    msg += separator;
                 }
             }
             msg += ']';

@@ -17,10 +17,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     InputStream in(stdin);
     OutputStream out(stdout);
 
-    char inBuf[bufferSize];
-    char outBuf[outBufferSize];
+    uchar inBuf[bufferSize];
+    uchar outBuf[outBufferSize];
     int read;
-    while ((read = in.read(inBuf, bufferSize)) > 0) {
+    while ((read = in.read((char *) inBuf, bufferSize)) > 0) {
         int times = read / 7;
         int left = read % 7;
         int i = 0;
@@ -32,7 +32,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
             encode7bytes(outBuf + i * 8, inBuf + i * 7);
             ++i;
         }
-        out.write(outBuf, i * 8);
+        out.write((char *) outBuf, i * 8);
     }
 
     in.close();
