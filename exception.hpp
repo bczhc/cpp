@@ -32,7 +32,7 @@ namespace bczhc {
 
         ~Exception() noexcept override = default;
 
-        [[nodiscard]] const char *what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override {
+        [[nodiscard]] const char *what() const noexcept override {
             return msg.getCString();
         }
 
