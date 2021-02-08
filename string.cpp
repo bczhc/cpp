@@ -54,17 +54,26 @@ size_t String::length() const {
     return stringSize;
 }
 
-void String::newData(const char *s, size_t size) {
-    stringSize = size, dataSize = stringSize + 1;
+void String::newData(const char *s, size_t strSize, size_t capacity) {
+    if (capacity < strSize + 1) throw String("illegal capacity");
+    stringSize = strSize, dataSize = capacity;
     data = new char[dataSize];
-    for (size_t i = 0; i < size; ++i) data[i] = s[i];
-    data[size] = '\0';
+    for (size_t i = 0; i < strSize; ++i) data[i] = s[i];
+    data[strSize] = '\0';
 }
 
-void String::fromCharsString(const char *s, size_t size) {
+void String::newData(const char *s, size_t size) {
+    newData(s, size, size + 1);
+}
+
+void String::fromCharsString(const char *s, size_t strSize) {
+    fromCharsString(s, strSize, strSize + 1);
+}
+
+void String::fromCharsString(const char *s, size_t strSize, ssize_t capacity) {
     release();
     deleteCount = new int(0);
-    newData(s, size);
+    newData(s, strSize, capacity);
 }
 
 
@@ -131,15 +140,15 @@ String &String::append(char c) {
     return *this;
 }
 
-ssize_t String::indexOf(char c) {
+ssize_t String::indexOf(char c) const {
     return String::indexOf(data, c);
 }
 
-ssize_t String::indexOf(const char *s) {
+ssize_t String::indexOf(const char *s) const {
     return String::indexOf(data, s);
 }
 
-ssize_t String::indexOf(const String &string) {
+ssize_t String::indexOf(const String &string) const {
     return indexOf(string.data);
 }
 
@@ -200,25 +209,11 @@ String::~String() {
 }
 
 String String::toString(int32_t a) {
-    if (a == 0) return "0";
-    String s;
-    int32_t x = a;
-    while (x != 0) {
-        s.insert(0, (char) (x % 10 + 48));
-        x /= 10;
-    }
-    return s;
+    return utils::Integer::toString(a);
 }
 
 String String::toString(int64_t a) {
-    if (a == 0) return "0";
-    String s;
-    int64_t x = a;
-    while (x != 0) {
-        s.append((char) (x % 10 + 48));
-        x /= 10;
-    }
-    return s;
+    return utils::Long::toString(a);
 }
 
 String String::toString(float a) {
@@ -260,7 +255,7 @@ String &String::insert(size_t index, const String &string) {
     return *this;
 }
 
-String String::toString(int32_t i, int radix) {
+String String::toString(int32_t i, int32_t radix) {
     if (radix < 2 || radix > 36)
         radix = 10;
 
@@ -278,10 +273,10 @@ String String::toString(int32_t i, int radix) {
     }
 
     while (i <= -radix) {
-        buf[charPos--] = digits[-(i % radix)];
+        buf[charPos--] = utils::Integer::digits[-(i % radix)];
         i = i / radix;
     }
-    buf[charPos] = digits[-i];
+    buf[charPos] = utils::Integer::digits[-i];
 
     if (negative) {
         buf[--charPos] = '-';
@@ -290,7 +285,7 @@ String String::toString(int32_t i, int radix) {
     return String(buf + charPos, (33 - charPos));
 }
 
-String String::toString(int64_t i, int radix) {
+String String::toString(int64_t i, int32_t radix) {
     if (radix < 2 || radix > 36)
         radix = 10;
     if (radix == 10)
@@ -304,10 +299,10 @@ String String::toString(int64_t i, int radix) {
     }
 
     while (i <= -radix) {
-        buf[charPos--] = digits[(int32_t) (-(i % radix))];
+        buf[charPos--] = utils::Integer::digits[(int32_t) (-(i % radix))];
         i = i / radix;
     }
-    buf[charPos] = digits[(int32_t) (-i)];
+    buf[charPos] = utils::Integer::digits[(int32_t) (-i)];
 
     if (negative) {
         buf[--charPos] = '-';
@@ -323,9 +318,7 @@ String String::toString(char c) {
 }
 
 String::String(size_t capacity) {
-    stringSize = 0, dataSize = capacity + 1;
-    data = new char[dataSize];
-    data[0] = '\0';
+    fromCharsString(nullptr, 0, capacity);
 }
 
 void String::clear() {

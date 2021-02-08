@@ -26,11 +26,11 @@ static EchoCallback *echo;
 
 class Logging {
 public:
-    inline static int CRITICAL = 50;
-    inline static int INFO = 20;
-    inline static int DEBUG = 10;
+    constexpr static int CRITICAL = 50;
+    constexpr static int INFO = 20;
+    constexpr static int DEBUG = 10;
 
-    inline static int combination[] = {CRITICAL, INFO, DEBUG};
+    constexpr static int combination[] = {CRITICAL, INFO, DEBUG};
 
     int mLevel;
 
@@ -149,7 +149,7 @@ Array<unsigned char> hex2bytes(const String &hexString) {
     Array<unsigned char> dat(len);
     for (int j = 0; j < len; ++j) {
         const String &s = hexString.substr(j * 2, 2);
-        dat[j] = (unsigned char) parseInt(s, 16);
+        dat[j] = (unsigned char) Integer::parseInt(s, 16);
     }
     return dat;
 }

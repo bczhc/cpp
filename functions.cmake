@@ -37,7 +37,7 @@ function(confLib)
             file.cpp
             app/base128/Base128Lib.cpp
             utf8.cpp
-            number_parser.cpp
+            exception.cpp
     )
 
     #sqlite3

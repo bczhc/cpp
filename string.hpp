@@ -1,5 +1,5 @@
-#ifndef BCZHC_STRING_H
-#define BCZHC_STRING_H
+#ifndef BCZHC_STRING_HPP
+#define BCZHC_STRING_HPP
 
 #include "./third_party/practice/LinearList.hpp"
 #include <cctype>
@@ -13,23 +13,19 @@
 using namespace bczhc::linearlist;
 
 namespace bczhc::string {
-    static char digits[] = {
-            '0', '1', '2', '3', '4', '5',
-            '6', '7', '8', '9', 'a', 'b',
-            'c', 'd', 'e', 'f', 'g', 'h',
-            'i', 'j', 'k', 'l', 'm', 'n',
-            'o', 'p', 'q', 'r', 's', 't',
-            'u', 'v', 'w', 'x', 'y', 'z'};
-
     class String {
     private:
         char *data = nullptr;
         size_t stringSize = 0, dataSize = 0;
         bool mIsNull = false;
 
+        void newData(const char *s, size_t strSize, size_t capacity);
+
         void newData(const char *s, size_t size);
 
         void fromCharsString(const char *s, size_t size);
+
+        void fromCharsString(const char *s, size_t strSize, ssize_t capacity);
 
         void resize(size_t newStringLength);
 
@@ -67,15 +63,15 @@ namespace bczhc::string {
 
         String &append(const char *s, size_t size);
 
-        ssize_t indexOf(char c);
+        ssize_t indexOf(char c) const;
 
-        ssize_t indexOf(const char *s);
+        ssize_t indexOf(const char *s) const ;
 
-        ssize_t indexOf(const String &string);
+        ssize_t indexOf(const String &string) const ;
 
-        static ssize_t indexOf(const char *s, char c);
+        static ssize_t indexOf(const char *s, char c) ;
 
-        static ssize_t indexOf(const char *haystack, const char *needle);
+        static ssize_t indexOf(const char *haystack, const char *needle) ;
 
         [[nodiscard]] SequentialList<String> split(const String &separator) const;
 
@@ -148,4 +144,4 @@ namespace bczhc::string {
         char &operator[](size_t index);
     };
 }// namespace bczhc
-#endif//BCZHC_STRING_H
+#endif//BCZHC_STRING_HPP

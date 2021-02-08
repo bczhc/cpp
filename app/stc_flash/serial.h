@@ -20,11 +20,11 @@ using namespace bczhc::array;
 namespace bczhc::serial {
     class Serial {
     public:
-        static inline char PARITY_NONE = 'N';
-        static inline char PARITY_EVEN = 'E';
-        static inline char PARITY_ODD = 'O';
-        static inline char PARITY_MARK = 'M';
-        static inline char PARITY_SPACE = 'S';
+        constexpr static char PARITY_NONE = 'N';
+        constexpr static char PARITY_EVEN = 'E';
+        constexpr static char PARITY_ODD = 'O';
+        constexpr static char PARITY_MARK = 'M';
+        constexpr static char PARITY_SPACE = 'S';
 
         virtual void setSpeed(unsigned int speed) = 0;
 

@@ -18,9 +18,9 @@ namespace bczhc::file {
         String path;
     public:
 #ifdef _WIN32
-        static inline char separator = '\\';
+        constexpr static char separator = '\\';
 #else
-        static inline char separator = '/';
+        constexpr static char separator = '/';
 #endif
 
         explicit File(const char *path);

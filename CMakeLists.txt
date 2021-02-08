@@ -24,20 +24,20 @@ add_executable(
 )
 add_executable(print_unicode_characters app/printUnicodeCharacters.cpp)
 add_executable(
-        testCpp
-        test/test.cpp
+        demoCpp
+        demo/demo.cpp
 )
-add_executable(fourier_seriesTest test/fourierSeriesTest.cpp)
-add_executable(sqlite3_to_JSON test/sqlite3ToJSON.cpp)
+add_executable(fourier_seriesTest demo/fourierSeriesTest.cpp)
+add_executable(sqlite3_to_JSON demo/sqlite3ToJSON.cpp)
 add_executable(snake app/snake.cpp)
-add_executable(sqlite_test test/sqliteTest.cpp)
+add_executable(sqlite_test demo/sqliteTest.cpp)
 add_executable(
         characters_statistics
         app/charactersStatistics/charactersStatistics.cpp
         app/charactersStatistics/CountCharacters.cpp
 )
-add_executable(thread test/thread.cpp)
-add_executable(producer_and_consumer test/producerAndConsumerTest.cpp)
+add_executable(thread demo/thread.cpp)
+add_executable(producer_and_consumer demo/producerAndConsumerTest.cpp)
 add_executable(
         reverse
         app/characterReverser/reverse.cpp
@@ -56,6 +56,11 @@ if (UNIX)
     )
 endif ()
 
-add_executable(testC test/test.c test/api.cpp)
+add_executable(demoC demo/demo.c demo/api.cpp)
+add_executable(
+        test
+        test/test.cpp
+        test/string.cpp
+)
 
 add_compile_definitions("${MACRO_DEFINITIONS}")
