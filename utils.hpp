@@ -2,8 +2,8 @@
 // Created by zhc on 11/21/20.
 //
 
-#ifndef CPP_UTILS_HPP
-#define CPP_UTILS_HPP
+#ifndef BCZHC_UTILS_HPP
+#define BCZHC_UTILS_HPP
 
 #include <cstdint>
 #include <sys/time.h> // NOLINT(modernize-deprecated-headers)
@@ -250,4 +250,4 @@ namespace bczhc {
     };
 }
 
-#endif //CPP_UTILS_HPP
+#endif //BCZHC_UTILS_HPP

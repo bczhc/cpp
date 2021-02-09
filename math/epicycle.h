@@ -2,8 +2,8 @@
 // Created by root on 2020/4/2.
 //
 
-#ifndef CPP_EPICYCLE_H
-#define CPP_EPICYCLE_H
+#ifndef BCZHC_EPICYCLE_H
+#define BCZHC_EPICYCLE_H
 
 #include "./complex_value.h"
 
@@ -21,4 +21,4 @@ namespace bczhc {
 
 }// namespace bczhc
 
-#endif// CPP_EPICYCLE_H
+#endif// BCZHC_EPICYCLE_H

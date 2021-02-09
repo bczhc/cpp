@@ -2,8 +2,8 @@
 // Created by root on 2020/8/23.
 //
 
-#ifndef CPP_COUNTCHARACTERS_H
-#define CPP_COUNTCHARACTERS_H
+#ifndef BCZHC_COUNTCHARACTERS_H
+#define BCZHC_COUNTCHARACTERS_H
 
 #include "../../third_party/json-single-header/single_include/nlohmann/json.hpp"
 #include "../../third_party/sqlite3-single-c/sqlite3.h"
@@ -33,4 +33,4 @@ namespace bczhc {
     };
 }// namespace bczhc
 
-#endif// CPP_COUNTCHARACTERS_H
+#endif// BCZHC_COUNTCHARACTERS_H

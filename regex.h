@@ -2,8 +2,8 @@
 // Created by zhc on 12/26/20.
 //
 
-#ifndef CPP_REGEX_H
-#define CPP_REGEX_H
+#ifndef BCZHC_REGEX_H
+#define BCZHC_REGEX_H
 
 #ifdef CMAKE_PCRE_FOUND
 #include "utils.hpp"
@@ -29,4 +29,4 @@ namespace bczhc::regex {
 
 #endif //CMAKE_PCRE_FOUND
 
-#endif //CPP_REGEX_H
+#endif //BCZHC_REGEX_H

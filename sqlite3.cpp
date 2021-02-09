@@ -25,16 +25,15 @@ int Sqlite3::exec(const char *cmd, Sqlite3::SqliteCallback &callback, void *arg)
 Sqlite3::~Sqlite3() {
     if (!closed && db != nullptr) {
         close();
+        closed = true;
     }
 }
 
-Sqlite3 Sqlite3::open(const char *path) {
-    Sqlite3 db;
-    int status = sqlite3_open(path, &db.db);
+Sqlite3::Sqlite3(const char *path) {
+    int status = sqlite3_open(path, &this->db);
     if (status != SQLITE_OK) {
         throw SqliteException("open failed", status);
     }
-    return db;
 }
 
 Sqlite3::Statement Sqlite3::compileStatement(const char *sql) const {

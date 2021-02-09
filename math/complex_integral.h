@@ -2,8 +2,8 @@
 // Created by root on 2020/4/2.
 //
 
-#ifndef CPP_COMPLEX_INTEGRAL_H
-#define CPP_COMPLEX_INTEGRAL_H
+#ifndef BCZHC_COMPLEX_INTEGRAL_H
+#define BCZHC_COMPLEX_INTEGRAL_H
 
 #include "fourier_series.h"
 
@@ -19,4 +19,4 @@ namespace bczhc {
     };
 }// namespace bczhc
 
-#endif// CPP_COMPLEX_INTEGRAL_H
+#endif// BCZHC_COMPLEX_INTEGRAL_H

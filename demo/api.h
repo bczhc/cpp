@@ -2,8 +2,8 @@
 // Created by zhc on 2/5/21.
 //
 
-#ifndef CPP_API_H
-#define CPP_API_H
+#ifndef BCZHC_API_H
+#define BCZHC_API_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,4 +13,4 @@ extern "C" {
 }
 #endif
 
-#endif //CPP_API_H
+#endif //BCZHC_API_H

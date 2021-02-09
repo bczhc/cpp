@@ -67,14 +67,11 @@ namespace bczhc {
         }
 
         bool closed = false;
-    private:
-        Sqlite3() = default;
-
     public:
         sqlite3 *db = nullptr;
         char *errMsg = nullptr;
 
-        static Sqlite3 open(const char *path);
+        Sqlite3(const char *path);
 
         int close();
 

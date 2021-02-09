@@ -5,7 +5,7 @@ include(./functions.cmake)
 setCompiler()
 setFlags()
 
-project(cpp)
+project(bczhc_cpp)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)

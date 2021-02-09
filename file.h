@@ -2,8 +2,8 @@
 // Created by zhc on 11/21/20.
 //
 
-#ifndef CPP_FILE_H
-#define CPP_FILE_H
+#ifndef BCZHC_FILE_H
+#define BCZHC_FILE_H
 
 #include "./string.hpp"
 #include "string.hpp"
@@ -50,4 +50,4 @@ namespace bczhc {
     };
 }
 
-#endif //CPP_FILE_H
+#endif //BCZHC_FILE_H

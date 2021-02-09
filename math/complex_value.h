@@ -2,8 +2,8 @@
 // Created by root on 2020/4/2.
 //
 
-#ifndef CPP_COMPLEX_VALUE_H
-#define CPP_COMPLEX_VALUE_H
+#ifndef BCZHC_COMPLEX_VALUE_H
+#define BCZHC_COMPLEX_VALUE_H
 
 #include <cmath>
 #include <cstdint>
@@ -72,4 +72,4 @@ namespace bczhc {
         virtual void x(ComplexValue &dest, double t) = 0;
     };
 }// namespace bczhc
-#endif// CPP_COMPLEX_VALUE_H
+#endif// BCZHC_COMPLEX_VALUE_H
