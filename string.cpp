@@ -436,3 +436,15 @@ ssize_t String::firstIndexOf(char c) const {
     }
     return -1;
 }
+
+String bczhc::operator+(const char *s, const String &o) {
+    return String(s) + o;
+}
+
+bool bczhc::operator==(const char *s, const String &o) {
+    return o == s;
+}
+
+bool bczhc::operator!=(const char *s, const String &o) {
+    return o != s;
+}

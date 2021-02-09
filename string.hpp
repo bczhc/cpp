@@ -142,6 +142,12 @@ namespace bczhc {
         [[nodiscard]] ssize_t firstIndexOf(char c) const;
 
         char &operator[](size_t index);
+
+        friend String operator+(const char *s, const String &o);
+
+        friend bool operator==(const char *s, const String &o);
+
+        friend bool operator!=(const char *s, const String &o);
     };
 }
 #endif//BCZHC_STRING_HPP
