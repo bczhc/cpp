@@ -9,40 +9,24 @@
 #include <cassert>
 #include "../app/base128/Base128Lib.h"
 #include "../sqlite3.hpp"
-#include "../third_party/json-single-header/single_include/nlohmann/json.hpp"
-
-extern "C" {
-#include "../third_party/crypto-algorithms/sha256.h"
-}
 
 using namespace std;
 using namespace bczhc;
-using JSON = nlohmann::json;
-
-class A {
-public:
-    A() {
-        cout << "constructing..." << endl;
-    }
-
-    ~A() {
-        cout << "destructing..." << endl;
-    }
-
-    A(const A &a) {
-        cout << "copying..." << endl;
-    }
-};
-
-A f(A a) {
-    return a;
-}
 
 int main() {
-    A a;
+    Sqlite3 db("/home/zhc/private-repo/diary.db");
+    auto stmt = db.compileStatement("SELECT * FROM diary");
+    auto dateIndex = stmt.getIndexByColumnName("date");
+    auto contentIndex = stmt.getIndexByColumnName("content");
+    cout << dateIndex << ' ' << contentIndex << endl;
+    auto c = stmt.getCursor();
+    while (c.step()) {
+        int d = c.getInt(dateIndex);
+        auto s = String(c.getText(contentIndex), 21);
+        cout << d << ' ' << s.getCString() << endl;
+    }
 
-    String s;
-    cout << ("" == s) << endl;
-    cout << ("" != s) << endl;
+    stmt.release();
+    db.close();
     return 0;
 }

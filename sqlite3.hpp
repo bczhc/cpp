@@ -20,6 +20,30 @@ namespace bczhc {
             virtual int callback(void *arg, int colNum, char **content, char **colName) = 0;
         };
 
+        class Statement;
+
+        class Cursor {
+        private:
+            Statement &stmt;
+
+        public:
+            explicit Cursor(Sqlite3::Statement &stmt);
+
+            void reset() const;
+
+            bool step() const;
+
+            int32_t getInt(int column) const;
+
+            int64_t getLong(int column) const;
+
+            double getDouble(int column) const;
+
+            const char *getText(int column) const;
+
+            const uchar *const getBlob(int column) const;
+        };
+
         class Statement {
         public:
             sqlite3_stmt *stmt;
@@ -47,6 +71,28 @@ namespace bczhc {
             void bindNull(int row) const;
 
             void release() const;
+
+            int stepRow() const;
+
+            void clearBinding() const;
+
+            Cursor getCursor() {
+                Cursor c(*this);
+                return c;
+            }
+
+            /**
+             *
+             * @param c column name
+             * @return index, the leftmost value is 0
+             */
+            int getIndexByColumnName(const char *c) {
+                int size = sqlite3_column_count(this->stmt);
+                for (int i = 0; i < size; ++i) {
+                    if (String::equal(c, sqlite3_column_name(this->stmt, i))) return i;
+                }
+                throw SqliteException("not found column by name", -1);
+            }
         };
 
     private:

@@ -119,3 +119,43 @@ void Sqlite3::Statement::release() const {
 Sqlite3::Statement::Statement(const Sqlite3::Statement &stat) {
     this->stmt = stat.stmt;
 }
+
+int Sqlite3::Statement::stepRow() const {
+    return sqlite3_step(this->stmt);
+}
+
+void Sqlite3::Statement::clearBinding() const {
+    int status = sqlite3_clear_bindings(this->stmt);
+    if (status != SQLITE_OK) throw SqliteException("clearing failed", status);
+}
+
+bool Sqlite3::Cursor::step() const {
+    return stmt.stepRow() == SQLITE_ROW;
+}
+
+void Sqlite3::Cursor::reset() const {
+    stmt.reset();
+}
+
+Sqlite3::Cursor::Cursor(Sqlite3::Statement &stmt): stmt(stmt) {
+}
+
+const uchar *const Sqlite3::Cursor::getBlob(int column) const {
+    return (const uchar *) sqlite3_column_blob(stmt.stmt, column);
+}
+
+const char *Sqlite3::Cursor::getText(int column) const {
+    return (const char *) sqlite3_column_text(stmt.stmt, column);
+}
+
+double Sqlite3::Cursor::getDouble(int column) const {
+    return sqlite3_column_double(stmt.stmt, column);
+}
+
+int64_t Sqlite3::Cursor::getLong(int column) const {
+    return sqlite3_column_int64(stmt.stmt, column);
+}
+
+int32_t Sqlite3::Cursor::getInt(int column) const {
+    return sqlite3_column_int(stmt.stmt, column);
+}
