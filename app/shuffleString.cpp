@@ -1,15 +1,10 @@
 #include "../string.hpp"
-#include "../third_party/practice/LinearList.hpp"
 #include <iostream>
 #include "../io.h"
 #include <sys/time.h>
 
 using namespace std;
 using namespace bczhc;
-using namespace linearlist;
-using namespace string;
-using namespace utf8;
-using namespace io;
 
 #define RANDOM(a, b) (((double) rand() / RAND_MAX) * ((b) - (a)) + (a))
 
@@ -24,15 +19,15 @@ int main() {
     is.close();
     const char *s = str.getCString();
 
-    timeval t;
+    timeval t{};
     gettimeofday(&t, nullptr);
     srand(t.tv_sec * 1000 + t.tv_usec / 1000);
     using List = LinkedList<int>;
     List list;
-    SolvedUTF8Properties solved;
+    SolvedUTF8Properties solved{};
     int i = 0;
     while (s[i] != '\0') {
-        solveUTF8Bytes(solved, s + i);
+        solveUTF8Bytes(solved, (uchar *) (s + i));
         i += solved.bytesLength;
         list.insert(solved.codepoint);
     }

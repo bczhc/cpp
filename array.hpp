@@ -6,10 +6,11 @@
 #define BCZHC_ARRAY_ARRAY_HPP
 
 #include "./string.hpp"
+#include "string.hpp"
 
-using namespace bczhc::string;
+using namespace bczhc;
 
-namespace bczhc::array {
+namespace bczhc {
     template<typename T>
     class Array {
     private:

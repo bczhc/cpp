@@ -4,9 +4,7 @@
 #include <unistd.h>
 
 using namespace bczhc;
-using namespace concurrent;
 using Condetion = MutexLock::Condition;
-using namespace linearlist;
 
 class Message {
 public:
@@ -51,7 +49,7 @@ int main() {
     } r;
     Thread t(&r);
     for (int i = 0; i < 10; ++i) {
-        Message msg;
+        Message msg{};
         msg.a = i;
         q.put(msg);
     }

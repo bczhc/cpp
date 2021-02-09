@@ -5,7 +5,7 @@
 
 using namespace bczhc;
 
-int utf8::getUTF8Size(int codepoint) {
+int bczhc::getUTF8Size(uint32_t codepoint) {
     if (codepoint >= 0x0 && codepoint <= 0x7f) {
         return 1;
     } else if (codepoint >= 0x80 && codepoint <= 0x7ff) {
@@ -18,26 +18,26 @@ int utf8::getUTF8Size(int codepoint) {
     return 0;
 }
 
-int utf8::unicode2UTF8(char *dest, int codepoint) {
-    int utf8Size = utf8::getUTF8Size(codepoint);
+int bczhc::unicode2UTF8(char *dest, uint32_t codepoint) {
+    int utf8Size = bczhc::getUTF8Size(codepoint);
     switch (utf8Size) {
         case 1:
-            dest[0] = codepoint & 0b01111111;
+            dest[0] = (uchar) (codepoint & 0b01111111U);
             break;
         case 2:
-            dest[1] = 0b10000000 | (codepoint & 0b00111111);
-            dest[0] = 0b11000000 | ((codepoint >> 6) & 0b00111111);
+            dest[1] = (uchar) (0b10000000U | (codepoint & 0b00111111U));
+            dest[0] = (uchar) (0b11000000U | ((codepoint >> 6U) & 0b00111111U));
             break;
         case 3:
-            dest[2] = 0b10000000 | (codepoint & 0b00111111);
-            dest[1] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
-            dest[0] = 0b11100000 | ((codepoint >> 12) & 0b00111111);
+            dest[2] = (uchar) (0b10000000U | (codepoint & 0b00111111U));
+            dest[1] = (uchar) (0b10000000U | ((codepoint >> 6U) & 0b00111111U));
+            dest[0] = (uchar) (0b11100000U | ((codepoint >> 12U) & 0b00111111U));
             break;
         case 4:
-            dest[3] = 0b10000000 | (codepoint & 0b00111111);
-            dest[2] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
-            dest[1] = 0b10000000 | ((codepoint >> 12) & 0b00111111);
-            dest[0] = 0b11110000 | ((codepoint >> 18) & 0b00111111);
+            dest[3] = (uchar) (0b10000000U | (codepoint & 0b00111111U));
+            dest[2] = (uchar) (0b10000000U | ((codepoint >> 6U) & 0b00111111U));
+            dest[1] = (uchar) (0b10000000U | ((codepoint >> 12U) & 0b00111111U));
+            dest[0] = (uchar) (0b11110000U | ((codepoint >> 18U) & 0b00111111U));
             break;
         default:
             break;
@@ -45,38 +45,38 @@ int utf8::unicode2UTF8(char *dest, int codepoint) {
     return utf8Size;
 }
 
-int bczhc::utf8::getUTF8BytesLength(const unsigned char firstByte) {
-    if (firstByte >> 7 == 0)
+int bczhc::getUTF8BytesLength(const uchar firstByte) {
+    if (firstByte >> 7U == 0)
         return 1;
-    if (firstByte >> 5 == 0b110)
+    if (firstByte >> 5U == 0b110)
         return 2;
-    if (firstByte >> 4 == 0b1110)
+    if (firstByte >> 4U == 0b1110)
         return 3;
-    if (firstByte >> 3 == 0b11110)
+    if (firstByte >> 3U == 0b11110)
         return 4;
     return 0;
 }
 
-void bczhc::utf8::solveUTF8Bytes(utf8::SolvedUTF8Properties &solvedProperties,
-                                 const char *bytes) {
-    solvedProperties.bytesLength = utf8::getUTF8BytesLength(bytes[0]);
+void bczhc::solveUTF8Bytes(SolvedUTF8Properties &solvedProperties, const uchar *bytes) {
+    solvedProperties.bytesLength = getUTF8BytesLength(bytes[0]);
     switch (solvedProperties.bytesLength) {
         case 1:
-            solvedProperties.codepoint = bytes[0] & 0b01111111;
+            solvedProperties.codepoint = (int) (bytes[0] & 0b01111111U);
             break;
         case 2:
-            solvedProperties.codepoint =
-                    (bytes[1] & 0b00111111) | ((bytes[0] & 0b00011111) << 6);
+            solvedProperties.codepoint = (int) ((bytes[1] & 0b00111111U)
+                                                | ((bytes[0] & 0b00011111U) << 6U));
             break;
         case 3:
-            solvedProperties.codepoint = (bytes[2] & 0b00111111) |
-                                         ((bytes[1] & 0b00111111) << 6) |
-                                         ((bytes[0] & 0b00001111) << 12);
+            solvedProperties.codepoint = (int) ((bytes[2] & 0b00111111U)
+                                                | ((bytes[1] & 0b00111111U) << 6U)
+                                                | ((bytes[0] & 0b00001111U) << 12U));
             break;
         case 4:
-            solvedProperties.codepoint =
-                    (bytes[3] & 0b00111111) | ((bytes[2] & 0b00111111) << 6) |
-                    ((bytes[1] & 0b00111111) << 12) | ((bytes[0] & 0b00000111) << 18);
+            solvedProperties.codepoint = (int) ((bytes[3] & 0b00111111U)
+                                                | ((bytes[2] & 0b00111111U) << 6U)
+                                                | ((bytes[1] & 0b00111111U) << 12U)
+                                                | ((bytes[0] & 0b00000111U) << 18U));
             break;
         default:
             break;

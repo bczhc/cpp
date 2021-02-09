@@ -5,6 +5,8 @@
 #ifndef BCZHC_DEF_H
 #define BCZHC_DEF_H
 
+#include <cstdint>
+
 #ifndef BCZHC_DEF_1
 typedef uint8_t uchar;
 #endif

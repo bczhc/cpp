@@ -3,6 +3,7 @@
 //
 
 #include "regex.h"
+#include "string.hpp"
 
 using namespace regex;
 

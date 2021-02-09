@@ -6,6 +6,7 @@
 #define BCZHC_EXCEPTION_HPP
 
 #include <exception>
+#include "string.hpp"
 
 #ifndef BCZHC_STRING_HPP
 
@@ -13,7 +14,7 @@
 
 #endif
 
-using namespace bczhc::string;
+using namespace bczhc;
 
 namespace bczhc {
     class Exception : public std::exception {
@@ -69,6 +70,13 @@ namespace bczhc {
         explicit IndexOutOfBoundsException(const String &msg);
 
         IndexOutOfBoundsException();
+    };
+
+    class SqliteException : public Exception {
+    public:
+        int returnCode;
+        SqliteException(const char *msg, int returnCode);
+        explicit SqliteException(int returnCode) : returnCode(returnCode) {}
     };
 }
 

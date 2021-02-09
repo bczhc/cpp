@@ -24,7 +24,7 @@ int bczhc::CharacterCounter::countCharacters(const char *u8Bytes,
     int offset = 0;
     SolvedUTF8Properties solvedProperties{};
     while (offset < size) {
-        solveUTF8Bytes(solvedProperties, u8Bytes + offset);
+        solveUTF8Bytes(solvedProperties, (uchar *) (u8Bytes + offset));
         int codepoint = solvedProperties.codepoint;
         offset += solvedProperties.bytesLength;
         if (data->find(codepoint) == data->end()) {

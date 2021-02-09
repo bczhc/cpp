@@ -11,23 +11,26 @@
 #include "./string.hpp"
 #include <cmath>
 #include "./exception.hpp"
+#include "string.hpp"
 
 #define ARR_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
-using namespace bczhc::string;
+using namespace bczhc;
 
-namespace bczhc::utils {
+namespace bczhc {
+    enum Endianness {
+        BIG, LITTLE
+    };
+
+    int min(int a, int b);
+
+    int pow(int base, int exponent);
+
     template<typename T>
     class Result {
         int status = 0;
         T r;
     };
-
-    int64_t getCurrentTimeMillis();
-
-    int min(int a, int b);
-
-    int pow(int base, int exponent);
 
     int8_t lsl(int8_t x, uint8_t n);
 
@@ -44,12 +47,6 @@ namespace bczhc::utils {
     int32_t lsr(int32_t x, uint32_t n);
 
     int64_t lsr(int64_t x, uint64_t n);
-
-    enum Endianness {
-        BIG, LITTLE
-    };
-
-    Endianness getEndianness();
 
     class Character {
     private:
@@ -73,6 +70,10 @@ namespace bczhc::utils {
         static constexpr int32_t MIN_RADIX = 2;
         static constexpr int32_t MAX_RADIX = 36;
     };
+
+    Endianness getEndianness();
+
+    int64_t getCurrentTimeMillis();
 
     class Integer {
     public:
@@ -125,12 +126,12 @@ namespace bczhc::utils {
         static String toString(int32_t i);
 
         /**
-         *
-         * @param s string
-         * @param radix radix
-         * @return result
-         * @throw NumberFormatException
-         */
+        *
+        * @param s string
+        * @param radix radix
+        * @return result
+        * @throw NumberFormatException
+        */
         static int32_t javaParseInt(const String &s, int32_t radix);
 
         static int32_t javaParseInt(const String &s);;
@@ -158,35 +159,35 @@ namespace bczhc::utils {
         static String toString(int64_t i);
 
         /**
-         *
-         * @param s string
-         * @param radix radix
-         * @return result
-         * @throw NumberFormatException
-         */
+        *
+        * @param s string
+        * @param radix radix
+        * @return result
+        * @throw NumberFormatException
+        */
         static int64_t javaParseLong(const String &s, int32_t radix);
 
         static int64_t javaParseLong(const String &s);
 
         /**
-         *
-         * @param s s
-         * @param beginIndex i
-         * @param endIndex i
-         * @param radix radix
-         * @return r
-         * @throw NullPointerException
-         * @throw IndexOutOfBoundsException
-         * @throw NumberFormatException
-         */
+        *
+        * @param s s
+        * @param beginIndex i
+        * @param endIndex i
+        * @param radix radix
+        * @return r
+        * @throw NullPointerException
+        * @throw IndexOutOfBoundsException
+        * @throw NumberFormatException
+        */
         static int64_t javaParseLong(const String &s, int32_t beginIndex, int32_t endIndex, int32_t radix);
 
         /**
-         *
-         * @param s string
-         * @param radix radix
-         * @return NumberFormatException
-         */
+        *
+        * @param s string
+        * @param radix radix
+        * @return NumberFormatException
+        */
         static int64_t javaParseUnsignedLong(const String &s, int32_t radix);
 
         static int64_t javaParseUnsignedLong(const String &s);
@@ -209,7 +210,7 @@ namespace bczhc::utils {
         static constexpr uint32_t EXP_SHIFT = 23;
         static constexpr uint32_t MANTISSA_SHIFT = 0;
 
-//    private:
+        //    private:
         static String toBinaryString(uint32_t a) {
             // 0b101010101010010101
             String r(32);

@@ -9,7 +9,7 @@
 #include <cstdint>
 #include "../string.hpp"
 
-using namespace bczhc::string;
+using namespace bczhc;
 
 namespace bczhc {
     class ComplexValue {

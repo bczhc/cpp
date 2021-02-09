@@ -3,64 +3,9 @@
 //
 
 #include "utils.hpp"
+#include "string.hpp"
 
-int64_t bczhc::utils::getCurrentTimeMillis() {
-    timeval t{};
-    gettimeofday(&t, nullptr);
-    return t.tv_sec * 1000 + t.tv_usec / 1000;
-}
-
-int bczhc::utils::min(int a, int b) {
-    return a < b ? a : b;
-}
-
-int bczhc::utils::pow(int base, int exponent) {
-    int r = 1;
-    for (int i = 0; i < exponent; ++i) {
-        r *= base;
-    }
-    return r;
-}
-
-int8_t bczhc::utils::lsl(int8_t x, uint8_t n) {
-    return (int8_t) (((uint8_t) x) << n);
-}
-
-int8_t bczhc::utils::lsr(int8_t x, uint8_t n) {
-    return (int8_t) (((uint8_t) x) >> n);
-}
-
-int16_t bczhc::utils::lsl(int16_t x, uint16_t n) {
-    return (int16_t) (((uint16_t) x) << n);
-}
-
-int16_t bczhc::utils::lsr(int16_t x, uint16_t n) {
-    return (int16_t) (((uint16_t) x) >> n);
-}
-
-int64_t bczhc::utils::lsl(int64_t x, uint64_t n) {
-    return (int64_t) (((uint64_t) x) << n);
-}
-
-int32_t bczhc::utils::lsl(int32_t x, uint32_t n) {
-    return (int32_t) (((uint32_t) x) << n);
-}
-
-int32_t bczhc::utils::lsr(int32_t x, uint32_t n) {
-    return (int32_t) (((uint32_t) x) >> n);
-}
-
-int64_t bczhc::utils::lsr(int64_t x, uint64_t n) {
-    return (int64_t) (((uint64_t) x) >> n);
-}
-
-bczhc::utils::Endianness bczhc::utils::getEndianness() {
-    int16_t a = 0x0102;
-    if (*((int8_t *) &a) == 0x02) return Endianness::LITTLE;
-    return Endianness::BIG;
-}
-
-int32_t bczhc::utils::Long::stringSize(int64_t x) {
+int32_t Long::stringSize(int64_t x) {
     int64_t p = 10;
     for (int32_t i = 1; i < 19; i++) {
         if (x < p) return i;
@@ -69,7 +14,7 @@ int32_t bczhc::utils::Long::stringSize(int64_t x) {
     return 19;
 }
 
-void bczhc::utils::Long::getChars(int64_t i, int32_t index, char *buf) {
+void Long::getChars(int64_t i, int32_t index, char *buf) {
     int64_t q;
     int32_t r;
     int32_t charPos = index;
@@ -116,7 +61,7 @@ void bczhc::utils::Long::getChars(int64_t i, int32_t index, char *buf) {
     }
 }
 
-String bczhc::utils::Long::toString(int64_t i) {
+String Long::toString(int64_t i) {
     if (i == MIN_VALUE) return "-9223372036854775808";
     int32_t size = (i < 0) ? stringSize(-i) + 1 : stringSize(i);
     char buf[size];
@@ -124,7 +69,7 @@ String bczhc::utils::Long::toString(int64_t i) {
     return String(buf, size);
 }
 
-int64_t bczhc::utils::Long::javaParseLong(const String &s, int radix) {
+int64_t Long::javaParseLong(const String &s, int radix) {
     if (s.isNull()) throw NumberFormatException("null");
     
     if (radix > 36 || radix < 2) throw NumberFormatException("illegal radix");
@@ -168,15 +113,15 @@ int64_t bczhc::utils::Long::javaParseLong(const String &s, int radix) {
     }
 }
 
-int64_t bczhc::utils::Long::javaParseLong(const String &s) {
+int64_t Long::javaParseLong(const String &s) {
     return javaParseLong(s, 10);
 }
 
-int64_t bczhc::utils::Long::javaParseUnsignedLong(const String &s) {
+int64_t Long::javaParseUnsignedLong(const String &s) {
     return javaParseUnsignedLong(s, 10);
 }
 
-int64_t bczhc::utils::Long::javaParseUnsignedLong(const String &s, int32_t radix) {
+int64_t Long::javaParseUnsignedLong(const String &s, int32_t radix) {
     if (s.isNull()) throw NumberFormatException("null");
 
     int32_t len = s.length();
@@ -264,7 +209,7 @@ int64_t bczhc::utils::Long::javaParseUnsignedLong(const String &s, int32_t radix
     }
 }
 
-int64_t bczhc::utils::Long::javaParseLong(const String &s, int32_t beginIndex, int32_t endIndex, int32_t radix) {
+int64_t Long::javaParseLong(const String &s, int32_t beginIndex, int32_t endIndex, int32_t radix) {
     if (s.isNull()) throw NullPointerException();
     if (beginIndex < 0 || beginIndex > endIndex || endIndex > s.length()) {
         throw IndexOutOfBoundsException();
@@ -312,17 +257,17 @@ int64_t bczhc::utils::Long::javaParseLong(const String &s, int32_t beginIndex, i
     }
 }
 
-int64_t bczhc::utils::Long::parseLong(const String &s, int32_t radix) {
+int64_t Long::parseLong(const String &s, int32_t radix) {
     //for negative binary
     if (radix == 2) return javaParseUnsignedLong(s, 2);
     return javaParseUnsignedLong(s, radix);
 }
 
-int64_t bczhc::utils::Long::parseLong(const String &s) {
+int64_t Long::parseLong(const String &s) {
     return parseLong(s, 10);
 }
 
-int32_t bczhc::utils::Integer::javaParseUnsignedInt(const String &s, int32_t radix) {
+int32_t Integer::javaParseUnsignedInt(const String &s, int32_t radix) {
     if (s.isNull()) throw NumberFormatException("null");
     int32_t len = s.length();
     if (len > 0) {
@@ -353,7 +298,7 @@ int32_t bczhc::utils::Integer::javaParseUnsignedInt(const String &s, int32_t rad
     }
 }
 
-int32_t bczhc::utils::Integer::javaParseInt(const String &s, int32_t radix) {
+int32_t Integer::javaParseInt(const String &s, int32_t radix) {
     if (s.isNull()) throw NumberFormatException("null");
     if (radix > 36 || radix < 2) throw NumberFormatException("illegal radix");
     bool negative = false;
@@ -395,7 +340,7 @@ int32_t bczhc::utils::Integer::javaParseInt(const String &s, int32_t radix) {
     }
 }
 
-String bczhc::utils::Integer::toString(int32_t i) {
+String Integer::toString(int32_t i) {
     if (i == MIN_VALUE) return "-2147483648";
     int32_t size = (i < 0) ? stringSize(-i) + 1 : stringSize(i);
     char buf[size];
@@ -403,7 +348,7 @@ String bczhc::utils::Integer::toString(int32_t i) {
     return String(buf, size);
 }
 
-void bczhc::utils::Integer::getChars(int32_t i, int32_t index, char *buf) {
+void Integer::getChars(int32_t i, int32_t index, char *buf) {
     int32_t q, r;
     int32_t charPos = index;
     char sign = 0;
@@ -437,32 +382,89 @@ void bczhc::utils::Integer::getChars(int32_t i, int32_t index, char *buf) {
     }
 }
 
-int32_t bczhc::utils::Integer::stringSize(int32_t x) {
+int32_t Integer::stringSize(int32_t x) {
     for (int32_t i = 0;; i++)
         if (x <= sizeTable[i])
             return i + 1;
 }
 
-int32_t bczhc::utils::Integer::javaParseUnsignedInt(const String &s) {
+int32_t Integer::javaParseUnsignedInt(const String &s) {
     return javaParseUnsignedInt(s, 10);
 }
 
-int32_t bczhc::utils::Integer::javaParseInt(const String &s) {
+int32_t Integer::javaParseInt(const String &s) {
     return javaParseInt(s, 10);
 }
 
-int32_t bczhc::utils::Integer::parseInt(const String &s, int32_t radix) {
+int32_t Integer::parseInt(const String &s, int32_t radix) {
     // for negative binary
     if (radix == 2) return javaParseUnsignedInt(s, 2);
     return javaParseInt(s, radix);
 }
 
-int32_t bczhc::utils::Integer::parseInt(const String &s) {
+int32_t Integer::parseInt(const String &s) {
     return parseInt(s, 10);
 }
 
-int32_t bczhc::utils::Character::digit(int32_t ch, int32_t radix) {
+int32_t Character::digit(int32_t ch, int32_t radix) {
     int value = DIGITS[ch];
     return (value >= 0 && value < radix && radix >= 2
             && radix <= 36) ? value : -1;
 }
+
+int8_t bczhc::lsl(int8_t x, uint8_t n) {
+    return (int8_t) (((uint8_t) x) << n);
+}
+
+int8_t bczhc::lsr(int8_t x, uint8_t n) {
+    return (int8_t) (((uint8_t) x) >> n);
+}
+
+int16_t bczhc::lsl(int16_t x, uint16_t n) {
+    return (int16_t) (((uint16_t) x) << n);
+}
+
+int16_t bczhc::lsr(int16_t x, uint16_t n) {
+    return (int16_t) (((uint16_t) x) >> n);
+}
+
+int64_t bczhc::lsl(int64_t x, uint64_t n) {
+    return (int64_t) (((uint64_t) x) << n);
+}
+
+int32_t bczhc::lsl(int32_t x, uint32_t n) {
+    return (int32_t) (((uint32_t) x) << n);
+}
+
+int32_t bczhc::lsr(int32_t x, uint32_t n) {
+    return (int32_t) (((uint32_t) x) >> n);
+}
+
+int64_t bczhc::lsr(int64_t x, uint64_t n) {
+    return (int64_t) (((uint64_t) x) >> n);
+}
+
+int bczhc::min(int a, int b) {
+    return a < b ? a : b;
+}
+
+int bczhc::pow(int base, int exponent) {
+    int r = 1;
+    for (int i = 0; i < exponent; ++i) {
+        r *= base;
+    }
+    return r;
+}
+
+int64_t bczhc::getCurrentTimeMillis() {
+    timeval t{};
+    gettimeofday(&t, nullptr);
+    return t.tv_sec * 1000 + t.tv_usec / 1000;
+}
+
+Endianness bczhc::getEndianness() {
+    int16_t a = 0x0102;
+    if (*((int8_t *) &a) == 0x02) return Endianness::LITTLE;
+    return Endianness::BIG;
+}
+

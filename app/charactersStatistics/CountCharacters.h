@@ -14,7 +14,7 @@
 
 using namespace std;
 using json = nlohmann::json;
-using namespace bczhc::utf8;
+using namespace bczhc;
 
 namespace bczhc {
     class CharacterCounter {

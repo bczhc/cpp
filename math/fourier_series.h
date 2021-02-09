@@ -11,7 +11,6 @@
 #include "../third_party/practice/LinearList.hpp"
 
 using namespace bczhc;
-using namespace linearlist;
 
 namespace bczhc {
     class FourierSeriesCallback {

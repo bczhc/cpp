@@ -6,13 +6,13 @@
 #define CPP_FILE_H
 
 #include "./string.hpp"
+#include "string.hpp"
 #include <cstdint>
 #include <cstdio>
 
 using namespace bczhc;
-using namespace string;
 
-namespace bczhc::file {
+namespace bczhc {
     class File {
     private:
         String path;

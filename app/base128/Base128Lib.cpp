@@ -4,7 +4,7 @@
 
 #include "Base128Lib.h"
 
-void bczhc::base128::encode7bytes(uchar *dest, const uchar *src) {
+void bczhc::encode7bytes(uchar *dest, const uchar *src) {
     dest[0] = ((src[0] & 255U) >> 1U);
     dest[1] = (((src[0] & 1U) << 6U) | ((src[1] & 255U) >> 2U));
     dest[2] = (((src[1] & 3U) << 5U) | ((src[2] & 255U) >> 3U));
@@ -15,7 +15,7 @@ void bczhc::base128::encode7bytes(uchar *dest, const uchar *src) {
     dest[7] = (src[6] & 127U);
 }
 
-void bczhc::base128::decode8bytes(uchar *dest, const uchar *src) {
+void bczhc::decode8bytes(uchar *dest, const uchar *src) {
     dest[0] = (((src[0] & 255U) << 1U) | ((src[1] & 255U) >> 6U));
     dest[1] = (((src[1] & 255U) << 2U) | ((src[2] & 255U) >> 5U));
     dest[2] = (((src[2] & 255U) << 3U) | ((src[3] & 255U) >> 4U));

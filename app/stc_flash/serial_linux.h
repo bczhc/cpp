@@ -7,7 +7,7 @@
 
 #include "serial.h"
 
-namespace bczhc::serial {
+namespace bczhc {
     class SerialLinux : public Serial {
     private:
         int fd{};
@@ -21,6 +21,7 @@ namespace bczhc::serial {
         [[nodiscard]] bool waitReadable(uint32_t timeoutMillis) const;
 
         void setFlags() const;
+
     public:
         SerialLinux(int fd, uint32_t baud, uint32_t timeout);
 

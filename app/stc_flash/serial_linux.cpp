@@ -4,10 +4,9 @@
 
 #include "serial_linux.h"
 
-using namespace bczhc::string;
-using namespace bczhc::utils;
+using namespace bczhc;
 
-timespec bczhc::serial::SerialLinux::timespec_from_ms(const uint32_t millis) {
+timespec SerialLinux::timespec_from_ms(const uint32_t millis) {
     timespec time{};
     time.tv_sec = millis / 1e3;
     time.tv_nsec = (millis - (time.tv_sec * 1e3)) * 1e6;
@@ -15,7 +14,7 @@ timespec bczhc::serial::SerialLinux::timespec_from_ms(const uint32_t millis) {
 }
 
 
-bool bczhc::serial::SerialLinux::waitReadable(uint32_t timeoutMillis) const {
+bool SerialLinux::waitReadable(uint32_t timeoutMillis) const {
     // Setup a select call to block for serial data or a timeout
     fd_set readfds;
     FD_ZERO(&readfds);
@@ -44,7 +43,7 @@ bool bczhc::serial::SerialLinux::waitReadable(uint32_t timeoutMillis) const {
     return true;
 }
 
-void bczhc::serial::SerialLinux::setFlags() const {
+void SerialLinux::setFlags() const {
     termios options{};
     tcgetattr(fd, &options);
     // set up raw mode / no echo / binary
@@ -64,12 +63,12 @@ void bczhc::serial::SerialLinux::setFlags() const {
 }
 
 
-bczhc::serial::SerialLinux::SerialLinux(int fd, uint32_t baud, uint32_t timeout) : fd(fd), baud(baud), timeout(timeout) {
+SerialLinux::SerialLinux(int fd, uint32_t baud, uint32_t timeout) : fd(fd), baud(baud), timeout(timeout) {
     setSpeed(baud), setTimeout(timeout);
     setFlags();
 }
 
-bczhc::serial::SerialLinux::SerialLinux(const char *port, uint32_t baud, uint32_t timeout) {
+SerialLinux::SerialLinux(const char *port, uint32_t baud, uint32_t timeout) {
     this->portName = port;
     int o = ::open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (o == -1) throw String("Open port failed.");
@@ -79,7 +78,7 @@ bczhc::serial::SerialLinux::SerialLinux(const char *port, uint32_t baud, uint32_
     setFlags();
 }
 
-void bczhc::serial::SerialLinux::setSpeed(unsigned int speed) {
+void SerialLinux::setSpeed(unsigned int speed) {
     uint32_t rate = 0;
     switch (speed) {
 #ifdef B0
@@ -285,11 +284,11 @@ void bczhc::serial::SerialLinux::setSpeed(unsigned int speed) {
     this->baud = speed;
 }
 
-void bczhc::serial::SerialLinux::close() const {
+void SerialLinux::close() const {
     if (::close(this->fd) != 0) throw String("Close failed.");
 }
 
-Array<uchar> bczhc::serial::SerialLinux::read(ssize_t size) const {
+Array<uchar> SerialLinux::read(ssize_t size) const {
     int64_t start = getCurrentTimeMillis();
     char buf[size];
     ssize_t haveRead = 0;
@@ -317,36 +316,36 @@ Array<uchar> bczhc::serial::SerialLinux::read(ssize_t size) const {
     return r;
 }
 
-ssize_t bczhc::serial::SerialLinux::write(uchar *buf, ssize_t size) const {
+ssize_t SerialLinux::write(uchar *buf, ssize_t size) const {
     ssize_t i = ::write(this->fd, buf, size);
     if (i == -1) throw String("write error");
     return i;
 }
 
-unsigned int bczhc::serial::SerialLinux::getBaud() const {
+unsigned int SerialLinux::getBaud() const {
     return this->baud;
 }
 
-void bczhc::serial::SerialLinux::flush() const {
+void SerialLinux::flush() const {
     if (tcflush(this->fd, TCIOFLUSH)) throw String("flush error");
 }
 
-void bczhc::serial::SerialLinux::setTimeout(uint32_t t) {
+void SerialLinux::setTimeout(uint32_t t) {
     this->timeout = t;
 }
 
-void bczhc::serial::SerialLinux::setParity(char p) {
+void SerialLinux::setParity(char p) {
     this->parity = p;
 }
 
-char bczhc::serial::SerialLinux::getParity() const {
+char SerialLinux::getParity() const {
     return this->parity;
 }
 
-uint32_t bczhc::serial::SerialLinux::getTimeout() const {
+uint32_t SerialLinux::getTimeout() const {
     return this->timeout;
 }
 
-String bczhc::serial::SerialLinux::getPortName() const {
+String SerialLinux::getPortName() const {
     return this->portName;
 }

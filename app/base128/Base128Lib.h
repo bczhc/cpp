@@ -7,7 +7,7 @@
 
 using uchar = unsigned char;
 
-namespace bczhc::base128 {
+namespace bczhc {
     void encode7bytes(uchar *dest, const uchar src[7]);
 
     void decode8bytes(uchar *dest, const uchar src[8]);

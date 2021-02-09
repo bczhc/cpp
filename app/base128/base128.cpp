@@ -6,8 +6,6 @@
 #include "../base128/Base128Lib.h"
 
 using namespace bczhc;
-using namespace io;
-using namespace base128;
 
 static int bufferSize = 7168; //7 * 1024
 

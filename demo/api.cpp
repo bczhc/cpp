@@ -5,7 +5,7 @@
 #include "api.h"
 #include "../string.hpp"
 
-using namespace bczhc::string;
+using namespace bczhc;
 
 void toString(char **dst, int i) {
     String s = String::toString(i);

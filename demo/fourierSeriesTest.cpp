@@ -2,7 +2,6 @@
 #include <iostream>
 
 using namespace bczhc;
-using namespace concurrent;
 using namespace std;
 
 int main() {

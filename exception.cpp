@@ -3,6 +3,7 @@
 //
 
 #include "./exception.hpp"
+#include "string.hpp"
 
 bczhc::NumberFormatException bczhc::NumberFormatException::forInputString(const String &s) {
     return NumberFormatException(String("For input string: \"") + s + "\"");
@@ -31,3 +32,5 @@ bczhc::IndexOutOfBoundsException::IndexOutOfBoundsException(const char *msg) : E
 bczhc::IndexOutOfBoundsException::IndexOutOfBoundsException(const String &msg) : Exception(msg) {}
 
 bczhc::IndexOutOfBoundsException::IndexOutOfBoundsException() = default;
+
+bczhc::SqliteException::SqliteException(const char *msg, int returnCode) : Exception(msg), returnCode(returnCode) {}

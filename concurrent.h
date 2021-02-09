@@ -13,9 +13,8 @@
 #endif
 
 using namespace bczhc;
-using namespace linearlist;
 
-namespace bczhc::concurrent {
+namespace bczhc {
     class MutexLock {
     public:
         class Condition {
@@ -24,7 +23,7 @@ namespace bczhc::concurrent {
             pthread_mutex_t &mutex;
 
         public:
-            Condition(MutexLock &mutexLock) : mutex(mutexLock.mutexLock){};
+            explicit Condition(MutexLock &mutexLock) : mutex(mutexLock.mutexLock) {};
 
             ~Condition();
 
@@ -60,7 +59,7 @@ namespace bczhc::concurrent {
         MutexLock lock;
 
     public:
-        CountDownLatch(int count) : count(count) {}
+        explicit CountDownLatch(int count) : count(count) {}
 
         CountDownLatch();
 
@@ -79,7 +78,7 @@ namespace bczhc::concurrent {
         MutexLock lock;
 
     public:
-        LongWaitCountDownLatch(int count);
+        explicit LongWaitCountDownLatch(int count);
 
         void countDown();
 
@@ -107,7 +106,7 @@ namespace bczhc::concurrent {
 
         void unlatchAndNotify();
 
-        bool isLatched() const;
+        [[nodiscard]] bool isLatched() const;
     };
 
     class Runnable {
@@ -120,8 +119,6 @@ namespace bczhc::concurrent {
     public:
         virtual void accept(ArgType &arg) = 0;
     };
-
-    void *call(void *arg);
 
     template<typename T>
     struct Bean {
@@ -146,8 +143,10 @@ namespace bczhc::concurrent {
     private:
         pthread_t t{};
 
+        static void *call(void *arg);
+
     public:
-        Thread(Runnable *runnable);
+        explicit Thread(Runnable *runnable);
 
         void join() const;
 
@@ -182,10 +181,11 @@ namespace bczhc::concurrent {
                 Queue<Runnable *> &runnables;
                 MutexLock &lock;
                 bool &interrupted;
-                concurrent::LongWaitCountDownLatch *&waitAllLatch;
+                bczhc::LongWaitCountDownLatch *&waitAllLatch;
 
             public:
-                CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock, bool &interrupted, concurrent::LongWaitCountDownLatch *&waitAllLatch);
+                CoreThreadRunnable(Queue<Runnable *> &runnables, MutexLock &lock, bool &interrupted,
+                                   bczhc::LongWaitCountDownLatch *&waitAllLatch);
 
                 void run() override;
             };
@@ -196,10 +196,10 @@ namespace bczhc::concurrent {
             Thread **coreThreads;
             CoreThreadRunnable *coreThreadRunnable;
             bool interrupted = false;
-            concurrent::LongWaitCountDownLatch *waitAllLatch;
+            bczhc::LongWaitCountDownLatch *waitAllLatch;
 
         public:
-            FixedThreadPool(int poolSize);
+            explicit FixedThreadPool(int poolSize);
 
             ~FixedThreadPool() override;
 
@@ -214,6 +214,6 @@ namespace bczhc::concurrent {
 
         static ThreadPool *newFixedThreadPool(int poolSize);
     };
-}// namespace bczhc::concurrent
+}// namespace bczhc
 
 #endif// BCZHC_CONCURRENT_H

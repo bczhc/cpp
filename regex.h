@@ -12,9 +12,6 @@
 #include <pcre.h>
 
 using namespace bczhc;
-using namespace utils;
-using namespace linearlist;
-using namespace string;
 
 namespace bczhc::regex {
     using ResultList = LinkedList<String>;

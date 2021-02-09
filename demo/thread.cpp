@@ -3,7 +3,6 @@
 #include <cstdio>
 
 using namespace bczhc;
-using namespace concurrent;
 
 int main() {
     class R : public Runnable {

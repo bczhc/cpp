@@ -7,7 +7,7 @@
 #include "serial_linux.h"
 
 using namespace std;
-using namespace bczhc::serial;
+using namespace bczhc;
 
 String getPort() {
     String platform;

@@ -4,8 +4,6 @@
 #include "utils.hpp"
 
 using namespace bczhc;
-using namespace string;
-using namespace utf8;
 
 String::String() {
     fromCharsString(nullptr, 0);
@@ -209,11 +207,11 @@ String::~String() {
 }
 
 String String::toString(int32_t a) {
-    return utils::Integer::toString(a);
+    return Integer::toString(a);
 }
 
 String String::toString(int64_t a) {
-    return utils::Long::toString(a);
+    return Long::toString(a);
 }
 
 String String::toString(float a) {
@@ -273,10 +271,10 @@ String String::toString(int32_t i, int32_t radix) {
     }
 
     while (i <= -radix) {
-        buf[charPos--] = utils::Integer::digits[-(i % radix)];
+        buf[charPos--] = Integer::digits[-(i % radix)];
         i = i / radix;
     }
-    buf[charPos] = utils::Integer::digits[-i];
+    buf[charPos] = Integer::digits[-i];
 
     if (negative) {
         buf[--charPos] = '-';
@@ -299,10 +297,10 @@ String String::toString(int64_t i, int32_t radix) {
     }
 
     while (i <= -radix) {
-        buf[charPos--] = utils::Integer::digits[(int32_t) (-(i % radix))];
+        buf[charPos--] = Integer::digits[(int32_t) (-(i % radix))];
         i = i / radix;
     }
-    buf[charPos] = utils::Integer::digits[(int32_t) (-i)];
+    buf[charPos] = Integer::digits[(int32_t) (-i)];
 
     if (negative) {
         buf[--charPos] = '-';

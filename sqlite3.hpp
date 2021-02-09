@@ -8,8 +8,9 @@
 #include "third_party/sqlite3-single-c/sqlite3.h"
 #include <cstdint>
 #include "string.hpp"
+#include "./exception.hpp"
 
-using namespace bczhc::string;
+using namespace bczhc;
 
 namespace bczhc {
     class Sqlite3 {
@@ -47,11 +48,10 @@ namespace bczhc {
 
             [[nodiscard]] int bindNull(int row) const;
 
-            int release() const;
+            [[nodiscard]] int release() const;
         };
 
     private:
-
         class Bean {
         public:
             SqliteCallback &callback;
@@ -67,11 +67,14 @@ namespace bczhc {
         }
 
         bool closed = false;
+    private:
+        Sqlite3() = default;
+
     public:
         sqlite3 *db = nullptr;
         char *errMsg = nullptr;
 
-        int open(const char *path);
+        static Sqlite3 open(const char *path);
 
         int close();
 

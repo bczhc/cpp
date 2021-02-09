@@ -6,9 +6,7 @@
 #include <vector>
 
 using namespace bczhc;
-using namespace io;
 using namespace std;
-using namespace utf8;
 
 inline bool range(int codepoint) {
     if (codepoint >= 0x4e00 && codepoint <= 0x9fff)
@@ -48,7 +46,7 @@ int main(int argc, char **argv) {
     } c(counter);
     solveU8FromStream(stdin, c);
     if (han) {
-        int c = 0;
+        int cc = 0;
         using vec = vector<pair<int, int64_t>>;
         vec *v = counter.getSortVector();
         int len = v->size();
@@ -60,12 +58,12 @@ int main(int argc, char **argv) {
             unicode2UTF8(u8Char, codepoint);
             u8Char[getUTF8Size(codepoint)] = '\0';
             cout << u8Char;
-            ++c;
-            if (c % 25 == 0)
+            ++cc;
+            if (cc % 25 == 0)
                 cout << endl;
         }
         cout << endl
-             << "Total: " << c << endl;
+             << "Total: " << cc << endl;
     } else {
         json *j = counter.getJsonData();
         cout << j->dump() << endl;

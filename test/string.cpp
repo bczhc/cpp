@@ -5,7 +5,7 @@
 #include "test.h"
 #include "../string.hpp"
 
-using namespace bczhc::string;
+using namespace bczhc;
 
 String f1() {
     return String("s3") += '.';

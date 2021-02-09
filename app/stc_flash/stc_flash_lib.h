@@ -22,14 +22,6 @@
 #include "serial.h"
 
 using namespace bczhc;
-using namespace string;
-using namespace file;
-using namespace io;
-using namespace utils;
-using namespace bczhc::array;
-using namespace concurrent;
-using namespace symboltable;
-using namespace bczhc::serial;
 
 namespace bczhc {
     class EchoCallback {
@@ -41,8 +33,5 @@ namespace bczhc {
 
     int run(const String &hexFile, EchoCallback *echoCallback, Serial *serialImpl);
 }
-
-String ucharArr2String(const Array<uchar> &arr);
-
 
 #endif //BCZHC_STC_FLASH_LIB_H

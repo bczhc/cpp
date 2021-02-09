@@ -4,7 +4,7 @@
 #include <iostream>
 
 using namespace std;
-using namespace bczhc::io;
+using namespace bczhc;
 
 static OutputStream *os;
 
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
             os->write(&c, 1);
             os->flush();
         }
-    } catch (String s) {
+    } catch (const String &s) {
         cout << s.getCString() << endl;
         return 1;
     }

@@ -15,9 +15,9 @@
 #include "../../utils.hpp"
 #include "../../def.h"
 
-using namespace bczhc::array;
+using namespace bczhc;
 
-namespace bczhc::serial {
+namespace bczhc {
     class Serial {
     public:
         constexpr static char PARITY_NONE = 'N';
@@ -34,17 +34,17 @@ namespace bczhc::serial {
 
         virtual ssize_t write(uchar *buf, ssize_t size) const = 0;
 
-        [[nodiscard]] virtual unsigned int getBaud() const= 0;
+        [[nodiscard]] virtual unsigned int getBaud() const = 0;
 
-        virtual void flush() const= 0;
+        virtual void flush() const = 0;
 
         virtual void setTimeout(uint32_t t) = 0;
 
         virtual void setParity(char p) = 0;
 
-        [[nodiscard]] virtual char getParity() const= 0;
+        [[nodiscard]] virtual char getParity() const = 0;
 
-        [[nodiscard]] virtual uint32_t getTimeout() const= 0;
+        [[nodiscard]] virtual uint32_t getTimeout() const = 0;
 
         [[nodiscard]] virtual String getPortName() const = 0;
     };

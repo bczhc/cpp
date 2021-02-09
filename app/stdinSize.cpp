@@ -7,7 +7,6 @@
 #include <iostream>
 
 using namespace bczhc;
-using namespace io;
 
 int main() {
     InputStream in(stdin);

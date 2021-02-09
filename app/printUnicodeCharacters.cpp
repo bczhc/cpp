@@ -6,7 +6,6 @@
 
 using json = nlohmann::json;
 using namespace bczhc;
-using namespace utf8;
 using namespace std;
 
 int main(int argc, char **argv) {
@@ -14,7 +13,7 @@ int main(int argc, char **argv) {
     if (argc == 2) end = atoi(argv[1]);
     else if (argc == 3)
         begin = atoi(argv[1]), end = atoi(argv[2]);
-    FILE *f = nullptr;
+    FILE *f;
     if ((f = fopen("./o", "wb")) == nullptr) {
         fprintf(stderr, "Open file error.");
         return 0;

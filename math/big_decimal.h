@@ -3,7 +3,7 @@
 
 #include "../string.hpp"
 
-using namespace bczhc::string;
+using namespace bczhc;
 
 namespace bczhc {
     namespace bigdecimal {

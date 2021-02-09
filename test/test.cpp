@@ -6,7 +6,7 @@
 #include "../string.hpp"
 #include <iostream>
 
-using namespace bczhc::string;
+using namespace bczhc;
 using namespace std;
 
 int main() {

@@ -9,7 +9,6 @@ using namespace std;
 #include <cstring>
 #include <pthread.h>
 #include <sys/time.h>
-#include <termio.h>
 #include <termios.h>
 #include <unistd.h>
 #include <utility>
@@ -43,7 +42,7 @@ private:
     char *map = nullptr;
     char orientation = RIGHT;
     bool gameover = false;
-    bczhc::linearlist::DoublyLinkedList<Point> snake{};
+    bczhc::DoublyLinkedList<Point> snake{};
     int64_t manualMoveTime = 0;
     int delayMillis;
 
@@ -231,7 +230,7 @@ int main(int argc, char **argv) {
     }
     char *filename = path + index;
     typedef pair<char *, char *> param;
-    bczhc::linearlist::LinkedList<param> params;
+    bczhc::LinkedList<param> params;
     bool help = false, invalidArguments = false;
     for (int i = 1; i < argc; ++i) {
         if (cmp2(argv[i], "--help", "-h")) {

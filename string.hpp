@@ -10,9 +10,9 @@
 #include <cstdint>
 #include <sys/types.h>
 
-using namespace bczhc::linearlist;
+using namespace bczhc;
 
-namespace bczhc::string {
+namespace bczhc {
     class String {
     private:
         char *data = nullptr;
@@ -63,15 +63,15 @@ namespace bczhc::string {
 
         String &append(const char *s, size_t size);
 
-        ssize_t indexOf(char c) const;
+        [[nodiscard]] ssize_t indexOf(char c) const;
 
-        ssize_t indexOf(const char *s) const ;
+        ssize_t indexOf(const char *s) const;
 
-        ssize_t indexOf(const String &string) const ;
+        [[nodiscard]] ssize_t indexOf(const String &string) const;
 
-        static ssize_t indexOf(const char *s, char c) ;
+        static ssize_t indexOf(const char *s, char c);
 
-        static ssize_t indexOf(const char *haystack, const char *needle) ;
+        static ssize_t indexOf(const char *haystack, const char *needle);
 
         [[nodiscard]] SequentialList<String> split(const String &separator) const;
 
@@ -143,5 +143,5 @@ namespace bczhc::string {
 
         char &operator[](size_t index);
     };
-}// namespace bczhc
+}
 #endif//BCZHC_STRING_HPP

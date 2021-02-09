@@ -3,7 +3,7 @@
 
 #include "../../string.hpp"
 
-using namespace bczhc::utf8;
+using namespace bczhc;
 
 namespace bczhc {
     void reverseCharacters(char *dest, char *s, int length);

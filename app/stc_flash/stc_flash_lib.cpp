@@ -308,7 +308,7 @@ using SymbolTableTupleBS = SymbolTable<Tuple2B, Tuple2S>;
 // SymbolTable byte-string
 using SymbolTableBS = SymbolTable<uchar, const char *>;
 
-void autoisp(serial::Serial &conn, int baud, NonableString &magic) {
+void autoisp(Serial &conn, int baud, NonableString &magic) {
     if (magic.isNone) return;
     uint32_t bak = conn.getBaud();
     conn.setSpeed(baud);
@@ -354,7 +354,7 @@ SequentialList<T> cutList(SequentialList<T> &list, int start, int end, int step 
 
 class Programmer {
 public:
-    serial::Serial &conn;
+    Serial &conn;
     NonableString &protocol;
     int chkmode = 0;
     double fosc = 0;
@@ -366,12 +366,12 @@ public:
     uint32_t bundrate = 0;
 
 
-    Programmer(serial::Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
+    Programmer(Serial &conn, NonableString &protocol) : conn(conn), protocol(protocol) {
         conn.setTimeout(50);
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-            conn.setParity(serial::Serial::PARITY_EVEN);
+            conn.setParity(Serial::PARITY_EVEN);
         } else
-            conn.setParity(serial::Serial::PARITY_NONE);
+            conn.setParity(Serial::PARITY_NONE);
         this->chkmode = 0;
     }
 
@@ -663,15 +663,15 @@ public:
 
             if (!this->protocol.isNone &&
                 in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
-                this->chkmode = 2, conn.setParity(serial::Serial::PARITY_EVEN);
+                this->chkmode = 2, conn.setParity(Serial::PARITY_EVEN);
             } else {
-                this->chkmode = 1, conn.setParity(serial::Serial::PARITY_NONE);
+                this->chkmode = 1, conn.setParity(Serial::PARITY_NONE);
             }
             if (!this->protocol.isNone) {
                 //del this->info
                 logging.info("Protocol ID: %s\n", this->protocol.val.getCString());
                 logging.info("Checksum mode: %d\n", this->chkmode);
-                logging.info("UART Parity: %s\n", conn.getParity() == serial::Serial::PARITY_EVEN ? "EVEN" : "NONE");
+                logging.info("UART Parity: %s\n", conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
                 for (int i = 0; i < this->info.length(); i += 16) {
                     const Array<uchar> a = cutArray<uchar>(info, i, i + 16);
                     String s = hexStrJoin<uchar>(' ', a);
@@ -1073,7 +1073,7 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
     prog.terminate();
 }
 
-int bczhc::run(const String &hexFile, EchoCallback *echoCallback, serial::Serial *serialImpl) {
+int bczhc::run(const String &hexFile, EchoCallback *echoCallback, Serial *serialImpl) {
     echo = echoCallback;
     struct Opt {
         uint32_t aispbaud = 4800;
@@ -1115,7 +1115,7 @@ int bczhc::run(const String &hexFile, EchoCallback *echoCallback, serial::Serial
     } else
         code.isNone = true;
     echoPrint("Connect to %s at baudrate %d\n", opts.port.getCString(), opts.lowbaud);
-    serial::Serial &conn = *serialImpl;
+    Serial &conn = *serialImpl;
     conn.setSpeed(opts.lowbaud);
     if (!opts.aispmagic.isNone) autoisp(conn, opts.aispbaud, opts.aispmagic);
     Programmer programmer(conn, opts.protocol);

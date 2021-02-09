@@ -3,7 +3,6 @@
 #include <pthread.h>
 
 using namespace bczhc;
-using namespace concurrent;
 
 MutexLock::Condition::~Condition() {
     pthread_cond_destroy(&cond);
@@ -96,7 +95,7 @@ void LongWaitCountDownLatch::interruptAndReset() {
     lock.unlock();
 }
 
-Thread::Thread(Runnable *runnable) { pthread_create(&t, nullptr, call, runnable); }
+Thread::Thread(Runnable *runnable) { pthread_create(&t, nullptr, Thread::call, runnable); }
 
 void Thread::join() const { pthread_join(t, nullptr); }
 
@@ -194,7 +193,7 @@ ThreadPool *Executors::newFixedThreadPool(int poolSize) {
     return new FixedThreadPool(poolSize);
 }
 
-void *bczhc::concurrent::call(void *arg) {
+void * Thread::call(void *arg) {
     auto *runnable = (Runnable *) arg;
     runnable->run();
     return nullptr;

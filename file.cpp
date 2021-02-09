@@ -3,20 +3,21 @@
 //
 
 #include "file.h"
+#include "string.hpp"
 
-bczhc::file::File::File(const char *path) {
+File::File(const char *path) {
     this->path = path;
 }
 
-int file::File::remove() {
+int File::remove() {
     return ::remove(this->path.getCString());
 }
 
-int file::File::move(const char *fileName) {
+int File::move(const char *fileName) {
     return ::remove(fileName);
 }
 
-String file::File::getExtension(const String &path) {
+String File::getExtension(const String &path) {
     int size = path.length();
     String r;
     for (int i = size - 1; i >= 0; --i) {
@@ -29,7 +30,7 @@ String file::File::getExtension(const String &path) {
     return "";
 }
 
-String file::File::getFileName(const String &path) {
+String File::getFileName(const String &path) {
     ssize_t i = path.lastIndexOf(separator);
     return path.substring(i + 1, path.length());
 }
