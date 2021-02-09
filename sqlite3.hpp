@@ -24,31 +24,29 @@ namespace bczhc {
         public:
             sqlite3_stmt *stmt;
 
-            [[nodiscard]] int step() const;
+            void step() const;
 
-            int status{};
-
-            Statement(sqlite3_stmt *stmt, int status);
+            Statement(sqlite3_stmt *stmt);
 
             Statement(const Sqlite3::Statement &stat);
 
-            [[nodiscard]] int reset() const;
+            void reset() const;
 
-            [[nodiscard]] int bind(int row, int32_t a) const;
+            void bind(int row, int32_t a) const;
 
-            [[nodiscard]] int bind(int row, int64_t a) const;
+            void bind(int row, int64_t a) const;
 
-            [[nodiscard]] int bind(int row, double a) const;
+            void bind(int row, double a) const;
 
-            int bindText(int row, const char *s) const;
+            void bindText(int row, const char *s) const;
 
-            int bindText(int row, const char *s, int size) const;
+            void bindText(int row, const char *s, int size) const;
 
-            int bindBlob(int row, const char *bytes, int size) const;
+            void bindBlob(int row, const char *bytes, int size) const;
 
-            [[nodiscard]] int bindNull(int row) const;
+            void bindNull(int row) const;
 
-            [[nodiscard]] int release() const;
+            void release() const;
         };
 
     private:
@@ -73,13 +71,13 @@ namespace bczhc {
 
         Sqlite3(const char *path);
 
-        int close();
+        void close();
 
-        int exec(const char *cmd, SqliteCallback &callback);
+        void exec(const char *cmd, SqliteCallback &callback);
 
-        int exec(const char *cmd);
+        void exec(const char *cmd);
 
-        int exec(const char *cmd, SqliteCallback &callback, void *arg);
+        void exec(const char *cmd, SqliteCallback &callback, void *arg);
 
         bool checkIfCorrupt();
 
