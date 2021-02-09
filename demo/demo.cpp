@@ -21,14 +21,13 @@ using JSON = nlohmann::json;
 
 int main() {
     const char *jsonPath = "/home/zhc/messages.json";
-    const char *outputPath = "/home/zhc/online_class_questions_11_1.db";
+    const char *outputPath = "/home/zhc/online_class_chat_messages_11_1.db";
 
     Sqlite3 db(outputPath);
     db.exec("BEGIN TRANSACTION");
-    db.exec("DROP TABLE IF EXISTS question");
-    db.exec("CREATE TABLE IF NOT EXISTS question (\n    subject_name TEXT NOT NULL,\n    question_owner_name TEXT NOT NULL,\n    question_owner_id INTEGER,\n    question_message TEXT NOT NULL,\n    second_timestamp INTEGER\n)");
-    auto stat = db.compileStatement("INSERT INTO question VALUES(?,?,?,?,?)");
-
+    db.exec("DROP TABLE IF EXISTS message");
+    db.exec("CREATE TABLE IF NOT EXISTS message\n(\n    subject_name     TEXT NOT NULL,\n    sender_id        INTEGER,\n    sender_name      TEXT NOT NULL,\n    text             TEXT NOT NULL,\n    rich_text        TEXT NOT NULL,\n    second_timestamp INTEGER\n)");
+    auto stat = db.compileStatement("INSERT INTO message VALUES(?,?,?,?,?,?)");
 
     InputStream is(jsonPath);
     String read;
@@ -47,21 +46,23 @@ int main() {
         auto courseSize = courses.size();
         for (int j = 0; j < courseSize; ++j) {
             auto course = courses[j];
-            auto questions = course["questions"];
-            auto qSize = questions.size();
-            if (qSize == 0) continue;
-            for (int k = 0; k < qSize; ++k) {
-                auto question = questions[k];
-                auto secondTimestamp = question["secondTimestamp"].get<int>();
-                auto questionText = question["question"].get<string>();
-                auto questionOwnerId = Integer::parseInt(question["questionOwnerId"].get<string>().c_str());
-                auto questionOwner = question["questionOwner"].get<string>();
+            auto chatMessages = course["chatMessages"];
+            auto charMessagesSize = chatMessages.size();
+            for (int k = 0; k < charMessagesSize; ++k) {
+                auto chat = chatMessages[k];
+                auto senderId = Integer::parseInt(chat["senderId"].get<string>().c_str());
+                auto sender = chat["sender"].get<string>();
+                auto text = chat["text"].get<string>();
+                auto richText = chat["richText"].get<string>();
+                auto timestamp = chat["timestamp"].get<int>();
+
                 stat.reset();
                 stat.bindText(1, subjectName.c_str());
-                stat.bindText(2, questionOwner.c_str());
-                stat.bind(3, questionOwnerId);
-                stat.bindText(4, questionText.c_str());
-                stat.bind(5, secondTimestamp);
+                stat.bind(2, senderId);
+                stat.bindText(3, sender.c_str());
+                stat.bindText(4, text.c_str());
+                stat.bindText(5, richText.c_str());
+                stat.bind(6, timestamp);
                 stat.step();
             }
         }
