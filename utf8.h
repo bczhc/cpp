@@ -1,20 +1,20 @@
-#ifndef UTF8_H
-#define UTF8_H
+#ifndef BCZHC_UTF8_H
+#define BCZHC_UTF8_H
+
+#include "def.h"
 
 namespace bczhc {
-    namespace utf8 {
-        struct SolvedUTF8Properties {
-            int bytesLength;
-            int codepoint;
-        };
+    struct SolvedUTF8Properties {
+        int bytesLength;
+        int codepoint;
+    };
 
-        int getUTF8BytesLength(unsigned char firstByte);
+    int getUTF8BytesLength(uchar firstByte);
 
-        void solveUTF8Bytes(SolvedUTF8Properties &solvedProperties, const char *bytes);
+    void solveUTF8Bytes(SolvedUTF8Properties &solvedProperties, const uchar *bytes);
 
-        int getUTF8Size(int codepoint);
+    int getUTF8Size(uint32_t codepoint);
 
-        int unicode2UTF8(char *dest, int codepoint);
-    } // namespace utf8
+    int unicode2UTF8(char *dest, uint32_t codepoint);
 } // namespace bczhc
-#endif // UTF8_H
+#endif // BCZHC_UTF8_H

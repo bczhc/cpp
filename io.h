@@ -1,55 +1,68 @@
 #ifndef BCZHC_IO_H
 #define BCZHC_IO_H
 
-#include "String.h"
-#include "utf8.h"
+#include "string.hpp"
 #include <cstdio>
 
-#define BUFFER_SIZE 8192
+#ifndef BCZHC_IO_BUFFER_SIZE
+#define BCZHC_IO_BUFFER_SIZE 8192
+#endif
 
 using namespace bczhc;
-using namespace utf8;
-using namespace string;
 
 namespace bczhc {
-    namespace io {
+    class U8StringCallback {
+    public:
+        virtual void callback(char *s, int size) = 0;
+    };
 
-        class U8StringCallback {
-        public:
-            virtual void callback(char *s, int size) = 0;
-        };
+    void solveU8FromStream(FILE *f, U8StringCallback &callback);
 
-        void solveU8FromStream(FILE *f, U8StringCallback &callback);
+    class InputStream {
+    private:
+        FILE *fp = nullptr;
+        bool closed = false;
 
-        class InputStream {
-        private:
-            FILE *fp = nullptr;
+    public:
+        explicit InputStream(const String& file);
 
-        public:
-            InputStream(String file);
+        explicit InputStream(FILE *stream);
 
-            InputStream(FILE *stream);
+        ~InputStream();
 
-            int read(char *bytes, int size);
+        int read(char *bytes, int size);
 
-            void close();
-        };
+        void close();
+    };
 
-        class OutputStream {
-        private:
-            FILE *fp = nullptr;
+    class OutputStream {
+    private:
+        FILE *fp = nullptr;
+        bool closed = false;
 
-        public:
-            OutputStream(String file);
+    public:
+        explicit OutputStream(const String& file);
 
-            OutputStream(FILE *stream);
+        explicit OutputStream(FILE *stream);
 
-            int write(const char *bytes, int size);
+        ~OutputStream();
 
-            void flush();
+        int write(const char *bytes, int size);
 
-            void close();
-        };
-    }// namespace io
+        void flush();
+
+        void close();
+    };
+
+    class
+    LineReader {
+    private:
+        InputStream &is;
+
+    public:
+        explicit LineReader(InputStream &in);
+
+        String readLine();
+    };
 }// namespace bczhc
 #endif// BCZHC_IO_H
