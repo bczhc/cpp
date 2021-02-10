@@ -14,15 +14,25 @@ void Sqlite3::exec(const char *cmd, Sqlite3::SqliteCallback &callback) {
     exec(cmd, callback, nullptr);
 }
 
-void Sqlite3::exec(const char *cmd) {
+void Sqlite3::exec(const char *cmd) const {
+    char *errMsg = nullptr;
     int r = sqlite3_exec(db, cmd, nullptr, nullptr, &errMsg);
-    if (r) throw SqliteException("executing failed", r);
+    if (r) {
+        String msg = "executing failed, msg: ";
+        msg += errMsg;
+        throw SqliteException(msg.getCString(), r);
+    }
 }
 
-void Sqlite3::exec(const char *cmd, Sqlite3::SqliteCallback &callback, void *arg) {
+void Sqlite3::exec(const char *cmd, Sqlite3::SqliteCallback &callback, void *arg) const {
+    char *errMsg = nullptr;
     Bean bean(callback, arg);
     int status = sqlite3_exec(db, cmd, callbackFunction, &bean, &errMsg);
-    if (status) throw SqliteException("executing failed", status);
+    if (status) {
+        String msg = "executing failed, msg: ";
+        msg += errMsg;
+        throw SqliteException(msg.getCString(), status);
+    }
 }
 
 Sqlite3::Sqlite3(const char *path) {

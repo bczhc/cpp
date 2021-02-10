@@ -113,7 +113,6 @@ namespace bczhc {
         bool closed = false;
     public:
         sqlite3 *db = nullptr;
-        char *errMsg = nullptr;
 
         Sqlite3(const char *path);
 
@@ -121,9 +120,9 @@ namespace bczhc {
 
         void exec(const char *cmd, SqliteCallback &callback);
 
-        void exec(const char *cmd);
+        void exec(const char *cmd) const;
 
-        void exec(const char *cmd, SqliteCallback &callback, void *arg);
+        void exec(const char *cmd, SqliteCallback &callback, void *arg) const;
 
         bool checkIfCorrupt();
 
