@@ -23,23 +23,17 @@ namespace bczhc {
     public:
         Exception() = default;
 
-        explicit Exception(const char *msg) {
-            this->msg = msg;
-        }
+        explicit Exception(const char *msg);
 
-        explicit Exception(const String &msg) {
-            this->msg = msg;
-        }
+        explicit Exception(const String &msg);
 
         ~Exception() noexcept override = default;
 
-        [[nodiscard]] const char *what() const noexcept override {
-            return msg.getCString();
-        }
+        [[nodiscard]] const char *what() const noexcept override;
 
-        Exception(const Exception &e) {
-            this->msg = e.msg;
-        }
+        Exception &operator=(const Exception &e);
+
+        Exception(const Exception &e);
     };
 
     class NumberFormatException : public Exception {
@@ -75,8 +69,19 @@ namespace bczhc {
     class SqliteException : public Exception {
     public:
         int returnCode;
+
         SqliteException(const char *msg, int returnCode);
+
         explicit SqliteException(int returnCode) : returnCode(returnCode) {}
+    };
+
+    class IOException : public Exception {
+    public:
+        explicit IOException(const char *msg);
+
+        explicit IOException(const String &msg);
+
+        IOException();
     };
 }
 

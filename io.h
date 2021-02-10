@@ -20,38 +20,44 @@ namespace bczhc {
 
     class InputStream {
     private:
-        FILE *fp = nullptr;
         bool closed = false;
 
     public:
+        FILE *fp = nullptr;
+
         explicit InputStream(const String& file);
 
         explicit InputStream(FILE *stream);
 
-        ~InputStream();
-
         int read(char *bytes, int size);
 
         void close();
+
+        InputStream &operator=(const InputStream &a);
+
+        InputStream(const InputStream &a);
     };
 
     class OutputStream {
     private:
-        FILE *fp = nullptr;
         bool closed = false;
 
     public:
+        FILE *fp = nullptr;
+
         explicit OutputStream(const String& file);
 
         explicit OutputStream(FILE *stream);
-
-        ~OutputStream();
 
         int write(const char *bytes, int size);
 
         void flush();
 
         void close();
+
+        OutputStream &operator=(const OutputStream &a);
+
+        OutputStream(const OutputStream &a);
     };
 
     class

@@ -143,11 +143,17 @@ namespace bczhc {
 
         char &operator[](size_t index);
 
-        friend String operator+(const char *s, const String &o);
+        friend String operator+(const char *s, const String &o) {
+            return String(s) + o;
+        }
 
-        friend bool operator==(const char *s, const String &o);
+        friend bool operator==(const char *s, const String &o) {
+            return o == s;
+        }
 
-        friend bool operator!=(const char *s, const String &o);
+        friend bool operator!=(const char *s, const String &o) {
+            return o != s;
+        }
     };
 }
 #endif//BCZHC_STRING_HPP

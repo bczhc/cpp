@@ -4,18 +4,33 @@
 
 using namespace bczhc;
 
-MutexLock::Condition::~Condition() {
+void MutexLock::Condition::release() {
     pthread_cond_destroy(&cond);
 }
 
-void MutexLock::Condition::wait() { pthread_cond_wait(&cond, &mutex); }
+void MutexLock::Condition::wait() { pthread_cond_wait(&cond, mutex); }
 
 void MutexLock::Condition::signal() {
     pthread_cond_signal(&cond);
 }
 
+MutexLock::Condition::Condition(MutexLock &mutexLock) : mutex(&mutexLock.mutexLock) {
+    cond = PTHREAD_COND_INITIALIZER;
+}
 
-MutexLock::~MutexLock() {
+MutexLock::Condition &MutexLock::Condition::operator=(const MutexLock::Condition &a) {
+    this->mutex = a.mutex;
+    this->cond = a.cond;
+    return *this;
+}
+
+MutexLock::Condition::Condition(const MutexLock::Condition &a) {
+    operator=(a);
+}
+
+MutexLock::Condition::Condition() = default;
+
+void MutexLock::release() {
     pthread_mutex_destroy(&mutexLock);
 }
 
@@ -36,9 +51,24 @@ MutexLock::Condition MutexLock::newCondition() {
     return cond;
 }
 
-void MutexLock::wait() { mCond.wait(); }
+void MutexLock::wait() { bundledCondition.wait(); }
 
-void MutexLock::notify() { mCond.signal(); }
+void MutexLock::notify() { bundledCondition.signal(); }
+
+MutexLock::MutexLock() {
+    mutexLock = PTHREAD_MUTEX_INITIALIZER;
+    bundledCondition = this->newCondition();
+}
+
+MutexLock &MutexLock::operator=(const MutexLock &a) {
+    this->mutexLock = a.mutexLock;
+    this->bundledCondition = a.bundledCondition;
+    return *this;
+}
+
+MutexLock::MutexLock(const MutexLock &a) {
+    operator=(a);
+}
 
 void CountDownLatch::await() const {
     while (count != 0) {
@@ -64,6 +94,8 @@ void CountDownLatch::set(int _count) {
     this->count = _count;
     lock.unlock();
 }
+
+CountDownLatch::CountDownLatch(int count) : count(count) {}
 
 LongWaitCountDownLatch::LongWaitCountDownLatch(int count) : count(count) {}
 
@@ -197,6 +229,15 @@ void * Thread::call(void *arg) {
     auto *runnable = (Runnable *) arg;
     runnable->run();
     return nullptr;
+}
+
+Thread &Thread::operator=(const Thread &a) {
+    this->t = a.t;
+    return *this;
+}
+
+Thread::Thread(const Thread &a) {
+    operator=(a);
 }
 
 void Latch::wait() {

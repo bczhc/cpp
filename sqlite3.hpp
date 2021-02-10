@@ -127,9 +127,11 @@ namespace bczhc {
 
         bool checkIfCorrupt();
 
-        ~Sqlite3();
-
         Statement compileStatement(const char *sql) const;
+
+        Sqlite3& operator=(const Sqlite3 &a);
+
+        Sqlite3(const Sqlite3 &a);
     };
 }
 

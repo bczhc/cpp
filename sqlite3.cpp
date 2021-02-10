@@ -25,13 +25,6 @@ void Sqlite3::exec(const char *cmd, Sqlite3::SqliteCallback &callback, void *arg
     if (status) throw SqliteException("executing failed", status);
 }
 
-Sqlite3::~Sqlite3() {
-    if (!closed && db != nullptr) {
-        close();
-        closed = true;
-    }
-}
-
 Sqlite3::Sqlite3(const char *path) {
     int status = sqlite3_open(path, &this->db);
     if (status != SQLITE_OK) {
@@ -63,6 +56,16 @@ bool Sqlite3::checkIfCorrupt() {
 
     exec("PRAGMA integrity_check", cb);
     return r;
+}
+
+Sqlite3 &Sqlite3::operator=(const Sqlite3 &a) {
+    this->db = a.db;
+    this->closed = a.closed;
+    return *this;
+}
+
+Sqlite3::Sqlite3(const Sqlite3 &a) {
+    operator=(a);
 }
 
 void Sqlite3::Statement::step() const {

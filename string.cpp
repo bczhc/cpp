@@ -53,7 +53,7 @@ size_t String::length() const {
 }
 
 void String::newData(const char *s, size_t strSize, size_t capacity) {
-    if (capacity < strSize + 1) throw String("illegal capacity");
+    if (capacity < strSize + 1) throw Exception("illegal capacity");
     stringSize = strSize, dataSize = capacity;
     data = new char[dataSize];
     for (size_t i = 0; i < strSize; ++i) data[i] = s[i];
@@ -435,16 +435,4 @@ ssize_t String::firstIndexOf(char c) const {
         if (data[i] == c) return i;
     }
     return -1;
-}
-
-String bczhc::operator+(const char *s, const String &o) {
-    return String(s) + o;
-}
-
-bool bczhc::operator==(const char *s, const String &o) {
-    return o == s;
-}
-
-bool bczhc::operator!=(const char *s, const String &o) {
-    return o != s;
 }

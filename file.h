@@ -29,20 +29,9 @@ namespace bczhc {
 
         static int move(const char *fileName);
 
-        int64_t getFileSize() {
-            FILE *fp = fopen(path.getCString(), "rb");
-            int64_t sz = File::getFileSize(fp);
-            fclose(fp);
-            return sz;
-        }
+        int64_t getFileSize();
 
-        static int64_t getFileSize(FILE *fp) {
-            int64_t sz;
-            fseek(fp, 0L, SEEK_END);
-            sz = (int64_t) ftell(fp);
-            fseek(fp, 0L, SEEK_SET);
-            return sz;
-        }
+        static int64_t getFileSize(FILE *fp);
 
         static String getExtension(const String &path);
 

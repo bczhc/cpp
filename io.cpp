@@ -1,6 +1,7 @@
 #include "io.h"
 #include "string.hpp"
 #include <cstdio>
+#include "./exception.hpp"
 
 using namespace bczhc;
 
@@ -35,11 +36,7 @@ void bczhc::solveU8FromStream(FILE *f, U8StringCallback &callback) {
 }
 
 InputStream::InputStream(const String& file) {
-    if ((fp = fopen(file.getCString(), "rb")) == nullptr) throw String("Open file failed.");
-}
-
-InputStream::~InputStream() {
-    if (!closed) this->close();
+    if ((fp = fopen(file.getCString(), "rb")) == nullptr) throw IOException("Open file failed.");
 }
 
 int InputStream::read(char *bytes, int size) {
@@ -52,11 +49,7 @@ void InputStream::close() {
 }
 
 OutputStream::OutputStream(const String& file) {
-    if ((fp = fopen(file.getCString(), "wb")) == nullptr) throw String("Open file failed.");
-}
-
-OutputStream::~OutputStream() {
-    if (!closed) this->close();
+    if ((fp = fopen(file.getCString(), "wb")) == nullptr) throw IOException("Open file failed.");
 }
 
 int OutputStream::write(const char *bytes, int size) {
@@ -76,8 +69,28 @@ InputStream::InputStream(FILE *stream) {
     fp = stream;
 }
 
+InputStream::InputStream(const InputStream &a) {
+    operator=(a);
+}
+
+InputStream &InputStream::operator=(const InputStream &a) {
+    this->fp = a.fp;
+    this->closed = a.closed;
+    return *this;
+}
+
 OutputStream::OutputStream(FILE *stream) {
     fp = stream;
+}
+
+OutputStream::OutputStream(const OutputStream &a) {
+    operator=(a);
+}
+
+OutputStream &OutputStream::operator=(const OutputStream &a) {
+    this->fp = a.fp;
+    this->closed = a.closed;
+    return *this;
 }
 
 LineReader::LineReader(InputStream &in) : is(in) {}

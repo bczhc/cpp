@@ -19,22 +19,29 @@ namespace bczhc {
     public:
         class Condition {
         private:
-            pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-            pthread_mutex_t &mutex;
+            pthread_cond_t cond{};
+            pthread_mutex_t *mutex = nullptr;
 
         public:
-            explicit Condition(MutexLock &mutexLock) : mutex(mutexLock.mutexLock) {};
+            Condition();
 
-            ~Condition();
+            explicit Condition(MutexLock &mutexLock);;
 
             void wait();
 
             void signal();
+
+            void release();
+
+            MutexLock::Condition &operator=(const MutexLock::Condition &a);
+
+            Condition(const MutexLock::Condition &a);
         };
 
-        pthread_mutex_t mutexLock = PTHREAD_MUTEX_INITIALIZER;
+        pthread_mutex_t mutexLock;
+        Condition bundledCondition;
 
-        ~MutexLock();
+        MutexLock();
 
         void lock();
 
@@ -42,15 +49,17 @@ namespace bczhc {
 
         bool tryLock();
 
+        void release();
+
         Condition newCondition();
 
-    private:
-        Condition mCond = newCondition();
-
-    public:
         void wait();
 
         void notify();
+
+        MutexLock &operator=(const MutexLock &a);
+
+        MutexLock(const MutexLock &a);
     };
 
     class CountDownLatch {
@@ -59,7 +68,7 @@ namespace bczhc {
         MutexLock lock;
 
     public:
-        explicit CountDownLatch(int count) : count(count) {}
+        explicit CountDownLatch(int count);
 
         CountDownLatch();
 
@@ -159,6 +168,10 @@ namespace bczhc {
         void sendSignal(int signal) const;
 
         [[nodiscard]] pthread_t getPThread() const;
+
+        Thread &operator=(const Thread &a);
+
+        Thread(const Thread &a);
     };
 
     class ThreadPool {

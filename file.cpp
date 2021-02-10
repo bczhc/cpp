@@ -35,3 +35,18 @@ String File::getFileName(const String &path) {
     return path.substring(i + 1, path.length());
 }
 
+int64_t File::getFileSize() {
+    FILE *fp = fopen(path.getCString(), "rb");
+    int64_t sz = File::getFileSize(fp);
+    fclose(fp);
+    return sz;
+}
+
+int64_t File::getFileSize(FILE *fp) {
+    int64_t sz;
+    fseek(fp, 0L, SEEK_END);
+    sz = (int64_t) ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+    return sz;
+}
+
