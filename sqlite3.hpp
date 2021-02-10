@@ -41,7 +41,7 @@ namespace bczhc {
 
             const char *getText(int column) const;
 
-            const uchar *const getBlob(int column) const;
+            const uchar * getBlob(int column) const;
         };
 
         class Statement {
@@ -62,11 +62,11 @@ namespace bczhc {
 
             void bind(int row, double a) const;
 
-            void bindText(int row, const char *s) const;
+            void bindText(int row, const char *s, void(*destructCallback)(void *) = SQLITE_STATIC) const;
 
-            void bindText(int row, const char *s, int size) const;
+            void bindText(int row, const char *s, int size, void(*destructCallback)(void *) = SQLITE_STATIC) const;
 
-            void bindBlob(int row, const char *bytes, int size) const;
+            void bindBlob(int row, const char *bytes, int size, void(*destructCallback)(void *) = SQLITE_STATIC) const;
 
             void bindNull(int row) const;
 
@@ -129,7 +129,7 @@ namespace bczhc {
 
         Statement compileStatement(const char *sql) const;
 
-        Sqlite3& operator=(const Sqlite3 &a);
+        Sqlite3 &operator=(const Sqlite3 &a);
 
         Sqlite3(const Sqlite3 &a);
     };

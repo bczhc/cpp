@@ -73,11 +73,7 @@ InputStream::InputStream(const InputStream &a) {
     operator=(a);
 }
 
-InputStream &InputStream::operator=(const InputStream &a) {
-    this->fp = a.fp;
-    this->closed = a.closed;
-    return *this;
-}
+InputStream &InputStream::operator=(const InputStream &a) = default;
 
 OutputStream::OutputStream(FILE *stream) {
     fp = stream;
@@ -87,11 +83,7 @@ OutputStream::OutputStream(const OutputStream &a) {
     operator=(a);
 }
 
-OutputStream &OutputStream::operator=(const OutputStream &a) {
-    this->fp = a.fp;
-    this->closed = a.closed;
-    return *this;
-}
+OutputStream &OutputStream::operator=(const OutputStream &a) = default;
 
 LineReader::LineReader(InputStream &in) : is(in) {}
 

@@ -59,6 +59,7 @@ bool Sqlite3::checkIfCorrupt() {
 }
 
 Sqlite3 &Sqlite3::operator=(const Sqlite3 &a) {
+    if (&a == this) return *this;
     this->db = a.db;
     this->closed = a.closed;
     return *this;
@@ -100,20 +101,6 @@ void Sqlite3::Statement::bindNull(int row) const {
     if (r) throw SqliteException("binding failed", r);
 }
 
-void Sqlite3::Statement::bindText(int row, const char *s) const {
-    bindText(row, s, -1);
-}
-
-void Sqlite3::Statement::bindBlob(int row, const char *bytes, int size) const {
-    int r = sqlite3_bind_blob(stmt, row, bytes, size, SQLITE_STATIC);
-    if (r) throw SqliteException("binding failed", r);
-}
-
-void Sqlite3::Statement::bindText(int row, const char *s, int size) const {
-    int r = sqlite3_bind_text(stmt, row, s, size, SQLITE_STATIC);
-    if (r) throw SqliteException("binding failed", r);
-}
-
 void Sqlite3::Statement::release() const {
     int r = sqlite3_finalize(this->stmt);
     if (r) throw SqliteException("releasing failed", r);
@@ -132,6 +119,20 @@ void Sqlite3::Statement::clearBinding() const {
     if (status != SQLITE_OK) throw SqliteException("clearing failed", status);
 }
 
+void Sqlite3::Statement::bindText(int row, const char *s, void (*destructCallback)(void *)) const {
+    bindText(row, s, -1, destructCallback);
+}
+
+void Sqlite3::Statement::bindText(int row, const char *s, int size, void (*destructCallback)(void *)) const {
+    int r = sqlite3_bind_text(stmt, row, s, size, destructCallback);
+    if (r) throw SqliteException("binding failed", r);
+}
+
+void Sqlite3::Statement::bindBlob(int row, const char *bytes, int size, void (*destructCallback)(void *)) const {
+    int r = sqlite3_bind_blob(stmt, row, bytes, size, destructCallback);
+    if (r) throw SqliteException("binding failed", r);
+}
+
 bool Sqlite3::Cursor::step() const {
     return stmt.stepRow() == SQLITE_ROW;
 }
@@ -140,10 +141,10 @@ void Sqlite3::Cursor::reset() const {
     stmt.reset();
 }
 
-Sqlite3::Cursor::Cursor(Sqlite3::Statement &stmt): stmt(stmt) {
+Sqlite3::Cursor::Cursor(Sqlite3::Statement &stmt) : stmt(stmt) {
 }
 
-const uchar *const Sqlite3::Cursor::getBlob(int column) const {
+const uchar *Sqlite3::Cursor::getBlob(int column) const {
     return (const uchar *) sqlite3_column_blob(stmt.stmt, column);
 }
 

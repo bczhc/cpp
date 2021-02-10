@@ -62,8 +62,8 @@ namespace bczhc {
         }
 
         Array<T> &operator=(const Array<T> &arr) {
-            release();
             if (&arr == this) return *this;
+            release();
 
             this->len = arr.len;
             this->elements = arr.elements;

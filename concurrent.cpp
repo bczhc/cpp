@@ -18,11 +18,7 @@ MutexLock::Condition::Condition(MutexLock &mutexLock) : mutex(&mutexLock.mutexLo
     cond = PTHREAD_COND_INITIALIZER;
 }
 
-MutexLock::Condition &MutexLock::Condition::operator=(const MutexLock::Condition &a) {
-    this->mutex = a.mutex;
-    this->cond = a.cond;
-    return *this;
-}
+MutexLock::Condition &MutexLock::Condition::operator=(const MutexLock::Condition &a) = default;
 
 MutexLock::Condition::Condition(const MutexLock::Condition &a) {
     operator=(a);
@@ -60,11 +56,7 @@ MutexLock::MutexLock() {
     bundledCondition = this->newCondition();
 }
 
-MutexLock &MutexLock::operator=(const MutexLock &a) {
-    this->mutexLock = a.mutexLock;
-    this->bundledCondition = a.bundledCondition;
-    return *this;
-}
+MutexLock &MutexLock::operator=(const MutexLock &a) = default;
 
 MutexLock::MutexLock(const MutexLock &a) {
     operator=(a);
@@ -231,10 +223,7 @@ void * Thread::call(void *arg) {
     return nullptr;
 }
 
-Thread &Thread::operator=(const Thread &a) {
-    this->t = a.t;
-    return *this;
-}
+Thread &Thread::operator=(const Thread &a) = default;
 
 Thread::Thread(const Thread &a) {
     operator=(a);

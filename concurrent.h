@@ -38,7 +38,7 @@ namespace bczhc {
             Condition(const MutexLock::Condition &a);
         };
 
-        pthread_mutex_t mutexLock;
+        pthread_mutex_t mutexLock{};
         Condition bundledCondition;
 
         MutexLock();

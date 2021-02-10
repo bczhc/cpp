@@ -63,33 +63,24 @@ public:
 };
 
 int main() {
-    Foo foo(1000);
-    class R : public Runnable {
-    private:
-        Foo &foo;
-        int i;
+    Sqlite3 db("");
+    db.exec("create table a(a)");
+    auto s = db.compileStatement("insert into a values(?)");
+    auto a = new String("hello, world");
+    s.bindText(1, a->getCString(), SQLITE_TRANSIENT);
+    delete a;
+    s.step();
+    s.release();
+
+    class C : public Sqlite3::SqliteCallback {
     public:
-        void run() override {
-            if (i == 1) {
-                foo.p1();
-            } else {
-                foo.p2();
-            }
-            delete this;
+        int callback(void *arg, int colNum, char **content, char **colName) override {
+            cout << content[0] << endl;
+            return 0;
         }
+    } cb;
 
-        explicit R(Foo &foo, int i) : foo(foo), i(i) {}
-    };
-    R *r1 = new R(foo, 1);
-    R *r2 = new R(foo, 2);
-
-    Thread t1(r1);
-    Thread t2(r2);
-
-    t1.join(), t2.join();
-
-    String s = "a";
-    cout << ("a" == s) << endl;
-
+    db.exec("select * from a", cb);
+    db.close();
     return 0;
 }
