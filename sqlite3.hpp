@@ -41,12 +41,13 @@ namespace bczhc {
 
             const char *getText(int column) const;
 
-            const uchar * getBlob(int column) const;
+            const uchar *getBlob(int column) const;
         };
 
         class Statement {
         public:
             sqlite3_stmt *stmt;
+            sqlite3 *db;
 
             void step() const;
 
@@ -111,6 +112,13 @@ namespace bczhc {
         }
 
         bool closed = false;
+
+        static String makeExceptionString(sqlite3 *db, const String &mainStatement, int errorCode);
+
+        SqliteException makeException(const String &mainStatement, int errorCode) const;
+
+        static SqliteException makeException(sqlite3 *db, const String &mainStatement, int errorCode);
+
     public:
         sqlite3 *db = nullptr;
 
@@ -118,7 +126,7 @@ namespace bczhc {
 
         void close();
 
-        void exec(const char *cmd, SqliteCallback &callback);
+        void exec(const char *cmd, SqliteCallback &callback) const;
 
         void exec(const char *cmd) const;
 
@@ -131,6 +139,8 @@ namespace bczhc {
         Sqlite3 &operator=(const Sqlite3 &a);
 
         Sqlite3(const Sqlite3 &a);
+
+        const char *getErrorMsg() const;
     };
 }
 

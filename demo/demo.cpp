@@ -63,24 +63,5 @@ public:
 };
 
 int main() {
-    Sqlite3 db("");
-    db.exec("create table a(a)");
-    auto s = db.compileStatement("insert into a values(?)");
-    auto a = new String("hello, world");
-    s.bindText(1, a->getCString(), SQLITE_TRANSIENT);
-    delete a;
-    s.step();
-    s.release();
-
-    class C : public Sqlite3::SqliteCallback {
-    public:
-        int callback(void *arg, int colNum, char **content, char **colName) override {
-            cout << content[0] << endl;
-            return 0;
-        }
-    } cb;
-
-    db.exec("select * from a", cb);
-    db.close();
     return 0;
 }

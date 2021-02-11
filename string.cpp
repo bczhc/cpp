@@ -315,8 +315,8 @@ String String::toString(char c) {
     return String(s);
 }
 
-String::String(size_t capacity) {
-    fromCharsString(nullptr, 0, capacity);
+String::String(size_t initialCapacity) {
+    fromCharsString(nullptr, 0, initialCapacity);
 }
 
 void String::clear() {
@@ -435,4 +435,28 @@ ssize_t String::firstIndexOf(char c) const {
         if (data[i] == c) return i;
     }
     return -1;
+}
+
+String String::operator+(int32_t a) const {
+    return (*this) + String::toString(a);
+}
+
+String String::operator+(int64_t a) const {
+    return (*this) + String::toString(a);
+}
+
+String &String::operator+=(int32_t a) {
+    return this->append(a);
+}
+
+String &String::operator+=(int64_t a) {
+    return this->append(a);
+}
+
+String &String::append(int64_t a) {
+    return this->append(String::toString(a));
+}
+
+String &String::append(int32_t a) {
+    return this->append(String::toString(a));
 }

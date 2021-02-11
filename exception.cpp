@@ -35,6 +35,8 @@ bczhc::IndexOutOfBoundsException::IndexOutOfBoundsException() = default;
 
 bczhc::SqliteException::SqliteException(const char *msg, int returnCode) : Exception(msg), returnCode(returnCode) {}
 
+SqliteException::SqliteException(const String &msg, int returnCode) : Exception(msg), returnCode(returnCode) {}
+
 IOException::IOException(const char *msg) : Exception(msg) {}
 
 IOException::IOException(const String &msg) : Exception(msg) {}

@@ -63,6 +63,10 @@ namespace bczhc {
 
         String &append(const char *s, size_t size);
 
+        String &append(int32_t a);
+
+        String &append(int64_t a);
+
         [[nodiscard]] ssize_t indexOf(char c) const;
 
         ssize_t indexOf(const char *s) const;
@@ -95,7 +99,7 @@ namespace bczhc {
 
         static String toString(char c);
 
-        explicit String(size_t capacity);
+        explicit String(size_t initialCapacity);
 
         void clear();
 
@@ -154,6 +158,14 @@ namespace bczhc {
         friend bool operator!=(const char *s, const String &o) {
             return o != s;
         }
+
+        String operator+(int32_t a) const;
+
+        String operator+(int64_t a) const;
+
+        String &operator+=(int32_t a);
+
+        String &operator+=(int64_t a);
     };
 }
 #endif//BCZHC_STRING_HPP
