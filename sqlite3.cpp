@@ -1,5 +1,4 @@
 #include <cstdint>
-#include <z3.h>
 #include "sqlite3.hpp"
 #include "string.hpp"
 
