@@ -8,7 +8,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    void toString(char **dst, int i);
+void toString(char **dst, int i);
 #ifdef __cplusplus
 }
 #endif

@@ -16,7 +16,7 @@
 #include "../../concurrent.h"
 #include <cstdarg>
 #include <cerrno>
-#include "../../third_party/practice/SymbolTable.hpp"
+#include "../../symbol_table.hpp"
 #include <cassert>
 #include <cmath>
 #include "serial.h"

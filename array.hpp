@@ -15,13 +15,12 @@ namespace bczhc {
     class Array {
     private:
         int len = 0;
-        int *deleteCount = nullptr;
+        int *refCount = nullptr;
 
         void release() const {
-            if (deleteCount == nullptr) return;
-            if (--*deleteCount == -1) {
+            if (--*refCount == -1) {
                 delete[] elements;
-                delete deleteCount;
+                delete refCount;
             }
         }
 
@@ -36,21 +35,20 @@ namespace bczhc {
             return r;
         }
 
+        Array() : Array(0) {}
+
         explicit Array(int size) {
             // Won't allocated when size is zero
             if (size != 0) {
                 elements = new T[size];
-                deleteCount = new int(0);
             }
+            refCount = new int(0);
             len = size;
         }
 
         Array(const Array<T> &arr) {
-            release();
-            this->len = arr.len;
-            this->elements = arr.elements;
-            this->deleteCount = arr.deleteCount;
-            if (deleteCount != nullptr) ++(*deleteCount);
+            copy(arr);
+            ++(*refCount);
         }
 
         [[nodiscard]] int length() const {
@@ -64,12 +62,15 @@ namespace bczhc {
         Array<T> &operator=(const Array<T> &arr) {
             if (&arr == this) return *this;
             release();
-
-            this->len = arr.len;
-            this->elements = arr.elements;
-            this->deleteCount = arr.deleteCount;
-            if (deleteCount != nullptr) ++(*deleteCount);
+            copy(arr);
+            ++(*refCount);
             return *this;
+        }
+
+        void copy(const Array <T> &arr) {
+            len = arr.len;
+            elements = arr.elements;
+            refCount = arr.refCount;
         }
 
         T &operator[](int i) const {

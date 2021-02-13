@@ -63,3 +63,5 @@ Exception &Exception::operator=(const Exception &e) {
 Exception::Exception(const Exception &e) {
     operator=(e);
 }
+
+KeyNotFoundException::KeyNotFoundException() = default;

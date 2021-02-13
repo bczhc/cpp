@@ -9,59 +9,90 @@
 #include <cassert>
 #include "../app/base128/Base128Lib.h"
 #include "../sqlite3.hpp"
+#include <memory>
+#include "../array_list.hpp"
+#include "../linked_list.hpp"
+#include "../stack.hpp"
+#include "../queue.hpp"
+#include "../iterator.hpp"
+#include "../symbol_table.hpp"
 
 using namespace std;
 using namespace bczhc;
 
-class Foo {
+template<typename T>
+class SharedPointer {
+private:
+    T *ptr;
+    int *count{};
+
+    void release() const {
+        if (--*count == -1) {
+            delete ptr;
+            delete count;
+        }
+    }
+
 public:
-    int k;
-    int flag = 1;
-    MutexLock lock;
-    using Condition = MutexLock::Condition;
-    Condition c1, c2;
-
-    explicit Foo(int k) : k(k) {
-        lock = MutexLock();
-        c1 = lock.newCondition();
-        c2 = lock.newCondition();
+    SharedPointer(T *ptr) : ptr(ptr) { // NOLINT(google-explicit-constructor)
+        count = new int(0);
     }
 
-    void p1() {
-        for (int i = 0; i < k; ++i) {
-            lock.lock();
-            if (flag != 1) {
-                c1.wait();
-            }
-            cout << "p1" << endl;
-            cout.flush();
-            flag = 2;
-            c2.signal();
-            lock.unlock();
-        }
+    T *get() {
+        return this->ptr;
     }
 
-    void p2() {
-        for (int i = 0; i < k; ++i) {
-            lock.lock();
-            if (flag != 2) {
-                c2.wait();
-            }
-            cout << "p2" << endl;
-            cout.flush();
-            flag = 1;
-            c1.signal();
-            lock.unlock();
-        }
+    SharedPointer(const SharedPointer &a) {
+        this->count = a.count;
+        this->ptr = a.ptr;
+        ++*count;
     }
 
-    ~Foo() {
-        c1.release();
-        c2.release();
-        lock.release();
+    SharedPointer &operator=(const SharedPointer &a) {
+        if (&a == this) return *this;
+        release();
+        this->ptr = a.ptr;
+        this->count = a.count;
+        ++*count;
+        return *this;
+    }
+
+    ~SharedPointer() {
+        release();
+    }
+
+    T *operator->() {
+        return this->ptr;
+    }
+
+    T *operator*() {
+        return this->ptr;
     }
 };
 
+template<typename T>
+using SP = SharedPointer<T>;
+
+void f2(SP<String> s) {
+    cout << s->getCString() << endl;
+}
+
+void f(SP<String> s) {
+    auto s2 = s;
+    auto s3 = s;
+    auto s4 = s2, s5 = s3;
+    f2(s2), f2(s4);
+    s5 = s2;
+    s5 = s;
+    s5 = s3;
+    s = s4;
+    s = s3;
+}
+
 int main() {
+    SymbolTable<String, int> t;
+    t.put("a", 2);
+    auto r = t.get("a");
+    cout << r << endl;
     return 0;
 }

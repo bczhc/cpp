@@ -85,6 +85,11 @@ namespace bczhc {
 
         IOException();
     };
+
+    class KeyNotFoundException : public Exception {
+    public:
+        KeyNotFoundException();
+    };
 }
 
 #endif //BCZHC_EXCEPTION_HPP

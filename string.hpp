@@ -1,7 +1,7 @@
 #ifndef BCZHC_STRING_HPP
 #define BCZHC_STRING_HPP
 
-#include "./third_party/practice/LinearList.hpp"
+#include "./array_list.hpp"
 #include <cctype>
 #include <cstddef>
 #include <cstdlib>
@@ -18,6 +18,7 @@ namespace bczhc {
         char *data = nullptr;
         size_t stringSize = 0, dataSize = 0;
         bool mIsNull = false;
+        int *refCount = nullptr;
 
         void newData(const char *s, size_t strSize, size_t capacity);
 
@@ -33,8 +34,6 @@ namespace bczhc {
 
 
     public:
-        int *deleteCount = nullptr;
-
         String();
 
         String(const String &string);
@@ -77,9 +76,9 @@ namespace bczhc {
 
         static ssize_t indexOf(const char *haystack, const char *needle);
 
-        [[nodiscard]] SequentialList<String> split(const String &separator) const;
+        [[nodiscard]] ArrayList<String> split(const String &separator) const;
 
-        static SequentialList<String> split(const String &str, const String &separator);
+        static ArrayList<String> split(const String &str, const String &separator);
 
         static String toString(int32_t a);
 

@@ -1,5 +1,5 @@
 #include "../concurrent.h"
-#include "../third_party/practice/LinearList.hpp"
+#include "../array_list.hpp"
 #include <ctime>
 #include <unistd.h>
 
@@ -13,7 +13,7 @@ public:
 
 class BlockingQueue {
 private:
-    SequentialList<Message> queue;
+    ArrayList<Message> queue;
     MutexLock lock;
 
 public:

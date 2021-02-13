@@ -1,7 +1,8 @@
 #include "../string.hpp"
 #include <iostream>
 #include "../io.h"
-#include <sys/time.h>
+#include "../utils.hpp"
+#include "../linked_list.hpp"
 
 using namespace std;
 using namespace bczhc;
@@ -19,9 +20,7 @@ int main() {
     is.close();
     const char *s = str.getCString();
 
-    timeval t{};
-    gettimeofday(&t, nullptr);
-    srand(t.tv_sec * 1000 + t.tv_usec / 1000);
+    srand((unsigned int) getCurrentTimeMillis());
     using List = LinkedList<int>;
     List list;
     SolvedUTF8Properties solved{};
@@ -35,7 +34,7 @@ int main() {
     char u8Bytes[5];
     String result;
     while (list.length() != 0) {
-        int ran = RANDOM(0, list.length() - 1);
+        int ran = RANDOM(0, list.length() - 1); // NOLINT(cert-msc50-cpp)
         u8Bytes[unicode2UTF8(u8Bytes, list.remove(ran))] = '\0';
         result.append(u8Bytes);
     }

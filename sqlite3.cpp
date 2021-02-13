@@ -78,7 +78,11 @@ bool Sqlite3::checkIfCorrupt() {
         }
     } cb(r);
 
-    exec("PRAGMA integrity_check", cb);
+    try {
+        exec("PRAGMA integrity_check", cb);
+    } catch (const SqliteException &e) {
+        return true;
+    }
     return r;
 }
 

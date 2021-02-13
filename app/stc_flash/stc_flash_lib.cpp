@@ -8,6 +8,7 @@ using namespace std;
 
 #include "serial.h"
 #include "stc_flash_lib.h"
+#include "../../linked_list.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
@@ -97,7 +98,7 @@ TypeWithNone<String> chooseProtocol(const char *protocolOrigin) {
 }
 
 template<typename T>
-Array<T> list2arr(SequentialList<T> &sl) {
+Array<T> list2arr(ArrayList<T> &sl) {
     int length = sl.length();
     Array<T> r(length);
     for (int i = 0; i < length; ++i) {
@@ -107,28 +108,28 @@ Array<T> list2arr(SequentialList<T> &sl) {
 }
 
 template<typename T>
-void repeatListInsert(SequentialList<T> &list, T value, int times) {
+void repeatListInsert(ArrayList<T> &list, T value, int times) {
     for (int i = 0; i < times; ++i) {
         list.insert(value);
     }
 }
 
 template<typename T>
-void insertArrToList(SequentialList<T> &list, T *arr, int size) {
+void insertArrToList(ArrayList<T> &list, T *arr, int size) {
     for (int i = 0; i < size; ++i) {
         list.insert((T) arr[i]);
     }
 }
 
 template<typename T>
-void insertArrToList(SequentialList<T> &list, const Array<T> &arr) {
+void insertArrToList(ArrayList<T> &list, const Array<T> &arr) {
     for (int i = 0; i < arr.length(); ++i) {
         list.insert((T) arr[i]);
     }
 }
 
 Code readToBytes(InputStream &in) {
-    SequentialList<unsigned char> b;
+    ArrayList<unsigned char> b;
     char buf[4096];
     int readLen;
     while ((readLen = in.read(buf, 4096)) > 0) {
@@ -186,7 +187,7 @@ void checkAndSetBoundary(int &start, int &end, int length) {
 }
 
 template<typename T>
-void sliceAssign(SequentialList<T> &list, int start, int end, const T *valueToAssign, int length) {
+void sliceAssign(ArrayList<T> &list, int start, int end, const T *valueToAssign, int length) {
     checkAndSetBoundary(start, end, list.length());
     list.remove(start, end);
     list.insert(start, valueToAssign, length);
@@ -206,10 +207,10 @@ Array<uchar> packUnsignedInt32BigEndian(uint32_t a) {
 }
 
 Code hex2bin(Code &code) {
-    SequentialList<unsigned char> buf;
+    ArrayList<unsigned char> buf;
     int base = 0, line = 0;
 
-    SequentialList<String> lines;
+    ArrayList<String> lines;
     String lineStr = String();
     int codeLen = code.val.length();
     for (int j = 0; j < codeLen; ++j) {
@@ -332,7 +333,7 @@ bool in(T1 a, T2 *set, uint32_t size) {
 
 template<typename T>
 Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
-    SequentialList<T> list;
+    ArrayList<T> list;
     int len = arr.length();
     checkAndSetBoundary(start, end, len);
     for (int i = start; i < end; i += step) {
@@ -342,10 +343,10 @@ Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
 }
 
 template<typename T>
-SequentialList<T> cutList(SequentialList<T> &list, int start, int end, int step = 1) {
+ArrayList<T> cutList(ArrayList<T> &list, int start, int end, int step = 1) {
     int len = list.length();
     checkAndSetBoundary(start, end, len);
-    SequentialList<T> r;
+    ArrayList<T> r;
     for (int i = start; i < end; i += step) {
         r.insert(list.get(i));
     }
@@ -376,7 +377,7 @@ public:
     }
 
     [[nodiscard]] Array<uchar> __conn_read(ssize_t size) const {
-        SequentialList<uchar> buf;
+        ArrayList<uchar> buf;
         while (buf.length() < size) {
             const Array<uchar> r = conn.read(size - buf.length());
             buf.insert(buf.length(), r.elements, r.length());
@@ -509,11 +510,10 @@ public:
                 {0xE2, 0x76},
                 {0xE2, 0xF6}};
 
-        SymbolTableBB::Result result = modelMap.get(model.elements[0]);
-        if (!result.found) throw String("not found");
-        const char *prefix = result.val.s;
-        int romratio = result.val.i;
-        SymbolTableTupleBS *fixmap = result.val.st;
+        auto result = modelMap.get(model.elements[0]);
+        const char *prefix = result.s;
+        int romratio = result.i;
+        SymbolTableTupleBS *fixmap = result.st;
         if ((model[0] == 0xF0 || model[0] == 0xF1) && (0x20 <= model[1] && model[1] <= 0x30)) {
             prefix = "90";
         }
@@ -655,9 +655,8 @@ public:
                 m.put(0xE1, PROTOCOL_12C52);  // STC12C52x
                 m.put(0xE2, PROTOCOL_12C5A);  // STC11Fx
                 m.put(0xE6, PROTOCOL_12C52);  // STC12C56x
-                const SymbolTableBS::Result result = m.get(model[0]);
-                if (!result.found) throw String("key error");
-                this->protocol = NonableString(result.val);
+                auto result = m.get(model[0]);
+                this->protocol = NonableString(result);
             } catch (...) {
             }
 
@@ -732,7 +731,7 @@ public:
     }
 
     void send(uchar cmd, const Array<uchar> &dat) const {
-        SequentialList<uchar> buf;
+        ArrayList<uchar> buf;
         buf.insert(0x46).insert(0xB9).insert(0x6A);
         int n = 1 + 2 + 1 + dat.length() + this->chkmode + 1;
         buf.insert(n >> 8).insert(n & 0xFF).insert(cmd);
@@ -865,7 +864,7 @@ public:
         } else {
             uchar a[] = {0x00, 0x00, (uchar)(this->romsize.val * 4), 0x00, 0x00, (uchar)(this->romsize.val * 4)};
             int len = ARR_SIZE(a);
-            SequentialList<uchar> b(len);
+            ArrayList<uchar> b(len);
             for (int i = 0; i < len; ++i) {
                 b.insert(a[i]);
             }
@@ -890,7 +889,7 @@ public:
 
     void flash(Code &nonableCode, Consumer<double> *yieldCallback) const {
         Array<uchar> &val = nonableCode.val;
-        SequentialList<uchar> codeList(val.length());
+        ArrayList<uchar> codeList(val.length());
         for (int i = 0; i < val.length(); ++i) {
             codeList.insert(val[i]);
         }
@@ -905,11 +904,11 @@ public:
 
             uchar a[] = {0, 0, (uchar)(i >> 8), (uchar)(i & 0xFF), 0, 128};
             int len = ARR_SIZE(a);
-            SequentialList<uchar> b(len);
+            ArrayList<uchar> b(len);
             for (int j = 0; j < len; ++j) {
                 b.insert(a[j]);
             }
-            SequentialList<uchar> cut = cutList(codeList, i, i + 128);
+            ArrayList<uchar> cut = cutList(codeList, i, i + 128);
             for (int j = 0; j < cut.length(); ++j) {
                 b.insert(cut[j]);
             }
@@ -950,7 +949,7 @@ public:
     }
 
     [[nodiscard]] bool options(NonableBoolean erase_eeprom) const {
-        SequentialList<uchar> dat;
+        ArrayList<uchar> dat;
         const Array<uchar> localFosc = packUnsignedInt32BigEndian((uint32_t)(this->fosc * 1000000));
         if (this->protocol.val == PROTOCOL_89) {
             if (!erase_eeprom.isNone) {

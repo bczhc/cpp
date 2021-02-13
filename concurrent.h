@@ -1,7 +1,7 @@
 #ifndef BCZHC_CONCURRENT_H
 #define BCZHC_CONCURRENT_H
 
-#include "./third_party/practice/LinearList.hpp"
+#include "./queue.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>

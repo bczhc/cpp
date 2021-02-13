@@ -2,7 +2,8 @@
 using namespace std;
 
 #ifndef __WIN32
-#include "../third_party/practice/LinearList.hpp"
+#include "../linked_list.hpp"
+#include "../doubly_linked_list.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>

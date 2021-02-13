@@ -11,11 +11,11 @@ String::String() {
 
 String::String(const String &string) {
     copy(string);
-    ++*deleteCount;
+    ++*refCount;
 }
 
 void String::copy(const String &string) {
-    deleteCount = string.deleteCount;
+    refCount = string.refCount;
     data = string.data;
     dataSize = string.dataSize;
     stringSize = string.stringSize;
@@ -69,27 +69,26 @@ void String::fromCharsString(const char *s, size_t strSize) {
 }
 
 void String::fromCharsString(const char *s, size_t strSize, ssize_t capacity) {
-    release();
-    deleteCount = new int(0);
+    refCount = new int(0);
     newData(s, strSize, capacity);
 }
 
 
 String &String::operator=(const String &string) {
-    release();
     if (&string == this) return *this;
+    release();
     copy(string);
-    ++*deleteCount;
+    ++*refCount;
     return *this;
 }
 
 String &String::operator=(const char *s) {
+    release();
     if (s == nullptr) {
         mIsNull = true;
         s = "(null)";
     }
-    delete[] data;
-    newData(s, strlen(s));
+    fromCharsString(s, strlen(s));
     return *this;
 }
 
@@ -162,15 +161,15 @@ ssize_t String::indexOf(const char *haystack, const char *needle) {
 }
 
 
-SequentialList<String> String::split(const String &separator) const {
+ArrayList<String> String::split(const String &separator) const {
     return String::split(*this, separator);
 }
 
-SequentialList<String> String::split(const String &str, const String &separator) {
+ArrayList<String> String::split(const String &str, const String &separator) {
     const char *s = str.getCString();
     size_t stringSize = str.length();
-    SequentialList<String> list;
-    SequentialList<size_t> indexes;
+    ArrayList<String> list;
+    ArrayList<size_t> indexes;
     size_t length = separator.length();
     const char *found;
     const char *start = s;
@@ -194,11 +193,10 @@ SequentialList<String> String::split(const String &str, const String &separator)
 }
 
 void String::release() {
-    if (deleteCount == nullptr) return;
-    if (--*deleteCount == -1) {
+    if (--*refCount == -1) {
         delete[] data;
         data = nullptr;
-        delete deleteCount;
+        delete refCount;
     }
 }
 
