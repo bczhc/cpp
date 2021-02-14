@@ -11,6 +11,20 @@ String f1() {
     return String("s3") += '.';
 }
 
+String f2(String a) {
+    auto b = a;
+    auto c = b;
+    c = a;
+    b = a;
+    a = b;
+    auto d = a, e = b;
+    d = e;
+    a = b;
+    a = d, e = a;
+    e = f1();
+    return a + b + c + d + e;
+}
+
 int test() {
     String s1;
     s1 += "a";
@@ -29,5 +43,6 @@ int test() {
     s4 = "abc";
     String s5 = s4;
     if (s4 != s5 || !s4.equals("abc")) return 4;
+    if (!f2("a").equals("aaaas3.")) return 5;
     return 0;
 }

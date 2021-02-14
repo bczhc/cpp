@@ -24,7 +24,7 @@ namespace bczhc {
 
         void release() {
             if (--*refCount == -1) {
-                delete data;
+                delete[] data;
                 delete refCount;
             }
         }
