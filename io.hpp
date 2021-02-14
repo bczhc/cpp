@@ -19,19 +19,18 @@ namespace bczhc {
     void solveU8FromStream(FILE *f, U8StringCallback &callback);
 
     class InputStream {
-    private:
-        bool closed = false;
-
     public:
         FILE *fp = nullptr;
 
-        explicit InputStream(const String& file);
+        InputStream();
+
+        explicit InputStream(const String &file);
 
         explicit InputStream(FILE *stream);
 
-        int read(char *bytes, int size);
+        int read(char *bytes, int size) const;
 
-        void close();
+        void close() const;
 
         InputStream &operator=(const InputStream &a);
 
@@ -39,36 +38,59 @@ namespace bczhc {
     };
 
     class OutputStream {
-    private:
-        bool closed = false;
-
     public:
         FILE *fp = nullptr;
 
-        explicit OutputStream(const String& file);
+        OutputStream();
+
+        explicit OutputStream(const String &file);
 
         explicit OutputStream(FILE *stream);
 
-        int write(const char *bytes, int size);
+        int write(const char *bytes, int size) const;
 
-        void flush();
+        void flush() const;
 
-        void close();
+        void close() const;
 
         OutputStream &operator=(const OutputStream &a);
 
         OutputStream(const OutputStream &a);
     };
 
-    class
-    LineReader {
+    class LineReader {
     private:
-        InputStream &is;
+        InputStream is;
 
     public:
-        explicit LineReader(InputStream &in);
+        LineReader();
 
-        String readLine();
+        explicit LineReader(const InputStream& in);
+
+        String readLine() const;
+
+        LineReader(const LineReader &a);
+
+        LineReader &operator=(const LineReader &a);
+    };
+
+    class Scanner {
+    private:
+        LineReader reader;
+    public:
+        explicit Scanner(FILE *in);
+
+        String nextString() const;
+
+        int32_t nextInt() const;
+
+        int64_t nextLong() const;
+
+        float nextFloat() const;
+
+        double nextDouble() const;
+
+        bool nextBool() const;
     };
 }// namespace bczhc
 #endif// BCZHC_IO_HPP

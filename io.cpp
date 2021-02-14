@@ -2,6 +2,7 @@
 #include "string.hpp"
 #include <cstdio>
 #include "./exception.hpp"
+#include "./utils.hpp"
 
 using namespace bczhc;
 
@@ -35,33 +36,31 @@ void bczhc::solveU8FromStream(FILE *f, U8StringCallback &callback) {
     }
 }
 
-InputStream::InputStream(const String& file) {
+InputStream::InputStream(const String &file) {
     if ((fp = fopen(file.getCString(), "rb")) == nullptr) throw IOException("Open file failed.");
 }
 
-int InputStream::read(char *bytes, int size) {
+int InputStream::read(char *bytes, int size) const {
     return fread(bytes, 1, size, fp);
 }
 
-void InputStream::close() {
-    closed = true;
+void InputStream::close() const {
     fclose(fp);
 }
 
-OutputStream::OutputStream(const String& file) {
+OutputStream::OutputStream(const String &file) {
     if ((fp = fopen(file.getCString(), "wb")) == nullptr) throw IOException("Open file failed.");
 }
 
-int OutputStream::write(const char *bytes, int size) {
+int OutputStream::write(const char *bytes, int size) const {
     return fwrite(bytes, 1, size, fp);
 }
 
-void OutputStream::flush() {
+void OutputStream::flush() const {
     fflush(fp);
 }
 
-void OutputStream::close() {
-    closed = true;
+void OutputStream::close() const {
     fclose(fp);
 }
 
@@ -73,6 +72,8 @@ InputStream::InputStream(const InputStream &a) {
     operator=(a);
 }
 
+InputStream::InputStream() = default;
+
 InputStream &InputStream::operator=(const InputStream &a) = default;
 
 OutputStream::OutputStream(FILE *stream) {
@@ -83,11 +84,13 @@ OutputStream::OutputStream(const OutputStream &a) {
     operator=(a);
 }
 
+OutputStream::OutputStream() = default;
+
 OutputStream &OutputStream::operator=(const OutputStream &a) = default;
 
-LineReader::LineReader(InputStream &in) : is(in) {}
+LineReader::LineReader(const InputStream& in) : is(in) {}
 
-String LineReader::readLine() {
+String LineReader::readLine() const {
     String line;
     char c;
     while (is.read(&c, 1) > 0) {
@@ -97,4 +100,53 @@ String LineReader::readLine() {
         line.append(c);
     }
     return nullptr;
+}
+
+LineReader &LineReader::operator=(const LineReader &a) {
+    if (&a == this) return *this;
+    this->is = a.is;
+    return *this;
+}
+
+LineReader::LineReader() = default;
+
+LineReader::LineReader(const LineReader &a) = default;
+
+Scanner::Scanner(FILE *in) {
+    auto is = InputStream(in);
+    reader = LineReader(is);
+}
+
+String Scanner::nextString() const {
+    const String line = reader.readLine();
+    if (line.isNull()) throw IOException("io error");
+    return line;
+}
+
+int32_t Scanner::nextInt() const {
+    return Integer::parseInt(nextString());
+}
+
+int64_t Scanner::nextLong() const {
+    return Long::parseLong(nextString());
+}
+
+bool Scanner::nextBool() const {
+    auto r = nextString();
+    try {
+        auto i = Integer::parseInt(r);
+        return i != 0;
+    } catch (const NumberFormatException &ignored) {
+    }
+    return String::toLowerCase(r).equals("true");
+}
+
+float Scanner::nextFloat() const {
+    // TODO
+    return 0;
+}
+
+double Scanner::nextDouble() const {
+    // TODO
+    return 0;
 }

@@ -116,6 +116,16 @@ namespace bczhc {
 
         static String toUpperCase(const char *s);
 
+        static String toUpperCase(const String &s);
+
+        String toUpperCase() const;
+
+        static String toLowerCase(const char *s);
+
+        static String toLowerCase(const String &s);
+
+        String toLowerCase() const;
+
         [[nodiscard]] bool equals(const String &s) const;
 
         static bool equal(const char *s1, const char *s2);

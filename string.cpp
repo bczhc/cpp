@@ -156,8 +156,15 @@ ssize_t String::indexOf(const char *s, char c) {
 }
 
 ssize_t String::indexOf(const char *haystack, const char *needle) {
-    const char *match = strstr(haystack, needle);
-    return match == nullptr ? -1 : (match - haystack);
+    if (haystack == nullptr || needle == nullptr) return -1;
+    for (int i = 0; haystack[i] != '\0'; ++i) {
+        bool match = true;
+        for (int j = 0; needle[j] != '\0'; ++j) {
+            if (haystack[i + j] != needle[j]) match = false;
+        }
+        if (match) return i;
+    }
+    return -1;
 }
 
 
@@ -340,9 +347,27 @@ bool String::isNull() const {
 }
 
 String String::toUpperCase(const char *s) {
-    String r;
-    for (size_t i = 0; s[i] != '\0'; ++i) {
-        r.append((char) toupper(s[i]));
+    return toUpperCase(String(s));
+}
+
+String String::toUpperCase(const String &s) {
+    size_t len = s.length();
+    String r(len);
+    for (size_t i = 0; i < len; ++i) {
+        r += (char) toupper(s.data[i]);
+    }
+    return r;
+}
+
+String String::toLowerCase(const char *s) {
+    return toLowerCase(String(s));
+}
+
+String String::toLowerCase(const String &s) {
+    size_t len = s.length();
+    String r(len);
+    for (size_t i = 0; i < len; ++i) {
+        r += (char) tolower(s.data[i]);
     }
     return r;
 }
@@ -465,4 +490,12 @@ String &String::appendUnicode(uint32_t codepoint) {
     unicode2UTF8(s, codepoint);
     this->append(s, size);
     return *this;
+}
+
+String String::toUpperCase() const {
+    return String::toUpperCase(*this);
+}
+
+String String::toLowerCase() const {
+    return String::toLowerCase(*this);
 }

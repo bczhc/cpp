@@ -19,17 +19,19 @@
 #include "../shared_pointer.hpp"
 #include <unordered_map>
 #include "../regex.hpp"
+#include "../io.hpp"
 
 using namespace std;
 using namespace bczhc;
 
+
+
 int main() {
-    uint32_t c1 = surrogateConvert(0xd83c, 0xdde6);
-    uint32_t c2 = surrogateConvert(0xd83c, 0xddee);
-    String s;
-    s.appendUnicode(c1).appendUnicode(c2);
-    cout << s.getCString() << endl;
-    cout << s.utf8Length() << endl;
-    cout << s.length() << endl;
+    Scanner sc(stdin);
+    cout << "string, int, long, bool" << endl;
+    cout << sc.nextString().getCString() << endl;
+    cout << sc.nextInt() << endl;
+    cout << sc.nextLong() << endl;
+    cout << sc.nextBool() << endl;
     return 0;
 }
