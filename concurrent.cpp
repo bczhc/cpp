@@ -229,6 +229,8 @@ Thread::Thread(const Thread &a) {
     operator=(a);
 }
 
+Thread::Thread() = default;
+
 void Latch::wait() {
     lock.lock();
     if (latched) lock.wait();

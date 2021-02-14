@@ -12,7 +12,16 @@ using namespace bczhc;
 template<typename T>
 class Stack {
 private:
-    using Node = typename LinkedList<T>::Node;
+    class Node {
+    public:
+        T data;
+        Node *next = nullptr;
+
+        Node(T data, Node *next) : data(data), next(next) {}
+
+        Node() = default;
+    };
+
     Node *head = nullptr;
     int len = 0;
     int *refCount;

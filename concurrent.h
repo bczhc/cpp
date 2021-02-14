@@ -157,6 +157,8 @@ namespace bczhc {
     public:
         explicit Thread(Runnable *runnable);
 
+        Thread();
+
         void join() const;
 
         void detach() const;
