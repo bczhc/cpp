@@ -1,7 +1,7 @@
 //
 // Created by bczhc on 2020/3/25.
 //
-#include "utf8.h"
+#include "utf8.hpp"
 
 using namespace bczhc;
 
@@ -82,3 +82,16 @@ void bczhc::solveUTF8Bytes(SolvedUTF8Properties &solvedProperties, const uchar *
             break;
     }
 }
+
+Surrogate bczhc::surrogateConvert(uint32_t codepoint) {
+    constexpr uint32_t LEAD_OFFSET = 0xd800 - (0x10000U >> 10U);
+    uint16_t lead = LEAD_OFFSET + (codepoint >> 10U);
+    uint16_t trail = 0xDc00 + (codepoint & 0x3FFU);
+    return Surrogate{.lead = lead, .trail = trail};
+}
+
+uint32_t bczhc::surrogateConvert(uint16_t lead, uint16_t trail) {
+    constexpr uint32_t SURROGATE_OFFSET = 0x10000 - (0xD800U << 10U) - 0xDc00;
+    return (lead << 10U) + trail + SURROGATE_OFFSET;
+}
+

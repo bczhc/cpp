@@ -458,3 +458,11 @@ String &String::append(int64_t a) {
 String &String::append(int32_t a) {
     return this->append(String::toString(a));
 }
+
+String &String::appendUnicode(uint32_t codepoint) {
+    int size = getUTF8Size(codepoint);
+    char s[size];
+    unicode2UTF8(s, codepoint);
+    this->append(s, size);
+    return *this;
+}

@@ -90,6 +90,13 @@ namespace bczhc {
     public:
         KeyNotFoundException();
     };
+
+    class PCREException: public Exception {
+    public:
+        explicit PCREException(const char *msg);
+
+        explicit PCREException(const String &msg);
+    };
 }
 
 #endif //BCZHC_EXCEPTION_HPP

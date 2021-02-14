@@ -1,11 +1,11 @@
-#include "../concurrent.h"
-#include "../file.h"
+#include "../concurrent.hpp"
+#include "../file.hpp"
 #include "../exception.hpp"
 #include <iostream>
 #include "../utils.hpp"
-#include "../io.h"
+#include "../io.hpp"
 #include "../array.hpp"
-#include "../def.h"
+#include "../def.hpp"
 #include <cassert>
 #include "../app/base128/Base128Lib.h"
 #include "../sqlite3.hpp"
@@ -18,40 +18,18 @@
 #include "../symbol_table.hpp"
 #include "../shared_pointer.hpp"
 #include <unordered_map>
-#include "stdatomic.h"
+#include "../regex.hpp"
 
 using namespace std;
 using namespace bczhc;
 
-static atomic_int i;
-pthread_spinlock_t lock;
-
 int main() {
-    class R : public Runnable {
-    public:
-        void run() override {
-            for (int j = 0; j < 10000; ++j) {
-                pthread_spin_lock(&lock);
-                ++i;
-                pthread_spin_unlock(&lock);
-            }
-            delete this;
-        }
-    };
-
-    pthread_spin_init(&lock, 0);
-
-
-    Array<Thread> a(100);
-    for (int j = 0; j < a.length(); ++j) {
-        a[j] = Thread(new R);
-    }
-
-    for (int j = 0; j < a.length(); ++j) {
-        a[j].join();
-    }
-
-    pthread_spin_destroy(&lock);
-    cout << i << endl;
+    uint32_t c1 = surrogateConvert(0xd83c, 0xdde6);
+    uint32_t c2 = surrogateConvert(0xd83c, 0xddee);
+    String s;
+    s.appendUnicode(c1).appendUnicode(c2);
+    cout << s.getCString() << endl;
+    cout << s.utf8Length() << endl;
+    cout << s.length() << endl;
     return 0;
 }

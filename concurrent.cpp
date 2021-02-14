@@ -1,4 +1,4 @@
-#include "concurrent.h"
+#include "concurrent.hpp"
 #include <csignal>
 #include <pthread.h>
 

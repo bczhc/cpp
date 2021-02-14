@@ -1,5 +1,5 @@
-#ifndef BCZHC_IO_H
-#define BCZHC_IO_H
+#ifndef BCZHC_IO_HPP
+#define BCZHC_IO_HPP
 
 #include "string.hpp"
 #include <cstdio>
@@ -71,4 +71,4 @@ namespace bczhc {
         String readLine();
     };
 }// namespace bczhc
-#endif// BCZHC_IO_H
+#endif// BCZHC_IO_HPP

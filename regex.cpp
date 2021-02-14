@@ -2,12 +2,10 @@
 // Created by zhc on 12/26/20.
 //
 
-#include "regex.h"
+#include "regex.hpp"
 #include "string.hpp"
 
-using namespace regex;
-
-ResultList regex::match(const char *pattern, const char *text, int textSize) {
+ResultList bczhc::match(const char *pattern, const char *text, int textSize) {
     LinkedList<String> list;
     auto *pPcre = getCompiledPcre(pattern);
 
@@ -21,11 +19,11 @@ ResultList regex::match(const char *pattern, const char *text, int textSize) {
         list.insert(s);
     }
 
-    free(pPcre);
+    pcre_free(pPcre);
     return list;
 }
 
-bool regex::test(const char *pattern, const char *text, int textSize) {
+bool bczhc::test(const char *pattern, const char *text, int textSize) {
     auto pPcre = getCompiledPcre(pattern);
     int r[3] = {0};
     pcre_exec(pPcre, nullptr, text, textSize, 0, 0, r, 3);
@@ -33,24 +31,24 @@ bool regex::test(const char *pattern, const char *text, int textSize) {
     return r[0] != -1;
 }
 
-pcre *regex::getCompiledPcre(const char *pattern) {
+pcre *bczhc::getCompiledPcre(const char *pattern) {
     const char *errorMsg = nullptr;
     int errMsgOffset = 0;
-    pcre *pPcre = pcre_compile(pattern, 0, &errorMsg, &errMsgOffset, nullptr);
+    pcre *pPcre = pcre_compile(pattern, PCRE_UTF8, &errorMsg, &errMsgOffset, nullptr);
     if (pPcre == nullptr) {
         String e = "Pattern compilation failed at offset: ";
         e.append(String::toString(errMsgOffset))
                 .append(". Error message: ")
                 .append(errorMsg);
-        throw e;
+        throw PCREException(e);
     }
     return pPcre;
 }
 
-ResultList regex::match(const char *pattern, const char *text) {
+ResultList bczhc::match(const char *pattern, const char *text) {
     return match(pattern, text, strlen(text));
 }
 
-bool regex::test(const char *pattern, const char *text) {
+bool bczhc::test(const char *pattern, const char *text) {
     return test(pattern, text, strlen(text));
 }

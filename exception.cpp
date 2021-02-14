@@ -65,3 +65,7 @@ Exception::Exception(const Exception &e) {
 }
 
 KeyNotFoundException::KeyNotFoundException() = default;
+
+PCREException::PCREException(const char *msg) : Exception(msg) {}
+
+PCREException::PCREException(const String &msg) : Exception(msg) {}

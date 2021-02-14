@@ -1,5 +1,5 @@
-#ifndef BCZHC_CONCURRENT_H
-#define BCZHC_CONCURRENT_H
+#ifndef BCZHC_CONCURRENT_HPP
+#define BCZHC_CONCURRENT_HPP
 
 #include "./queue.hpp"
 #include <cstdint>
@@ -231,4 +231,4 @@ namespace bczhc {
     };
 }// namespace bczhc
 
-#endif// BCZHC_CONCURRENT_H
+#endif// BCZHC_CONCURRENT_HPP

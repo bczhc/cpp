@@ -7,13 +7,13 @@
 
 #include <termios.h>
 #include "../../string.hpp"
-#include "../../file.h"
-#include "../../io.h"
+#include "../../file.hpp"
+#include "../../io.hpp"
 #include "../../utils.hpp"
 #include "../../array.hpp"
 #include <fcntl.h>
 #include <unistd.h>
-#include "../../concurrent.h"
+#include "../../concurrent.hpp"
 #include <cstdarg>
 #include <cerrno>
 #include "../../symbol_table.hpp"

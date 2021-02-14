@@ -1,4 +1,4 @@
-#include "../concurrent.h"
+#include "../concurrent.hpp"
 #include "../array_list.hpp"
 #include <ctime>
 #include <unistd.h>

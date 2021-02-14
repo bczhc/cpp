@@ -1,7 +1,7 @@
-#ifndef BCZHC_UTF8_H
-#define BCZHC_UTF8_H
+#ifndef BCZHC_UTF8_HPP
+#define BCZHC_UTF8_HPP
 
-#include "def.h"
+#include "def.hpp"
 
 namespace bczhc {
     struct SolvedUTF8Properties {
@@ -16,5 +16,14 @@ namespace bczhc {
     int getUTF8Size(uint32_t codepoint);
 
     int unicode2UTF8(char *dest, uint32_t codepoint);
+
+    uint32_t surrogateConvert(uint16_t lead, uint16_t trail);
+
+    struct Surrogate {
+        uint16_t lead;
+        uint16_t trail;
+    };
+
+    Surrogate surrogateConvert(uint32_t codepoint);
 } // namespace bczhc
-#endif // BCZHC_UTF8_H
+#endif // BCZHC_UTF8_HPP

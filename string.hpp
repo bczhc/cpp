@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
-#include "utf8.h"
+#include "utf8.hpp"
 #include <cstdint>
 #include <sys/types.h>
 
@@ -66,6 +66,8 @@ namespace bczhc {
 
         String &append(int64_t a);
 
+        String &appendUnicode(uint32_t codepoint);
+
         [[nodiscard]] ssize_t indexOf(char c) const;
 
         ssize_t indexOf(const char *s) const;
@@ -95,6 +97,16 @@ namespace bczhc {
         static String toString(int32_t i, int radix);
 
         static String toString(int64_t i, int radix);
+
+        static String toString(uint32_t i, int radix) {
+            // TODO
+            return String();
+        }
+
+        static String toString(uint64_t i, int radix) {
+            // TODO
+            return String();
+        }
 
         static String toString(char c);
 

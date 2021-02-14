@@ -2,10 +2,11 @@
 // Created by zhc on 12/26/20.
 //
 
-#ifndef BCZHC_REGEX_H
-#define BCZHC_REGEX_H
+#ifndef BCZHC_REGEX_HPP
+#define BCZHC_REGEX_HPP
 
 #ifdef CMAKE_PCRE_FOUND
+
 #include "utils.hpp"
 #include "./linked_list.hpp"
 #include "string.hpp"
@@ -13,7 +14,7 @@
 
 using namespace bczhc;
 
-namespace bczhc::regex {
+namespace bczhc {
     using ResultList = LinkedList<String>;
 
     pcre *getCompiledPcre(const char *pattern);
@@ -26,7 +27,6 @@ namespace bczhc::regex {
 
     bool test(const char *pattern, const char *text, int textSize);
 }
-
 #endif //CMAKE_PCRE_FOUND
 
-#endif //BCZHC_REGEX_H
+#endif //BCZHC_REGEX_HPP
