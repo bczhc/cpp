@@ -9,8 +9,9 @@ namespace bczhc {
     template<typename T>
     class SharedPointer {
     private:
-        T *ptr;
         int *refCount{};
+    protected:
+        T *ptr;
 
         void release() const {
             if (--*refCount == -1) {
@@ -24,7 +25,7 @@ namespace bczhc {
             refCount = new int(0);
         }
 
-        T *get() {
+        T *get() const {
             return this->ptr;
         }
 
@@ -47,16 +48,16 @@ namespace bczhc {
             release();
         }
 
-        T *operator->() {
+        T *operator->() const {
             return this->ptr;
         }
 
-        T &operator*() {
+        T &operator*() const {
             return *this->ptr;
         }
     };
 
-    template <typename T>
+    template<typename T>
     using SP = SharedPointer<T>;
 }
 

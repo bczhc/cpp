@@ -84,7 +84,7 @@ public:
 using NonableString = TypeWithNone<String>;
 using NonableBoolean = TypeWithNone<bool>;
 template<typename T>
-using NonableArray = TypeWithNone<Array<T>>;
+using NonableArray = TypeWithNone<SArray<T>>;
 using Code = NonableArray<uchar>;
 using NonableInt = TypeWithNone<int>;
 
@@ -98,9 +98,9 @@ TypeWithNone<String> chooseProtocol(const char *protocolOrigin) {
 }
 
 template<typename T>
-Array<T> list2arr(ArrayList<T> &sl) {
+SArray<T> list2arr(ArrayList<T> &sl) {
     int length = sl.length();
-    Array<T> r(length);
+    SArray<T> r(length);
     for (int i = 0; i < length; ++i) {
         r[i] = sl[i];
     }
@@ -122,8 +122,8 @@ void insertArrToList(ArrayList<T> &list, T *arr, int size) {
 }
 
 template<typename T>
-void insertArrToList(ArrayList<T> &list, const Array<T> &arr) {
-    for (int i = 0; i < arr.length(); ++i) {
+void insertArrToList(ArrayList<T> &list, const SArray<T> &arr) {
+    for (int i = 0; i < arr->length(); ++i) {
         list.insert((T) arr[i]);
     }
 }
@@ -144,10 +144,10 @@ double time() {
     return ((double) (getCurrentTimeMillis())) / 1000;
 }
 
-Array<unsigned char> hex2bytes(const String &hexString) {
+SArray<unsigned char> hex2bytes(const String &hexString) {
     int i = (int) hexString.length();
     int len = i / 2;
-    Array<unsigned char> dat(len);
+    SArray<unsigned char> dat(len);
     for (int j = 0; j < len; ++j) {
         const String &s = hexString.substr(j * 2, 2);
         dat[j] = (unsigned char) Integer::parseInt(s, 16);
@@ -165,13 +165,13 @@ ReturnType sum(ElementType *arr, int start, int end) {
 }
 
 template<typename ReturnType, typename ElementType>
-ReturnType sum(Array<ElementType> arr, int start, int end) {
-    return sum<ReturnType, ElementType>(arr.elements, start, end);
+ReturnType sum(SArray<ElementType> arr, int start, int end) {
+    return sum<ReturnType, ElementType>(arr->elements, start, end);
 }
 
 template<typename ReturnType, typename ElementType>
-ReturnType sum(Array<ElementType> arr) {
-    return sum<ReturnType, ElementType>(arr, 0, arr.length());
+ReturnType sum(SArray<ElementType> arr) {
+    return sum<ReturnType, ElementType>(arr, 0, arr->length());
 }
 
 void checkAndSetBoundary(int &start, int &end, int length) {
@@ -193,12 +193,12 @@ void sliceAssign(ArrayList<T> &list, int start, int end, const T *valueToAssign,
     list.insert(start, valueToAssign, length);
 }
 
-Array<uchar> packUnsignedInt32BigEndian(uint32_t a) {
+SArray<uchar> packUnsignedInt32BigEndian(uint32_t a) {
     bool reverse = false;
     int i = 0x11223344;
     reverse = (*((uchar *) &i) != 0x11);
     int len = (int) sizeof(uint32_t);
-    Array<uchar> r(len);
+    SArray<uchar> r(len);
     auto *p = (uchar *) &a;
     for (int j = 0; j < len; ++j) {
         r[j] = p[reverse ? (len - 1 - j) : j];
@@ -212,7 +212,7 @@ Code hex2bin(Code &code) {
 
     ArrayList<String> lines;
     String lineStr = String();
-    int codeLen = code.val.length();
+    int codeLen = code.val->length();
     for (int j = 0; j < codeLen; ++j) {
         char c = code.val[j];
         if (c != '\n') lineStr.append(c);
@@ -227,7 +227,7 @@ Code hex2bin(Code &code) {
         auto rec = lines.get(i);
         line += 1;
         uchar n = hex2bytes(rec.substring(1, 3))[0];
-        Array<unsigned char> dat = hex2bytes(rec.substring(1, n * 2 + 11));
+        SArray<unsigned char> dat = hex2bytes(rec.substring(1, n * 2 + 11));
         if (rec.charAt(0) != ':')
             throw String("Line ") + String::toString(line) + ": Missing start code \":\"";
         if ((sum<int32_t, unsigned char>(dat) & 0xFF) != 0)
@@ -242,7 +242,7 @@ Code hex2bin(Code &code) {
             memset(t, 0xFF, size);
             sliceAssign(buf, buf.length(), buf.length(), t, size);
             // Copy data to the buffer
-            sliceAssign(buf, addr, addr + n, dat.elements + 4 * sizeof(uchar), dat.length() - 1 - 4);
+            sliceAssign(buf, addr, addr + n, dat->elements + 4 * sizeof(uchar), dat->length() - 1 - 4);
         } else if (dat[3] == 1) {
             // EOF record
             if (n != 0) throw String("Line ") + String::toString(line) + ": Incorrect data length";
@@ -256,17 +256,17 @@ Code hex2bin(Code &code) {
         } else
             throw String("Line ") + String::toString(line) + ": Unsupported record type";
     }
-    Array<unsigned char> r(buf.length());
-    for (int i = 0; i < r.length(); ++i) {
+    SArray<unsigned char> r(buf.length());
+    for (int i = 0; i < r->length(); ++i) {
         r[i] = buf[i];
     }
     return Code(r);
 }
 
 template<typename T>
-String hexStrJoin(char joinMark, const Array<T> &arr) {
+String hexStrJoin(char joinMark, const SArray<T> &arr) {
     String r;
-    int length = arr.length();
+    int length = arr->length();
     for (int i = 0; i < length; ++i) {
         String hex = String::toString(arr[i], 16);
         if (hex.utf8Length() == 1) hex = String("0") + hex;
@@ -332,9 +332,9 @@ bool in(T1 a, T2 *set, uint32_t size) {
 }
 
 template<typename T>
-Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
+SArray<T> cutArray(const SArray<T> &arr, int start, int end, int step = 1) {
     ArrayList<T> list;
-    int len = arr.length();
+    int len = arr->length();
     checkAndSetBoundary(start, end, len);
     for (int i = start; i < end; i += step) {
         list.insert(arr[i]);
@@ -359,9 +359,9 @@ public:
     NonableString &protocol;
     int chkmode = 0;
     double fosc = 0;
-    Array<uchar> info = Array<uchar>(0);
+    SArray<uchar> info = SArray<uchar>(0);
     String version;
-    Array<uchar> model = Array<uchar>(0);
+    SArray<uchar> model = SArray<uchar>(0);
     String name;
     NonableInt romsize = NonableInt(int{}, true);
     uint32_t bundrate = 0;
@@ -376,11 +376,11 @@ public:
         this->chkmode = 0;
     }
 
-    [[nodiscard]] Array<uchar> __conn_read(ssize_t size) const {
+    [[nodiscard]] SArray<uchar> __conn_read(ssize_t size) const {
         ArrayList<uchar> buf;
         while (buf.length() < size) {
-            const Array<uchar> r = conn.read(size - buf.length());
-            buf.insert(buf.length(), r.elements, r.length());
+            const SArray<uchar> r = conn.read(size - buf.length());
+            buf.insert(buf.length(), r->elements, r->length());
             //TODO debug msg
             if (buf.length() == 0) throw String("io error");
         }
@@ -412,7 +412,7 @@ public:
         Bean2(T1 a1, T2 a2) : a1(a1), a2(a2) {}
     };
 
-    static Bean2<String, int> __model_database(const Array<uchar> &model) {
+    static Bean2<String, int> __model_database(const SArray<uchar> &model) {
         class Bean {
         public:
             const char *s = nullptr;
@@ -510,7 +510,7 @@ public:
                 {0xE2, 0x76},
                 {0xE2, 0xF6}};
 
-        auto result = modelMap.get(model.elements[0]);
+        auto result = modelMap.get(model->elements[0]);
         const char *prefix = result.s;
         int romratio = result.i;
         SymbolTableTupleBS *fixmap = result.st;
@@ -536,8 +536,8 @@ public:
         int localRomsize = romratio * (model[1] - foundKey[0]);
 
         try {
-            if (model.length() != 2) throw 1;
-            if (model.elements[0] != 0xF0 || model.elements[1] != 0x03) throw 1;
+            if (model->length() != 2) throw 1;
+            if (model->elements[0] != 0xF0 || model->elements[1] != 0x03) throw 1;
             localRomsize = 13;
         } catch (...) {
         }
@@ -561,16 +561,16 @@ public:
         return Bean2<String, int>(localName, localRomsize);
     }
 
-    [[nodiscard]] Bean2<uchar, Array<uchar>> recv(double timeout = 1.0, Array<uchar> start = Array<uchar>(0)) const {
-        if (start.length() == 0) {
-            start = Array<uchar>(3);
+    [[nodiscard]] Bean2<uchar, SArray<uchar>> recv(double timeout = 1.0, SArray<uchar> start = SArray<uchar>(0)) const {
+        if (start->length() == 0) {
+            start = SArray<uchar>(3);
             start[0] = 0x46, start[1] = 0xB9, start[2] = 0x68;
         }
         timeout += time();
         bool broken = false;
         while (time() < timeout) {
             try {
-                const Array<uchar> connRead = __conn_read(start.length());
+                const SArray<uchar> connRead = __conn_read(start->length());
                 if (connRead == start) {
                     broken = true;
                     break;
@@ -584,8 +584,8 @@ public:
             throw String("io error");
         }
 
-        uchar chksum = start[start.length() - 1];
-        Array<uchar> s = __conn_read(2);
+        uchar chksum = start[start->length() - 1];
+        SArray<uchar> s = __conn_read(2);
         int n = s[0] * 256 + s[1];
         if (n > 64) {
             logging.debug("recv(..): Incorrect packet size\n");
@@ -600,27 +600,27 @@ public:
             throw String("io error");
         }
         chksum += sum<int32_t, uchar>(cutArray<uchar>(s, 0, -(1 + this->chkmode)));
-        if (this->chkmode > 0 && ((chksum & 0xFF) != s[s.length() - 2])) {
+        if (this->chkmode > 0 && ((chksum & 0xFF) != s[s->length() - 2])) {
             logging.debug("recv(..): Incorrect checksum[0]\n");
             throw String("io error");
-        } else if (this->chkmode > 1 && ((chksum >> 8) & 0xFF) != s[s.length() - 3]) {
+        } else if (this->chkmode > 1 && ((chksum >> 8) & 0xFF) != s[s->length() - 3]) {
             logging.debug("recv(..): Incorrect checksum[1]\n");
             throw String("io error");
         }
-        return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));;
+        return Bean2<uchar, SArray<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));;
     }
 
     void detect() {
         uchar buf[] = {0x7F, 0x7F};
         bool broken = false;
-        const Array<uchar> start(1);
+        const SArray<uchar> start(1);
         start[0] = 0x68;
 
-        Array<uchar> dat(0);
+        SArray<uchar> dat(0);
         for (int i = 0; i < 1000; ++i) {
             try {
                 __conn_write(buf, 2);
-                const Bean2<uchar, Array<uchar>> recvBean = recv(0.015, start);
+                const Bean2<uchar, SArray<uchar>> recvBean = recv(0.015, start);
                 uchar cmd = recvBean.a1;
                 dat = recvBean.a2;
                 broken = true;
@@ -635,7 +635,7 @@ public:
         fosc = ((double) (sum<int32_t, uchar>(cutArray<uchar>(dat, 0, 16, 2)) * 256 +
                           sum<int32_t, uchar>(cutArray<uchar>(dat, 1, 16, 2)))) /
                8 * conn.getBaud() / 580974;
-        this->info = cutArray<uchar>(dat, 16, dat.length());
+        this->info = cutArray<uchar>(dat, 16, dat->length());
         this->version = String::toString(info[0] >> 4) + '.' + String::toString(info[0] & 0x0F) + ((char) info[1]);
         this->model = cutArray<uchar>(info, 3, 5);
         const Bean2<String, int> bean = __model_database(model);
@@ -670,8 +670,8 @@ public:
                 logging.info("Protocol ID: %s\n", this->protocol.val.getCString());
                 logging.info("Checksum mode: %d\n", this->chkmode);
                 logging.info("UART Parity: %s\n", conn.getParity() == Serial::PARITY_EVEN ? "EVEN" : "NONE");
-                for (int i = 0; i < this->info.length(); i += 16) {
-                    const Array<uchar> a = cutArray<uchar>(info, i, i + 16);
+                for (int i = 0; i < this->info->length(); i += 16) {
+                    const SArray<uchar> a = cutArray<uchar>(info, i, i + 16);
                     String s = hexStrJoin<uchar>(' ', a);
                     logging.info("Info string [%d]: %s\n", i / 16, s.getCString());
                 }
@@ -729,12 +729,12 @@ public:
         }
     }
 
-    void send(uchar cmd, const Array<uchar> &dat) const {
+    void send(uchar cmd, const SArray<uchar> &dat) const {
         ArrayList<uchar> buf;
         buf.insert(0x46), buf.insert(0xB9), buf.insert(0x6A);
-        int n = 1 + 2 + 1 + dat.length() + this->chkmode + 1;
+        int n = 1 + 2 + 1 + dat->length() + this->chkmode + 1;
         buf.insert(n >> 8), buf.insert(n & 0xFF), buf.insert(cmd);
-        buf.insert(buf.length(), dat.elements, dat.length());
+        buf.insert(buf.length(), dat->elements, dat->length());
 
         int chksum = sum<int, uchar>(buf.data, 2, buf.length());
         if (this->chkmode > 1) {
@@ -748,11 +748,11 @@ public:
         if (in<String, const char *>(this->protocol.val, PROTOSET_PARITY, ARR_SIZE(PROTOSET_PARITY))) {
             logging.info("Send unknown packet (50 00 00 36 01 ...)\n");
             uchar b[] = {0x00, 0x00, 0x36, 0x01};
-            send(0x50, Array<uchar>::from(b, 4));
-            const Bean2<uchar, Array<uchar>> recvBean = this->recv();
+            send(0x50, SArray<uchar>::from(b, 4));
+            const Bean2<uchar, SArray<uchar>> recvBean = this->recv();
             uchar cmd = recvBean.a1;
-            Array<uchar> dat = recvBean.a2;
-            assert(cmd == 0x8F && dat.length() == 0);
+            SArray<uchar> dat = recvBean.a2;
+            assert(cmd == 0x8F && dat->length() == 0);
         }
     }
 
@@ -762,7 +762,7 @@ public:
                 len = ARR_SIZE(bauds);
         bool broken = false;
         uint32_t baud;
-        Array<int> baudstr(0);
+        SArray<int> baudstr(0);
         for (int i = 0; i < len; ++i) {
             baud = bauds[i];
             double t = this->fosc * 1000000 / baud / 32;
@@ -779,36 +779,36 @@ public:
             }
             int baudstrT[] = {tcfg >> 8, tcfg & 0xFF, 0xFF - (tcfg >> 8), min((256 - (tcfg & 0xFF)) * 2, 0xFE),
                               (int) (baud0 / 60)};
-            baudstr = Array<int>::from(baudstrT, ARR_SIZE(baudstrT));
+            baudstr = SArray<int>::from(baudstrT, ARR_SIZE(baudstrT));
             logging.info("Test baudrate %d (accuracy %0.4f) using config %s\n", baud, std::abs(round(t) - t) / t,
                          hexStrJoin<int>(' ', baudstr).getCString());
-            Array<int> freqlist(0);
+            SArray<int> freqlist(0);
             if (in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
                 int a[] = {40, 20, 10, 5};
-                freqlist = Array<int>::from(a, ARR_SIZE(a));
+                freqlist = SArray<int>::from(a, ARR_SIZE(a));
             } else {
                 int a[] = {30, 24, 20, 12, 6, 3, 2, 1};
-                freqlist = Array<int>::from(a, ARR_SIZE(a));
+                freqlist = SArray<int>::from(a, ARR_SIZE(a));
             }
             int twait;
-            for (twait = 0; twait < freqlist.length(); ++twait) {
+            for (twait = 0; twait < freqlist->length(); ++twait) {
                 if (this->fosc > freqlist[twait]) {
                     broken = true;
                     break;
                 };
             }
             logging.info("Waiting time config %02X\n", (0x80 + twait));
-            Array<uchar> b(baudstr.length() + 1);
-            for (int j = 0; j < b.length() - 1; ++j) {
+            SArray<uchar> b(baudstr->length() + 1);
+            for (int j = 0; j < b->length() - 1; ++j) {
                 b[j] = (uchar) baudstr[j];
             }
-            b[b.length() - 1] = 0x80 + twait;
+            b[b->length() - 1] = 0x80 + twait;
             send(0x8F, b);
             try {
                 __conn_baudrate(baud);
-                const Bean2<uchar, Array<uchar>> rb = recv();
+                const Bean2<uchar, SArray<uchar>> rb = recv();
                 uchar cmd = rb.a1;
-                Array<uchar> dat = rb.a2;
+                SArray<uchar> dat = rb.a2;
                 __conn_baudrate(baud0, false);
                 broken = true;
                 break;
@@ -821,17 +821,17 @@ public:
         }
         if (!broken) throw String("io error");
         logging.info("Change baudrate to %d\n", baud);
-        Array<uchar> b2(baudstr.length());
-        for (int i = 0; i < b2.length(); ++i) {
+        SArray<uchar> b2(baudstr->length());
+        for (int i = 0; i < b2->length(); ++i) {
             b2[i] = (uchar) baudstr[i];
         }
         send(0x8E, b2);
         __conn_baudrate(baud);
         conn.setSpeed(baud);
         this->bundrate = baud;
-        const Bean2<uchar, Array<uchar>> rb = recv();
+        const Bean2<uchar, SArray<uchar>> rb = recv();
         uchar cmd = rb.a1;
-        Array<uchar> dat = rb.a2;
+        SArray<uchar> dat = rb.a2;
     }
 
     void unknown_packet_2() const {
@@ -840,16 +840,16 @@ public:
                 logging.info("Send unknown packet (80 00 00 36 01 ...)\n");
                 uchar a[] = {0x00, 0x00, 0x36, 0x01};
                 int aSize = (int) ARR_SIZE(a);
-                Array<uchar> s(aSize + this->model.length());
+                SArray<uchar> s(aSize + this->model->length());
                 for (int j = 0; j < aSize; ++j) {
                     s[j] = a[j];
                 }
-                for (int j = aSize; j < s.length(); ++j) {
+                for (int j = aSize; j < s->length(); ++j) {
                     s[j] = this->model[j - aSize];
                 }
                 send(0x80, s);
-                const Bean2<uchar, Array<uchar>> rb = recv();
-                assert(rb.a1 == 0x80 && rb.a2.length() == 0);
+                const Bean2<uchar, SArray<uchar>> rb = recv();
+                assert(rb.a1 == 0x80 && rb.a2->length() == 0);
             }
         }
     }
@@ -857,8 +857,8 @@ public:
     void erase() const {
         if (in<String, const char *>(this->protocol.val, PROTOSET_89, ARR_SIZE(PROTOSET_89))) {
             uchar a[] = {0x01, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33};
-            send(0x84, Array<uchar>::from(a, ARR_SIZE(a)));
-            const Bean2<uchar, Array<uchar>> rb = recv(10);
+            send(0x84, SArray<uchar>::from(a, ARR_SIZE(a)));
+            const Bean2<uchar, SArray<uchar>> rb = recv(10);
             assert(rb.a1 == 0x80);
         } else {
             uchar a[] = {0x00, 0x00, (uchar) (this->romsize.val * 4), 0x00, 0x00, (uchar) (this->romsize.val * 4)};
@@ -874,11 +874,11 @@ public:
                 b.insert(i);
             }
 
-            const Array<uchar> c = list2arr<uchar>(b);
+            const SArray<uchar> c = list2arr<uchar>(b);
             send(0x84, c);
-            const Bean2<uchar, Array<uchar>> rb = recv(10);
-            Array<uchar> dat = rb.a2;
-            if (dat.length() != 0) {
+            const Bean2<uchar, SArray<uchar>> rb = recv(10);
+            SArray<uchar> dat = rb.a2;
+            if (dat->length() != 0) {
                 String msg = "Serial number: ";
                 msg += hexStrJoin<uchar>(' ', dat);
                 logging.info("%s\n", msg.getCString());
@@ -887,18 +887,18 @@ public:
     }
 
     void flash(Code &nonableCode, Consumer<double> *yieldCallback) const {
-        Array<uchar> &val = nonableCode.val;
-        ArrayList<uchar> codeList(val.length());
-        for (int i = 0; i < val.length(); ++i) {
+        SArray<uchar> &val = nonableCode.val;
+        ArrayList<uchar> codeList(val->length());
+        for (int i = 0; i < val->length(); ++i) {
             codeList.insert(val[i]);
         }
-        int repeatCount = 511 - (val.length() - 1) % 512;
+        int repeatCount = 511 - (val->length() - 1) % 512;
         for (int i = 0; i < repeatCount; ++i) {
             codeList.insert(0x00);
         }
-        Array<uchar> code = list2arr<uchar>(codeList);
+        SArray<uchar> code = list2arr<uchar>(codeList);
 
-        for (int i = 0; i < code.length(); i += 128) {
+        for (int i = 0; i < code->length(); i += 128) {
             logging.info("Flash code region (%04X, %04X)\n", i, i + 127);
 
             uchar a[] = {0, 0, (uchar) (i >> 8), (uchar) (i & 0xFF), 0, 128};
@@ -911,18 +911,18 @@ public:
             for (int j = 0; j < cut.length(); ++j) {
                 b.insert(cut[j]);
             }
-            const Array<uchar> &sent = list2arr<uchar>(b);
+            const SArray<uchar> &sent = list2arr<uchar>(b);
             send(0x00, sent);
-            const Bean2<uchar, Array<uchar>> rb = recv();
+            const Bean2<uchar, SArray<uchar>> rb = recv();
             uchar cmd = rb.a1;
-            Array<uchar> dat = rb.a2;
+            SArray<uchar> dat = rb.a2;
 
             int sum = 0;
             for (int j = 0; j < cut.length(); ++j) {
                 sum += cut[j];
             }
             assert(dat[0] == sum % 256);
-            double r = ((double) (i + 128)) / code.length();
+            double r = ((double) (i + 128)) / code->length();
             yieldCallback->accept(r);
         }
     }
@@ -932,24 +932,24 @@ public:
             logging.info("Send unknown packet (69 00 00 36 01 ...)\n");
             uchar a[] = {0x00, 0x00, 0x36, 0x01};
             int len = ARR_SIZE(a);
-            Array<uchar> sent(len + this->model.length());
+            SArray<uchar> sent(len + this->model->length());
             for (int i = 0; i < len; ++i) {
                 sent[i] = a[i];
             }
-            for (int i = len; i < sent.length(); ++i) {
+            for (int i = len; i < sent->length(); ++i) {
                 sent[i] = this->model[i - len];
             }
             send(0x69, sent);
-            const Bean2<uchar, Array<uchar>> &rb = recv();
+            const Bean2<uchar, SArray<uchar>> &rb = recv();
             uchar cmd = rb.a1;
-            Array<uchar> dat = rb.a2;
-            assert(cmd == 0x8D && dat.length() == 0);
+            SArray<uchar> dat = rb.a2;
+            assert(cmd == 0x8D && dat->length() == 0);
         }
     }
 
     [[nodiscard]] bool options(NonableBoolean erase_eeprom) const {
         ArrayList<uchar> dat;
-        const Array<uchar> localFosc = packUnsignedInt32BigEndian((uint32_t) (this->fosc * 1000000));
+        const SArray<uchar> localFosc = packUnsignedInt32BigEndian((uint32_t) (this->fosc * 1000000));
         if (this->protocol.val == PROTOCOL_89) {
             if (!erase_eeprom.isNone) {
                 this->info[2] &= 0xF7;
@@ -957,7 +957,7 @@ public:
             }
 
             auto cut = cutArray<uchar>(this->info, 2, 3);
-            for (int i = 0; i < cut.length(); ++i) {
+            for (int i = 0; i < cut->length(); ++i) {
                 dat.insert(cut[i]);
             }
             for (int i = 0; i < 3; ++i) {
@@ -993,7 +993,7 @@ public:
 
         if (dat.length() != 0) {
             send(0x8D, list2arr<uchar>(dat));
-            const Bean2<uchar, Array<uchar>> rb = recv();
+            const Bean2<uchar, SArray<uchar>> rb = recv();
         }
         return true;
     }
@@ -1001,7 +1001,7 @@ public:
     void terminate() const {
         logging.info("Send termination command\n");
 
-        send(0x82, Array<uchar>(0));
+        send(0x82, SArray<uchar>(0));
         this->conn.flush();
         Thread::sleep(200);
     }
@@ -1031,7 +1031,7 @@ void program(Programmer &prog, Code &code, NonableBoolean erase_eeprom = Nonable
     prog.erase();
 
     echoPrint(" done\n");
-    echoPrint("Size of the binary: %d\n", code.val.length());
+    echoPrint("Size of the binary: %d\n", code.val->length());
 
     echoPrint("Programming: ");
     echo->flush();
@@ -1100,7 +1100,7 @@ int bczhc::run(const String &hexFile, EchoCallback *echoCallback, Serial *serial
 
     logging.basicConfig(opts.loglevel);
 
-    Code code(Array<uchar>(0));
+    Code code(SArray<uchar>(0));
     if (opts.image != nullptr) {
         Code localCode = readToBytes(*opts.image);
         opts.image->close();

@@ -288,7 +288,7 @@ void SerialLinux::close() const {
     if (::close(this->fd) != 0) throw String("Close failed.");
 }
 
-Array<uchar> SerialLinux::read(ssize_t size) const {
+SArray<uchar> SerialLinux::read(ssize_t size) const {
     int64_t start = getCurrentTimeMillis();
     char buf[size];
     ssize_t haveRead = 0;
@@ -309,7 +309,7 @@ Array<uchar> SerialLinux::read(ssize_t size) const {
             break;
         }
     }
-    Array<uchar> r(haveRead);
+    SArray<uchar> r(haveRead);
     for (int i = 0; i < haveRead; ++i) {
         r[i] = buf[i];
     }

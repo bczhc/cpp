@@ -183,5 +183,14 @@ namespace bczhc {
 
         String &operator+=(int64_t a);
     };
+
+    class SString : public SP<String> {
+    public:
+        SString() : SP<String>(new String) {}
+
+        SString(const char *s) : SP<String>(new String) {
+            (*get()) = s;
+        }
+    };
 }
 #endif//BCZHC_STRING_HPP

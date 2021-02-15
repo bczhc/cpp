@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include "../regex.hpp"
 #include "../io.hpp"
+#include <random>
 
 using namespace std;
 using namespace bczhc;

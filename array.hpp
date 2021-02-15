@@ -13,41 +13,23 @@ namespace bczhc {
     template<typename T>
     class Array {
     private:
-        int len = 0;
-        int *refCount = nullptr;
-
-        void release() const {
-            if (--*refCount == -1) {
-                delete[] elements;
-                delete refCount;
-            }
-        }
+        size_t len = 0;
 
     public:
         T *elements = nullptr;
 
-        static Array<T> from(T *arr, int size) {
-            Array<T> r(size);
-            for (int i = 0; i < size; ++i) {
-                r[i] = arr[i];
-            }
-            return r;
-        }
-
         Array() : Array(0) {}
 
         explicit Array(int size) {
-            // Won't allocated when size is zero
+            // Won't allocate when size is zero
             if (size != 0) {
                 elements = new T[size];
             }
-            refCount = new int(0);
             len = size;
         }
 
         Array(const Array<T> &arr) {
             copy(arr);
-            ++(*refCount);
         }
 
         [[nodiscard]] int length() const {
@@ -55,21 +37,22 @@ namespace bczhc {
         }
 
         ~Array() {
-            release();
+            delete[] elements;
         }
 
         Array<T> &operator=(const Array<T> &arr) {
             if (&arr == this) return *this;
-            release();
+            delete[] elements;
             copy(arr);
-            ++(*refCount);
             return *this;
         }
 
-        void copy(const Array <T> &arr) {
+        void copy(const Array<T> &arr) {
             len = arr.len;
-            elements = arr.elements;
-            refCount = arr.refCount;
+            elements = new T[arr.len];
+            for (size_t i = 0; i < len; ++i) {
+                elements[i] = arr.elements[i];
+            }
         }
 
         T &operator[](int i) const {
@@ -114,6 +97,30 @@ namespace bczhc {
             }
             msg += ']';
             return msg;
+        }
+    };
+
+    template<typename T>
+    class SArray : public SP<Array<T>> {
+    public:
+        SArray() : SP<Array<T>>(new Array<T>()) {}
+
+        SArray(size_t size) : SP<Array<T>>(new Array<T>(size)) {}
+
+        T &operator[](size_t i) const {
+            return (*this->ptr)[i];
+        }
+
+        bool operator==(const SArray<T> &a) const {
+            return (*this->ptr) == *a.ptr;
+        }
+
+        static SArray<T> from(T *arr, int size) {
+            SArray<T> r(size);
+            for (int i = 0; i < size; ++i) {
+                r[i] = arr[i];
+            }
+            return r;
         }
     };
 }

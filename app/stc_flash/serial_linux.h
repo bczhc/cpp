@@ -31,7 +31,7 @@ namespace bczhc {
 
         void close() const override;
 
-        [[nodiscard]] Array<uchar> read(ssize_t size) const override;
+        [[nodiscard]] SArray<uchar> read(ssize_t size) const override;
 
         ssize_t write(uchar *buf, ssize_t size) const override;
 

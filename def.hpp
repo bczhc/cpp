@@ -11,4 +11,8 @@
 using uchar = uint8_t;
 #endif
 
+#ifndef BCZHC_DEF_2
+#define RANDOM(a, b) (((double) rand() / RAND_MAX) * ((b) - (a)) + (a))
+#endif
+
 #endif //BCZHC_DEF_HPP

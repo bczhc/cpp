@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <sys/types.h>
+#include "./shared_pointer.hpp"
 
 namespace bczhc {
     template<typename T>
@@ -70,11 +71,11 @@ namespace bczhc {
             ssize_t t;
             if (len + size >= dataSize)
                 resize(dataSize * 2 + len + size);
-            for (size_t i = len - 1 + size; i > index; --i) {
+            for (ssize_t i = len - 1 + size; i > (ssize_t) index; --i) {
                 t = i - size;
                 if (t >= 0) data[i] = data[t];
             }
-            for (size_t i = index; i < index + size; ++i) {
+            for (ssize_t i = index; i < (ssize_t) (index + size); ++i) {
                 data[i] = a[i - index];
             }
             len += size;
@@ -149,6 +150,16 @@ namespace bczhc {
             data = new T[dataSize];
             copy(a.data, len);
             return *this;
+        }
+    };
+
+    template<typename T>
+    class SArrayList : public SP<ArrayList<T>> {
+    public:
+        SArrayList() : SP<ArrayList<T>>(new ArrayList<T>) {}
+
+        T &operator[](size_t i) {
+            return (*(this->get()))[i];
         }
     };
 }

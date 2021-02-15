@@ -15,7 +15,9 @@ using namespace std;
 #include <utility>
 
 #define MAP(x, y) (map[(x) + (y) *col])
+#ifndef RANDOM
 #define RANDOM(a, b) (((double) rand() / RAND_MAX) * ((b) - (a)) + (a))
+#endif
 #define UP 0
 #define DOWN 1
 #define LEFT 2
