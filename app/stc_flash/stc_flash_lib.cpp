@@ -607,8 +607,7 @@ public:
             logging.debug("recv(..): Incorrect checksum[1]\n");
             throw String("io error");
         }
-        return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));
-        ;
+        return Bean2<uchar, Array<uchar>>(s[0], cutArray<uchar>(s, 1, -(1 + this->chkmode)));;
     }
 
     void detect() {
@@ -732,16 +731,16 @@ public:
 
     void send(uchar cmd, const Array<uchar> &dat) const {
         ArrayList<uchar> buf;
-        buf.insert(0x46).insert(0xB9).insert(0x6A);
+        buf.insert(0x46), buf.insert(0xB9), buf.insert(0x6A);
         int n = 1 + 2 + 1 + dat.length() + this->chkmode + 1;
-        buf.insert(n >> 8).insert(n & 0xFF).insert(cmd);
+        buf.insert(n >> 8), buf.insert(n & 0xFF), buf.insert(cmd);
         buf.insert(buf.length(), dat.elements, dat.length());
 
         int chksum = sum<int, uchar>(buf.data, 2, buf.length());
         if (this->chkmode > 1) {
             buf.insert((chksum >> 8) & 0xFF);
         }
-        buf.insert(chksum & 0xFF).insert(0x16);
+        buf.insert(chksum & 0xFF), buf.insert(0x16);
         __conn_write(buf.data, buf.length());
     }
 
@@ -760,7 +759,7 @@ public:
     void handshake() {
         uint32_t baud0 = conn.getBaud();
         uint32_t bauds[] = {115200, 57600, 38400, 28800, 19200, 14400, 9600, 4800, 2400, 1200},
-                 len = ARR_SIZE(bauds);
+                len = ARR_SIZE(bauds);
         bool broken = false;
         uint32_t baud;
         Array<int> baudstr(0);
@@ -862,7 +861,7 @@ public:
             const Bean2<uchar, Array<uchar>> rb = recv(10);
             assert(rb.a1 == 0x80);
         } else {
-            uchar a[] = {0x00, 0x00, (uchar)(this->romsize.val * 4), 0x00, 0x00, (uchar)(this->romsize.val * 4)};
+            uchar a[] = {0x00, 0x00, (uchar) (this->romsize.val * 4), 0x00, 0x00, (uchar) (this->romsize.val * 4)};
             int len = ARR_SIZE(a);
             ArrayList<uchar> b(len);
             for (int i = 0; i < len; ++i) {
@@ -902,7 +901,7 @@ public:
         for (int i = 0; i < code.length(); i += 128) {
             logging.info("Flash code region (%04X, %04X)\n", i, i + 127);
 
-            uchar a[] = {0, 0, (uchar)(i >> 8), (uchar)(i & 0xFF), 0, 128};
+            uchar a[] = {0, 0, (uchar) (i >> 8), (uchar) (i & 0xFF), 0, 128};
             int len = ARR_SIZE(a);
             ArrayList<uchar> b(len);
             for (int j = 0; j < len; ++j) {
@@ -950,7 +949,7 @@ public:
 
     [[nodiscard]] bool options(NonableBoolean erase_eeprom) const {
         ArrayList<uchar> dat;
-        const Array<uchar> localFosc = packUnsignedInt32BigEndian((uint32_t)(this->fosc * 1000000));
+        const Array<uchar> localFosc = packUnsignedInt32BigEndian((uint32_t) (this->fosc * 1000000));
         if (this->protocol.val == PROTOCOL_89) {
             if (!erase_eeprom.isNone) {
                 this->info[2] &= 0xF7;

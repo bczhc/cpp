@@ -6,13 +6,7 @@
 #define BCZHC_EXCEPTION_HPP
 
 #include <exception>
-#include "string.hpp"
-
-#ifndef BCZHC_STRING_HPP
-
 #include "./string.hpp"
-
-#endif
 
 using namespace bczhc;
 

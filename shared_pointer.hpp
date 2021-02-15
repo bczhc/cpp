@@ -51,8 +51,8 @@ namespace bczhc {
             return this->ptr;
         }
 
-        T *operator*() {
-            return this->ptr;
+        T &operator*() {
+            return *this->ptr;
         }
     };
 

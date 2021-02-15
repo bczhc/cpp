@@ -9,29 +9,20 @@
 #include "utf8.hpp"
 #include <cstdint>
 #include <sys/types.h>
+#include "./shared_pointer.hpp"
 
 using namespace bczhc;
 
 namespace bczhc {
-    class String {
+    class String : public ArrayList<char> {
     private:
-        char *data = nullptr;
-        size_t stringSize = 0, dataSize = 0;
         bool mIsNull = false;
-        int *refCount = nullptr;
 
-        void newData(const char *s, size_t strSize, size_t capacity);
+        void checkSpaceAndResize(size_t newSize);
 
-        void newData(const char *s, size_t size);
+        void copyStr(const String &string);
 
-        void fromCharsString(const char *s, size_t size);
-
-        void fromCharsString(const char *s, size_t strSize, ssize_t capacity);
-
-        void resize(size_t newStringLength);
-
-        void release();
-
+        void copyStr(const char *s, size_t size);
 
     public:
         String();
@@ -48,13 +39,19 @@ namespace bczhc {
 
         [[nodiscard]] size_t utf8Length() const;
 
-        [[nodiscard]] size_t length() const;
-
         String &operator=(const String &string);
 
         String &operator=(const char *s);
 
-        void copy(const String &string);
+        void insert(size_t index, const char *a, size_t size) override;
+
+        void insert(char a) override;
+
+        void insert(const char *a, size_t size) override;
+
+        char remove(int index) override;
+
+        void remove(size_t start, size_t end) override;
 
         String &append(const String &string);
 
@@ -67,8 +64,6 @@ namespace bczhc {
         String &append(int64_t a);
 
         String &appendUnicode(uint32_t codepoint);
-
-        [[nodiscard]] ssize_t indexOf(char c) const;
 
         ssize_t indexOf(const char *s) const;
 
@@ -90,9 +85,9 @@ namespace bczhc {
 
         static String toString(double a);
 
-        String &insert(size_t index, char c);
+        void insert(size_t index, char c) override;
 
-        String &insert(size_t index, const String &string);
+        void insert(size_t index, const String &string);
 
         static String toString(int32_t i, int radix);
 
@@ -112,7 +107,7 @@ namespace bczhc {
 
         explicit String(size_t initialCapacity);
 
-        void clear();
+        void clear() override;
 
         static String toUpperCase(const char *s);
 
@@ -142,7 +137,7 @@ namespace bczhc {
 
         [[nodiscard]] String substring(size_t start, size_t end) const;
 
-        [[nodiscard]] char *toCharArray() const;
+        [[nodiscard]]SharedPointer<char> toCharArray() const;
 
         String operator+(const String &s) const;
 

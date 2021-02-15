@@ -24,14 +24,6 @@
 using namespace std;
 using namespace bczhc;
 
-
-
 int main() {
-    Scanner sc(stdin);
-    cout << "string, int, long, bool" << endl;
-    cout << sc.nextString().getCString() << endl;
-    cout << sc.nextInt() << endl;
-    cout << sc.nextLong() << endl;
-    cout << sc.nextBool() << endl;
     return 0;
 }

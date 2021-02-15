@@ -5,99 +5,105 @@
 #ifndef BCZHC_CPP_ARRAY_LIST_HPP
 #define BCZHC_CPP_ARRAY_LIST_HPP
 
+#include <cstddef>
+#include <sys/types.h>
+
 namespace bczhc {
     template<typename T>
     class ArrayList {
-    private:
-        int len = 0;
-        int dataSize = 0;
-        int *refCount;
+    protected:
+        size_t len;
+        size_t dataSize;
 
-        void resize(int newSize) {
+        void resize(size_t newSize) {
             T *newArr = new T[newSize];
-            for (int i = 0; i < len; ++i)
+            for (size_t i = 0; i < len; ++i)
                 newArr[i] = data[i];
             delete[] data;
             data = newArr;
             dataSize = newSize;
         }
 
-        void release() {
-            if (--*refCount == -1) {
-                delete[] data;
-                delete refCount;
-            }
-        }
-
-        void copy(const ArrayList<T> &a) {
-            this->data = a.data;
-            this->dataSize = a.dataSize;
-            this->refCount = a.refCount;
-            this->len = a.len;
-        }
-
     public:
         T *data = nullptr;
 
-        explicit ArrayList(int capacity) {
-            refCount = new int(0);
+        explicit ArrayList(size_t capacity) {
             data = new T[capacity];
             dataSize = capacity;
+            len = 0;
         }
 
-        ArrayList() {
-            refCount = new int(0);
-            data = new T[1];
-            dataSize = 1;
+        ArrayList() : ArrayList(10) {}
+
+        ArrayList(const ArrayList<T> &a) {
+            len = a.len, dataSize = a.dataSize;
+            data = new T[dataSize];
+            copy(a.data, len);
         }
 
-        ~ArrayList() { release(); }
+        ~ArrayList() {
+            delete[] data;
+        }
 
-        void clear() { len = 0; }
+        virtual void clear() {
+            resize(10);
+            len = 0;
+        }
 
-        bool isEmpty() { return len == 0; }
+        bool isEmpty() const { return len == 0; }
 
-        int length() { return len; }
+        int length() const { return len; }
 
-        T get(int i) { return data[i]; }
+        T get(int i) const { return data[i]; }
 
-        void insert(int index, T a) {
+        virtual void insert(size_t index, T a) {
             if (len == dataSize)
                 resize(dataSize * 2 + 2);
-            for (int i = len; i > index; --i)
+            for (size_t i = len; i > index; --i)
                 data[i] = data[i - 1];
             data[index] = a;
             ++len;
         }
 
-        void insert(int index, const T *a, int size) {
+        virtual void insert(size_t index, const T *a, size_t size) {
             if (index < 0 || index > len) return;
-            int t;
+            ssize_t t;
             if (len + size >= dataSize)
                 resize(dataSize * 2 + len + size);
-            for (int i = len - 1 + size; i > index; --i) {
+            for (size_t i = len - 1 + size; i > index; --i) {
                 t = i - size;
                 if (t >= 0) data[i] = data[t];
             }
-            for (int i = index; i < index + size; ++i) {
+            for (size_t i = index; i < index + size; ++i) {
                 data[i] = a[i - index];
             }
             len += size;
         }
 
-        ArrayList<T> &insert(T a) {
-            if (len == dataSize)
-                resize(dataSize * 2 + 2);
+        virtual void insert(T a) {
+            if (len + 1 >= dataSize)
+                resize(2 * (dataSize + 1));
             data[len++] = a;
-            return *this;
         }
 
-        T remove(int index) {
+        virtual void insert(const T *a, size_t size) {
+            size_t newSize = dataSize + size;
+            if (newSize > dataSize) {
+                dataSize = 2 * newSize;
+                resize(dataSize);
+            }
+            for (size_t i = 0; i < size; ++i) {
+                data[len + i] = a[i];
+            }
+            len += size;
+        }
+
+        virtual T remove(int index) {
             if (len < dataSize / 4)
                 resize(dataSize / 2);
             T removed = data[index];
             --len;
-            for (int i = index; i < len; ++i)
+            for (size_t i = index; i < len; ++i)
                 data[i] = data[i + 1];
             return removed;
         }
@@ -107,38 +113,41 @@ namespace bczhc {
          * @param start
          * @param end
          */
-        void remove(int start, int end) {
+        virtual void remove(size_t start, size_t end) {
             if (start < 0 || start >= len || end > len || end < start) return;
-            int removedSize = end - start;
-            int t = len - removedSize;
-            for (int i = start; i < t; ++i) {
+            size_t removedSize = end - start;
+            size_t t = len - removedSize;
+            for (size_t i = start; i < t; ++i) {
                 data[i] = data[i + removedSize];
             }
             if (len < dataSize / 4) resize(dataSize / 2);
             len -= removedSize;
         }
 
-        int indexOf(T t) {
-            for (int i = 0; i < len; ++i) {
+        ssize_t indexOf(T t) const {
+            for (size_t i = 0; i < len; ++i) {
                 if (data[i] == t)
                     return i;
             }
+            return -1;
         }
 
-        T &operator[](int i) {
+        T &operator[](size_t i) const {
             return data[i];
         }
 
-        ArrayList(const ArrayList<T> &a) {
-            copy(a);
-            ++*refCount;
+        void copy(const T *src, size_t size) {
+            for (size_t i = 0; i < size; ++i) {
+                data[i] = src[i];
+            }
         }
 
         ArrayList<T> &operator=(const ArrayList<T> &a) {
             if (&a == this) return *this;
-            release();
-            copy(a);
-            ++*refCount;
+            delete[] data;
+            len = a.len, dataSize = len;
+            data = new T[dataSize];
+            copy(a.data, len);
             return *this;
         }
     };

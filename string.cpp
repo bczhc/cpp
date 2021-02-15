@@ -5,33 +5,35 @@
 
 using namespace bczhc;
 
-String::String() {
-    fromCharsString(nullptr, 0);
+using Super = ArrayList<char>;
+
+String::String() : Super::ArrayList(1) {
+    data[0] = '\0';
 }
 
-String::String(const String &string) {
-    copy(string);
-    ++*refCount;
+String::String(const String &string) : Super::ArrayList(string.len + 1) {
+    copyStr(string);
 }
 
-void String::copy(const String &string) {
-    refCount = string.refCount;
-    data = string.data;
-    dataSize = string.dataSize;
-    stringSize = string.stringSize;
-    mIsNull = string.mIsNull;
+void String::copyStr(const String &string) {
+    copyStr(string.data, string.len);
+    this->mIsNull = string.mIsNull;
 }
 
-String::String(const char *s) {
-    if (s == nullptr) {
-        mIsNull = true;
-        s = "(null)";
-    }
-    fromCharsString(s, strlen(s));
+void String::copyStr(const char *s, size_t size) {
+    len = size, dataSize = size + 1;
+    delete[] data;
+    data = new char[dataSize];
+    copy(s, len);
+    data[len] = '\0';
 }
 
-String::String(const char *s, size_t size) {
-    fromCharsString(s, size);
+String::String(const char *s) : String(s, s == nullptr ? 0 : strlen(s)) {}
+
+String::String(const char *s, size_t size) : Super::ArrayList(size + 1) {
+    len = size;
+    copyStr(s, size);
+    data[len] = '\0';
 }
 
 const char *String::getCString() const {
@@ -48,76 +50,34 @@ size_t String::utf8Length() const {
     return c;
 }
 
-size_t String::length() const {
-    return stringSize;
-}
-
-void String::newData(const char *s, size_t strSize, size_t capacity) {
-    if (capacity < strSize + 1) throw Exception("illegal capacity");
-    stringSize = strSize, dataSize = capacity;
-    data = new char[dataSize];
-    for (size_t i = 0; i < strSize; ++i) data[i] = s[i];
-    data[strSize] = '\0';
-}
-
-void String::newData(const char *s, size_t size) {
-    newData(s, size, size + 1);
-}
-
-void String::fromCharsString(const char *s, size_t strSize) {
-    fromCharsString(s, strSize, strSize + 1);
-}
-
-void String::fromCharsString(const char *s, size_t strSize, ssize_t capacity) {
-    refCount = new int(0);
-    newData(s, strSize, capacity);
-}
-
-
 String &String::operator=(const String &string) {
-    if (&string == this) return *this;
-    release();
-    copy(string);
-    ++*refCount;
+    Super::operator=(string);
+    copyStr(string);
     return *this;
 }
 
 String &String::operator=(const char *s) {
-    release();
     if (s == nullptr) {
-        mIsNull = true;
         s = "(null)";
+        mIsNull = true;
     }
-    fromCharsString(s, strlen(s));
+    copyStr(s, strlen(s));
     return *this;
 }
 
-void String::resize(size_t newSize) {
-    char *newChars = new char[newSize];
-    strcpy(newChars, data);
-    delete[] data;
-    data = nullptr;
-    data = newChars;
+void String::checkSpaceAndResize(size_t newSize) {
+    if (newSize >= dataSize) {
+        resize(2 * newSize);
+    }
 }
 
 String &String::append(const char *s, size_t size) {
-    size_t len = -1;
-    String *t = nullptr;
-    if (s == this->data) {
-        t = new String(s);
-        len = t->length();
-        s = t->data;
+    checkSpaceAndResize(len + size + 1);
+    for (size_t i = 0; i < size; ++i) {
+        data[len + i] = s[i];
     }
-    if (len == -1) len = size;
-    if (stringSize + len + 1 > dataSize) {
-        dataSize = 2 * (stringSize + len) + 2;
-        resize(dataSize);
-    }
-    for (size_t i = 0; i < len; ++i)
-        data[stringSize + i] = s[i];
-    stringSize += len;
-    data[stringSize] = '\0';
-    delete t;
+    len += size;
+    data[len] = '\0';
     return *this;
 }
 
@@ -127,18 +87,8 @@ String &String::append(const String &string) {
 }
 
 String &String::append(char c) {
-    if (stringSize + 2 > dataSize) {
-        dataSize = 2 * stringSize + 2;
-        resize(dataSize);
-    }
-    data[stringSize] = c;
-    ++stringSize;
-    data[stringSize] = '\0';
+    insert(c);
     return *this;
-}
-
-ssize_t String::indexOf(char c) const {
-    return String::indexOf(data, c);
 }
 
 ssize_t String::indexOf(const char *s) const {
@@ -199,17 +149,7 @@ ArrayList<String> String::split(const String &str, const String &separator) {
     return list;
 }
 
-void String::release() {
-    if (--*refCount == -1) {
-        delete[] data;
-        data = nullptr;
-        delete refCount;
-    }
-}
-
-String::~String() {
-    release();
-}
+String::~String() = default;
 
 String String::toString(int32_t a) {
     return Integer::toString(a);
@@ -233,29 +173,13 @@ String String::toString(double a) {
     return String(s);
 }
 
-String &String::insert(size_t index, char c) {
-    stringSize += 1;
-    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 2, resize(dataSize);
-    for (size_t i = stringSize; i > index; --i) {
-        data[i] = data[i - 1];
-    }
-    data[index] = c;
-    data[stringSize] = '\0';
-    return *this;
+void String::insert(size_t index, char c) {
+    checkSpaceAndResize(len + 2);
+    Super::insert(index, c);
 }
 
-String &String::insert(size_t index, const String &string) {
-    size_t len = string.length();
-    stringSize += len;
-    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 2, resize(dataSize);
-    for (size_t i = stringSize; i >= index + len; --i) {
-        data[i] = data[i - len];
-    }
-    for (size_t i = 0; i < len; ++i) {
-        data[index + i] = string.data[i];
-    }
-    data[stringSize] = '\0';
-    return *this;
+void String::insert(size_t index, const String &string) {
+    insert(index, string.data, string.len);
 }
 
 String String::toString(int32_t i, int32_t radix) {
@@ -315,17 +239,17 @@ String String::toString(int64_t i, int32_t radix) {
 }
 
 String String::toString(char c) {
-    char s[2];
-    s[0] = c, s[1] = '\0';
-    return String(s);
+    char s[1];
+    s[0] = c;
+    return String(s, 1);
 }
 
-String::String(size_t initialCapacity) {
-    fromCharsString(nullptr, 0, initialCapacity);
+String::String(size_t initialCapacity) : Super::ArrayList(initialCapacity + 1) {
+    data[0] = '\0';
 }
 
 void String::clear() {
-    stringSize = 0;
+    Super::clear();
     data[0] = '\0';
 }
 
@@ -352,11 +276,12 @@ String String::toUpperCase(const char *s) {
 
 String String::toUpperCase(const String &s) {
     size_t len = s.length();
+    char b[len + 1];
     String r(len);
     for (size_t i = 0; i < len; ++i) {
-        r += (char) toupper(s.data[i]);
+        b[i] = (char) toupper(s.data[i]);
     }
-    return r;
+    return String(b);
 }
 
 String String::toLowerCase(const char *s) {
@@ -365,11 +290,12 @@ String String::toLowerCase(const char *s) {
 
 String String::toLowerCase(const String &s) {
     size_t len = s.length();
+    char b[len + 1];
     String r(len);
     for (size_t i = 0; i < len; ++i) {
-        r += (char) tolower(s.data[i]);
+        b[i] = (char) tolower(s.data[i]);
     }
-    return r;
+    return String(b);
 }
 
 char String::charAt(size_t pos) const {
@@ -396,12 +322,12 @@ String String::substr(size_t start, size_t length) const {
     return substr(getCString(), start, length);
 }
 
-char *String::toCharArray() const {
-    char *r = new char[stringSize];
-    for (size_t i = 0; i < stringSize; ++i) {
+SharedPointer<char> String::toCharArray() const {
+    char *r = new char[dataSize];
+    for (size_t i = 0; i < dataSize; ++i) {
         r[i] = data[i];
     }
-    return r;
+    return SP<char>(r);
 }
 
 String String::operator+(const String &s) const {
@@ -454,7 +380,7 @@ char &String::operator[](size_t index) {
 }
 
 ssize_t String::firstIndexOf(char c) const {
-    for (size_t i = 0; i < length(); ++i) {
+    for (size_t i = 0; i < len; ++i) {
         if (data[i] == c) return i;
     }
     return -1;
@@ -498,4 +424,33 @@ String String::toUpperCase() const {
 
 String String::toLowerCase() const {
     return String::toLowerCase(*this);
+}
+
+void String::insert(size_t index, const char *a, size_t size) {
+    checkSpaceAndResize(len + size + 1);
+    Super::insert(index, a, size);
+    data[len] = '\0';
+}
+
+void String::insert(char a) {
+    checkSpaceAndResize(len + 2);
+    data[len++] = a;
+    data[len] = '\0';
+}
+
+void String::insert(const char *a, size_t size) {
+    checkSpaceAndResize(len + size + 1);
+    ArrayList::insert(a, size);
+    data[len] = '\0';
+}
+
+char String::remove(int index) {
+    char removed = ArrayList::remove(index);
+    data[len] = '\0';
+    return removed;
+}
+
+void String::remove(size_t start, size_t end) {
+    ArrayList::remove(start, end);
+    data[len] = '\0';
 }

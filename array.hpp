@@ -6,7 +6,6 @@
 #define BCZHC_ARRAY_ARRAY_HPP
 
 #include "./string.hpp"
-#include "string.hpp"
 
 using namespace bczhc;
 
