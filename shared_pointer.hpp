@@ -11,7 +11,7 @@ namespace bczhc {
     private:
         int *refCount{};
     protected:
-        T *ptr;
+        T *ptr{};
 
         void release() const {
             if (--*refCount == -1) {
@@ -21,12 +21,20 @@ namespace bczhc {
         }
 
     public:
+        SharedPointer() {
+            refCount = new int(0);
+        };
+
         SharedPointer(T *ptr) : ptr(ptr) { // NOLINT(google-explicit-constructor)
             refCount = new int(0);
         }
 
         T *get() const {
             return this->ptr;
+        }
+
+        T &getRef() const {
+            return *this->ptr;
         }
 
         SharedPointer(const SharedPointer &a) {
@@ -46,6 +54,10 @@ namespace bczhc {
 
         ~SharedPointer() {
             release();
+        }
+
+        bool isNull() const {
+            return ptr == nullptr;
         }
 
         T *operator->() const {

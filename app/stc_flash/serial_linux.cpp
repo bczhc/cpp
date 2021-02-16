@@ -147,7 +147,7 @@ void SerialLinux::setSpeed(unsigned int speed) {
             break;
 #endif
 #ifdef B7200
-        case 7200:
+            case 7200:
             rate = B7200;
             break;
 #endif
@@ -157,7 +157,7 @@ void SerialLinux::setSpeed(unsigned int speed) {
             break;
 #endif
 #ifdef B14400
-        case 14400:
+            case 14400:
             rate = B14400;
             break;
 #endif
@@ -167,7 +167,7 @@ void SerialLinux::setSpeed(unsigned int speed) {
             break;
 #endif
 #ifdef B28800
-        case 28800:
+            case 28800:
             rate = B28800;
             break;
 #endif
@@ -177,7 +177,7 @@ void SerialLinux::setSpeed(unsigned int speed) {
             break;
 #endif
 #ifdef B76800
-        case 76800:
+            case 76800:
             rate = B76800;
             break;
 #endif
@@ -192,12 +192,12 @@ void SerialLinux::setSpeed(unsigned int speed) {
             break;
 #endif
 #ifdef B128000
-        case 128000:
+            case 128000:
             rate = B128000;
             break;
 #endif
 #ifdef B153600
-        case 153600:
+            case 153600:
             rate = B153600;
             break;
 #endif
@@ -207,7 +207,7 @@ void SerialLinux::setSpeed(unsigned int speed) {
             break;
 #endif
 #ifdef B256000
-        case 256000:
+            case 256000:
             rate = B256000;
             break;
 #endif
@@ -288,7 +288,7 @@ void SerialLinux::close() const {
     if (::close(this->fd) != 0) throw String("Close failed.");
 }
 
-SArray<uchar> SerialLinux::read(ssize_t size) const {
+Array<uchar> SerialLinux::read(ssize_t size) const {
     int64_t start = getCurrentTimeMillis();
     char buf[size];
     ssize_t haveRead = 0;
@@ -309,7 +309,7 @@ SArray<uchar> SerialLinux::read(ssize_t size) const {
             break;
         }
     }
-    SArray<uchar> r(haveRead);
+    Array<uchar> r(haveRead);
     for (int i = 0; i < haveRead; ++i) {
         r[i] = buf[i];
     }

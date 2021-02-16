@@ -12,7 +12,7 @@ using namespace std;
 int main() {
     int status = 1;
     try {
-        status = test();
+        status = test1();
     } catch (const String &s) {
         cout << s.getCString() << endl;
     }

@@ -21,10 +21,14 @@
 #include "../regex.hpp"
 #include "../io.hpp"
 #include <random>
+#include "../doubly_linked_list.hpp"
+#include "../queue.hpp"
+#include "../stack.hpp"
 
 using namespace std;
 using namespace bczhc;
 
 int main() {
+
     return 0;
 }

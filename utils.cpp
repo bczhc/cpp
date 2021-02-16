@@ -71,7 +71,7 @@ String Long::toString(int64_t i) {
 
 int64_t Long::javaParseLong(const String &s, int radix) {
     if (s.isNull()) throw NumberFormatException("null");
-    
+
     if (radix > 36 || radix < 2) throw NumberFormatException("illegal radix");
 
     bool negative = false;

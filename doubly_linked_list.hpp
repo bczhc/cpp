@@ -6,6 +6,7 @@
 #define BCZHC_CPP_DOUBLY_LINKED_LISG_HPP
 
 #include "./iterator.hpp"
+#include "./exception.hpp"
 
 using namespace bczhc;
 
@@ -15,127 +16,146 @@ namespace bczhc {
     private:
         class Node {
         public:
-            T data;
             Node *prev = nullptr;
+            T data{};
             Node *next = nullptr;
 
             Node() = default;
+
+            Node(Node *prev, T data, Node *next) : prev(prev), data(data), next(next) {}
+
+            Node(Node *prev, Node *next) : prev(prev), next(next) {}
         };
 
-        Node *head, *last;
-        int len = 0;
-        int *refCount;
+        Node *head = nullptr, *last = nullptr;
+        size_t len = 0;
 
-        void copy(const DoublyLinkedList<T> &a) {
-            this->head = a.head;
-            this->last = a.last;
-            this->len = a.len;
-            this->refCount = a.refCount;
+        /**
+         * Get node, beginning from the first data head (the next of the dummy head).
+         * @param index index
+         * @return node
+         */
+        Node *getNode(size_t index) const {
+            auto t = head;
+            for (size_t i = 0; i <= index; ++i) {
+                t = t->next;
+            }
+            return t;
         }
 
-        void release() {
-            if (--*refCount == -1) {
-                clear();
-                delete head;
-                delete refCount;
-            }
+        void initDummy() {// dummy node
+            head = new Node(nullptr, nullptr);
+            // dummy node
+            last = new Node(nullptr, nullptr);
+            head->next = last, last->prev = head;
         }
 
     public:
         DoublyLinkedList() {
-            head = new Node();
-            last = head;
-            refCount = new int(0);
+            initDummy();
         }
 
         ~DoublyLinkedList() {
-            release();
+            clear();
+            delete head, delete last;
         }
 
         void clear() {
             len = 0;
             Node *t = head->next, *prev;
-            while (t != nullptr) {
+            while (t != last) {
                 prev = t;
                 t = t->next;
                 delete prev;
             }
-            head->next = nullptr;
-            last = head;
+            head->next = last, last->prev = head;
         }
 
-        bool isEmpty() { return len == 0; }
+        bool isEmpty() const { return len == 0; }
 
-        int length() { return len; }
+        int length() const { return len; }
 
-        T get(int index) {
-            Node *t = head;
-            for (int i = 0; i <= index; ++i) {
-                t = t->next;
-            }
-            return t->data;
+        T get(size_t index) const {
+            if (index < 0 || index >= len) throw IndexOutOfBoundsException();
+            return getNode(index)->data;
         }
 
         void insert(T a) {
-            Node *newNode = new Node();
-            newNode->prev = last, newNode->data = a;
-            last->next = newNode;
-            last = last->next;
-            ++len;
-        }
-
-        void insert(int index, T a) {
-            Node *prev = head;
-            for (int i = 0; i < index; ++i)
-                prev = prev->next;
-            Node *curr = prev->next;
-            Node *newNode = new Node;
-            newNode->prev = prev, newNode->data = a, newNode->next = curr;
-            curr->prev = newNode;
+            auto newNode = new Node(last->prev, a, last);
+            auto prev = last->prev;
             prev->next = newNode;
+            last->prev = newNode;
             ++len;
         }
 
-        T remove(int index) {
-            Node *prev = head;
-            for (int i = 0; i < index; ++i)
-                prev = prev->next;
-            Node *curr = prev->next;
-            T r = curr->data;
-            Node *next = curr->next;
-            if (next == nullptr) {
-                last = curr;
-            } else {
-                prev->next = next;
-                next->prev = prev;
+        void insertLast(T a) {
+            insert(a);
+        }
+
+        void insertFirst(T a) {
+            auto newNode = new Node(head, a, head->next);
+            head->next = newNode, head->next->prev = newNode;
+            ++len;
+        }
+
+        void insert(size_t index, T a) {
+            if (index < 0 || index > len) throw IndexOutOfBoundsException();
+            if (index == 0) insertFirst(a);
+            else if (index == len) insertLast(a);
+            else {
+                auto prev = getNode(index - 1), *next = prev->next;
+                auto newNode = new Node(prev, a, next);
+                prev->next = newNode, next->prev = newNode;
+                ++len;
             }
-            delete curr;
-            --len;
+        }
+
+        void insertAll(const DoublyLinkedList<T> &a) {
+            auto it = a.getIterator();
+            while (it.hasNext()) {
+                insert(it.next());
+            }
+        }
+
+        T remove(size_t index) {
+            if (index < 0 || index >= len) throw IndexOutOfBoundsException();
+            auto removed = getNode(index);
+            T r = removed->data;
+            removed->prev->next = removed->next;
+            removed->next->prev = removed->prev;
+            delete removed;
             return r;
         }
 
-        int indexOf(T e) {
-            Node *t = head;
-            for (int i = 0; i < len; ++i) {
+        ssize_t indexOf(T e) const {
+            auto t = head->next;
+            for (size_t i = 0; t != last; ++i) {
+                if (t->data == e) return i;
                 t = t->next;
-                if (e == t->data)
-                    return i;
             }
+            return -1;
         }
 
-        T getFirst() { return head->next->data; }
+        T getFirst() const {
+            if (len < 1) throw NoSuchElementException();
+            return head->next->data;
+        }
 
-        T getLast() { return last->data; }
+        T getLast() const {
+            if (len < 1) throw NoSuchElementException();
+            return last->prev->data;
+        }
 
         class Iterator : public bczhc::Iterator<T> {
         private:
             Node *t;
+            Node *last;
 
         public:
-            explicit Iterator(Node *head) : t(head) {}
+            explicit Iterator(Node *head, Node *last) : t(head), last(last) {}
 
             bool hasNext() override {
-                return t->next != nullptr;
+                return t->next != last;
             }
 
             T next() override {
@@ -144,21 +164,20 @@ namespace bczhc {
             }
         };
 
-        Iterator getIterator() {
-            Iterator it(head);
+        Iterator getIterator() const {
+            Iterator it(head, last);
             return it;
         }
 
         DoublyLinkedList(const DoublyLinkedList<T> &a) {
-            copy(a);
-            ++*refCount;
+            initDummy();
+            insertAll(a);
         }
 
         DoublyLinkedList<T> &operator=(const DoublyLinkedList<T> &a) {
             if (&a == this) return *this;
-            release();
-            copy(a);
-            ++*refCount;
+            clear();
+            insertAll(a);
             return *this;
         }
     };

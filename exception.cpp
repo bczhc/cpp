@@ -64,7 +64,7 @@ Exception::Exception(const Exception &e) {
     operator=(e);
 }
 
-KeyNotFoundException::KeyNotFoundException() = default;
+NoSuchElementException::NoSuchElementException() = default;
 
 PCREException::PCREException(const char *msg) : Exception(msg) {}
 

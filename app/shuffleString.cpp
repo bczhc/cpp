@@ -3,6 +3,7 @@
 #include "../io.hpp"
 #include "../utils.hpp"
 #include "../linked_list.hpp"
+#include "../utf8.hpp"
 
 using namespace std;
 using namespace bczhc;

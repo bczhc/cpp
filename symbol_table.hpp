@@ -61,7 +61,7 @@ namespace bczhc {
                     return t->value;
                 }
             }
-            throw KeyNotFoundException();
+            throw NoSuchElementException();
         }
 
         virtual void put(K key, V value) {

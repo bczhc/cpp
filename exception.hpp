@@ -80,9 +80,9 @@ namespace bczhc {
         IOException();
     };
 
-    class KeyNotFoundException : public Exception {
+    class NoSuchElementException : public Exception {
     public:
-        KeyNotFoundException();
+        NoSuchElementException();
     };
 
     class PCREException: public Exception {

@@ -1,4 +1,5 @@
 #include "reverseCharacters.h"
+#include "../../utf8.hpp"
 
 inline void cpyStr(char *dest, char *s, int length) {
     for (int i = 0; i < length; ++i)

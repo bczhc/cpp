@@ -3,6 +3,7 @@
 #include <cstdio>
 #include "./exception.hpp"
 #include "./utils.hpp"
+#include "./utf8.hpp"
 
 using namespace bczhc;
 

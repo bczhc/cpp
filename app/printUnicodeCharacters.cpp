@@ -3,6 +3,8 @@
 #include "../string.hpp"
 #include <cstdlib>
 #include <iostream>
+#include "../utf8.hpp"
+
 
 using json = nlohmann::json;
 using namespace bczhc;

@@ -1,5 +1,6 @@
 #include "../../string.hpp"
 #include <cstdio>
+#include "../../utf8.hpp"
 
 using namespace bczhc;
 using namespace std;

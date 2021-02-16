@@ -25,7 +25,7 @@ String f2(String a) {
     return a + b + c + d + e;
 }
 
-int test() {
+int test1() {
     String s1;
     s1 += "a";
     s1 += String().append('b') += "c2";

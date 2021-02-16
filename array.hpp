@@ -14,9 +14,25 @@ namespace bczhc {
     class Array {
     private:
         size_t len = 0;
+        int *refCount = nullptr;
+
+        void release() const {
+            if (--*refCount == -1) {
+                delete[] elements;
+                delete refCount;
+            }
+        }
 
     public:
         T *elements = nullptr;
+
+        static Array<T> from(T *arr, int size) {
+            Array<T> r(size);
+            for (int i = 0; i < size; ++i) {
+                r[i] = arr[i];
+            }
+            return r;
+        }
 
         Array() : Array(0) {}
 
@@ -25,11 +41,13 @@ namespace bczhc {
             if (size != 0) {
                 elements = new T[size];
             }
+            refCount = new int(0);
             len = size;
         }
 
         Array(const Array<T> &arr) {
             copy(arr);
+            ++(*refCount);
         }
 
         [[nodiscard]] int length() const {
@@ -37,22 +55,21 @@ namespace bczhc {
         }
 
         ~Array() {
-            delete[] elements;
+            release();
         }
 
         Array<T> &operator=(const Array<T> &arr) {
             if (&arr == this) return *this;
-            delete[] elements;
+            release();
             copy(arr);
+            ++(*refCount);
             return *this;
         }
 
         void copy(const Array<T> &arr) {
             len = arr.len;
-            elements = new T[arr.len];
-            for (size_t i = 0; i < len; ++i) {
-                elements[i] = arr.elements[i];
-            }
+            elements = arr.elements;
+            refCount = arr.refCount;
         }
 
         T &operator[](int i) const {

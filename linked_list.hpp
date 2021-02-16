@@ -15,7 +15,7 @@ namespace bczhc {
     private:
         class Node {
         public:
-            T data;
+            T data{};
             Node *next = nullptr;
 
             Node(T data, Node *next) : data(data), next(next) {}

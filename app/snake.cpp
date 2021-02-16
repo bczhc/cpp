@@ -1,18 +1,14 @@
 #include <iostream>
-using namespace std;
 
 #ifndef __WIN32
+
 #include "../linked_list.hpp"
 #include "../doubly_linked_list.hpp"
 #include <cstdint>
 #include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <pthread.h>
-#include <sys/time.h>
 #include <termios.h>
-#include <unistd.h>
-#include <utility>
+#include "../utils.hpp"
+#include "../concurrent.hpp"
 
 #define MAP(x, y) (map[(x) + (y) *col])
 #ifndef RANDOM
@@ -23,10 +19,10 @@ using namespace std;
 #define LEFT 2
 #define RIGHT 3
 
+using namespace bczhc;
+
 int64_t getTimestamp() {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    return tv.tv_sec * 1000LL + tv.tv_usec / 1000LL;
+    return getCurrentTimeMillis();
 }
 
 class SnakeGame {
@@ -88,9 +84,9 @@ private:
     void print() {
         for (int y = 0; y < row; ++y) {
             for (int x = 0; x < col; ++x) {
-                ::cout << ' ' << MAP(x, y);
+                printf(" %c", MAP(x, y));
             }
-            ::cout << ::endl;
+            printf("\n");
         }
     }
 
@@ -147,7 +143,7 @@ public:
             for (;;) {
                 if (getTimestamp() - manualMoveTime >= delayMillis)
                     break;
-                usleep(1000);
+                Thread::sleep(1);
             }
             move();
             manualMoveTime = getTimestamp();
@@ -195,13 +191,18 @@ public:
     }
 };
 
-void *f(void *arg) {
-    auto *game = (SnakeGame *) arg;
-    game->start();
-    delete game;
-    exit(0);
-    return nullptr;
-}
+class R : public Runnable {
+private:
+    SnakeGame *game;
+public:
+    explicit R(SnakeGame &game) : game(&game) {}
+
+    void run() override {
+        game->start();
+        delete this;
+        exit(0);
+    }
+};
 
 char scanKeyboard() {
     char in;
@@ -209,12 +210,12 @@ char scanKeyboard() {
     struct termios stored_settings{};
     tcgetattr(0, &stored_settings);
     new_settings = stored_settings;
-    new_settings.c_lflag &= (~ICANON);
+    new_settings.c_lflag &= (~((tcflag_t) ICANON));
     new_settings.c_cc[VTIME] = 0;
     tcgetattr(0, &stored_settings);
     new_settings.c_cc[VMIN] = 1;
     tcsetattr(0, TCSANOW, &new_settings);
-    in = getchar();
+    in = (char) getchar();
     tcsetattr(0, TCSANOW, &stored_settings);
     return in;
 }
@@ -223,8 +224,12 @@ inline bool cmp2(const char *str, const char *cmp, const char *orCmp) {
     return !strcmp(str, cmp) || !strcmp(str, orCmp);
 }
 
+struct Param {
+    char *a, *b;
+};
+
 int main(int argc, char **argv) {
-    srand(time(0));
+    srand((unsigned int) time(nullptr));
     int index = 0;
     char *path = argv[0];
     for (int i = 0; path[i] != '\0'; ++i) {
@@ -232,8 +237,7 @@ int main(int argc, char **argv) {
             index = i + 1;
     }
     char *filename = path + index;
-    typedef pair<char *, char *> param;
-    bczhc::LinkedList<param> params;
+    bczhc::LinkedList<Param> params;
     bool help = false, invalidArguments = false;
     for (int i = 1; i < argc; ++i) {
         if (cmp2(argv[i], "--help", "-h")) {
@@ -242,76 +246,74 @@ int main(int argc, char **argv) {
         }
         if (argv[i][0] == '-') {
             if (i + 1 < argc && argv[i + 1][0] != '-') {
-                param par(argv[i], argv[i + 1]);
+                Param par = {argv[i], argv[i + 1]};
                 params.insert(par);
             } else
                 invalidArguments = true;
         }
     }
     if (help) {
-        cout << "Usage: " << filename << " [options]" << endl
-             << "Options:" << endl
-             << "  -c,  --column <column>" << endl
-             << "  -r,  --row <row>" << endl
-             << "  -d,  --delay <delaied time (ms)>" << endl;
+        std::cout << "Usage: " << filename << " [options]" << std::endl
+                  << "Options:" << std::endl
+                  << "  -c,  --column <column>" << std::endl
+                  << "  -r,  --row <row>" << std::endl
+                  << "  -d,  --delay <delaied time (ms)>" << std::endl;
         return 0;
     }
     if (invalidArguments) {
-        cout << "Invalid arguments." << endl;
+        std::cout << "Invalid arguments." << std::endl;
         return 0;
     }
     int width = 10, height = 10, delay = 250;
     int len = params.length();
     for (int i = 0; i < len; ++i) {
-        param par = params.get(i);
-        char *first = par.first, *second = par.second;
+        Param par = params.get(i);
+        char *first = par.a, *second = par.b;
         if (cmp2(first, "-c", "--column"))
-            width = atoi(second);
+            width = Integer::parseInt(second);
         else if (cmp2(first, "-r", "--row"))
-            height = atoi(second);
+            height = Integer::parseInt(second);
         else if (cmp2(first, "-d", "--delay"))
-            delay = atoi(second);
+            delay = Integer::parseInt(second);
         else {
-            cout << "Unknown option: " << first << "." << endl;
+            std::cout << "Unknown option: " << first << "." << std::endl;
             return 0;
         }
     }
-    SnakeGame *game = new SnakeGame(width, height, delay);
-    pthread_t t;
-    pthread_create(&t, nullptr, f, (void *) game);
+    SnakeGame game(width, height, delay);
+    Thread t(new R(game));
     char read = 0;
-    while (!game->getGameoverStatus()) {
+    while (!game.getGameoverStatus()) {
         read = scanKeyboard();
-        cout << (int) read << endl;
+        std::cout << (int) read << std::endl;
         switch (read) {
             case 'w':
             case 'W':
-                game->moveUp();
+                game.moveUp();
                 break;
             case 's':
             case 'S':
-                game->moveDown();
+                game.moveDown();
                 break;
             case 'a':
             case 'A':
-                game->moveLeft();
+                game.moveLeft();
                 break;
             case 'd':
             case 'D':
-                game->moveRight();
+                game.moveRight();
                 break;
             case 'q':
-                delete game;
                 exit(0);
                 break;
             default:
                 break;
         }
     }
-    pthread_join(t, nullptr);
-    delete game;
+    t.join();
     return 0;
 }
+
 #else
 int main() {
     cout << "not supported for Windows" << endl;

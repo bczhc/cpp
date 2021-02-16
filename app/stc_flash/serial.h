@@ -30,7 +30,7 @@ namespace bczhc {
 
         virtual void close() const = 0;
 
-        [[nodiscard]] virtual SArray<uchar> read(ssize_t size) const = 0;
+        [[nodiscard]] virtual Array<uchar> read(ssize_t size) const = 0;
 
         virtual ssize_t write(uchar *buf, ssize_t size) const = 0;
 

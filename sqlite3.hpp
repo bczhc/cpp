@@ -9,6 +9,7 @@
 #include <cstdint>
 #include "string.hpp"
 #include "./exception.hpp"
+#include "./def.hpp"
 
 using namespace bczhc;
 

@@ -1,88 +1,129 @@
 #include "string.hpp"
-#include <cstddef>
-#include <cstring>
-#include "utils.hpp"
+#include "./utils.hpp"
 
 using namespace bczhc;
 
-using Super = ArrayList<char>;
-
-String::String() : Super::ArrayList(1) {
-    data[0] = '\0';
+void String::checkSpaceAndResize(size_t newSize) {
+    if (newSize > prop->dataSize) {
+        resize(newSize * 2);
+    }
 }
 
-String::String(const String &string) : Super::ArrayList(string.len + 1) {
-    copyStr(string);
+void String::mCopy(const String &s) {
+    mInfo = s.mInfo;
 }
 
-void String::copyStr(const String &string) {
-    copyStr(string.data, string.len);
-    this->mIsNull = string.mIsNull;
+void String::copyData(const char *s, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        prop->data[i] = s[i];
+    }
 }
 
-void String::copyStr(const char *s, size_t size) {
-    len = size, dataSize = size + 1;
-    delete[] data;
-    data = new char[dataSize];
-    copy(s, len);
-    data[len] = '\0';
+void String::checkSizeForTerminateCharAndResize() {
+    if (prop->dataSize < prop->length + 1) {
+        resize(prop->dataSize + 1);
+    }
+}
+
+String::String() : String(15) {}
+
+String::String(const String &string) : Super(string) {
+    mCopy(string);
+}
+
+String::String(const char *s, size_t size) : Super(s == nullptr ? (strlen("(null)") + 1) : (size + 1)) {
+    copyData(s, prop->dataSize - 1);
+    prop->length = prop->dataSize - 1;
+    prop->data[prop->length] = '\0';
+    mInfo = new Properties;
 }
 
 String::String(const char *s) : String(s, s == nullptr ? 0 : strlen(s)) {}
 
-String::String(const char *s, size_t size) : Super::ArrayList(size + 1) {
-    len = size;
-    copyStr(s, size);
-    data[len] = '\0';
+String::String(size_t initialCapacity) : Super(initialCapacity < 1 ? 1 : initialCapacity) {
+    prop->data[0] = '\0';
+    mInfo = new Properties;
+}
+
+String::~String() {
+    mRelease();
 }
 
 const char *String::getCString() const {
-    return data;
+    return this->prop->data;
 }
 
 size_t String::utf8Length() const {
     size_t c = 0;
     size_t i = 0;
-    while (data[i] != '\0') {
-        i += getUTF8BytesLength(data[i]);
+    while (prop->data[i] != '\0') {
+        i += getUTF8BytesLength(prop->data[i]);
         ++c;
     }
     return c;
 }
 
 String &String::operator=(const String &string) {
+    if (&string == this) return *this;
+    mRelease();
+    // contains ++refCount
     Super::operator=(string);
-    copyStr(string);
+    mCopy(string);
     return *this;
 }
+
+void String::mRelease() const { if (prop->refCount == 0) delete mInfo; }
 
 String &String::operator=(const char *s) {
+    Super::release();
+    delete mInfo;
+    prop = new Super::Properties;
+    mInfo = new Properties;
     if (s == nullptr) {
         s = "(null)";
-        mIsNull = true;
+        mInfo->isNull = true;
     }
-    copyStr(s, strlen(s));
+    prop->length = strlen(s);
+    prop->dataSize = prop->length + 1;
+    prop->data = new char[prop->dataSize];
+    // contains '\0';
+    copyData(s, prop->dataSize);
     return *this;
 }
 
-void String::checkSpaceAndResize(size_t newSize) {
-    if (newSize >= dataSize) {
-        resize(2 * newSize);
-    }
+void String::insert(size_t index, const char *a, size_t size) {
+    checkSpaceAndResize(prop->length + size + 1);
+    Super::insert(index, a, size);
+    prop->data[prop->length] = '\0';
 }
 
-String &String::append(const char *s, size_t size) {
-    checkSpaceAndResize(len + size + 1);
-    for (size_t i = 0; i < size; ++i) {
-        data[len + i] = s[i];
-    }
-    len += size;
-    data[len] = '\0';
-    return *this;
+void String::insert(char a) {
+    checkSpaceAndResize(prop->length + 2);
+    Super::insert(a);
+    prop->data[prop->length] = '\0';
+}
+
+void String::insert(const char *a, size_t size) {
+    checkSpaceAndResize(prop->length + size + 1);
+    Super::insert(a, size);
+    prop->data[prop->length] = '\0';
+}
+
+char String::remove(int index) {
+    auto removed = Super::remove(index);
+    checkSizeForTerminateCharAndResize();
+    prop->data[prop->length] = '\0';
+    return removed;
+}
+
+void String::remove(size_t start, size_t end) {
+    Super::remove(start, end);
+    checkSizeForTerminateCharAndResize();
+    prop->data[prop->length] = '\0';
 }
 
 String &String::append(const String &string) {
-    append(string.data, string.length());
+    append(string.getCString(), string.length());
     return *this;
 }
 
@@ -91,12 +132,35 @@ String &String::append(char c) {
     return *this;
 }
 
+String &String::append(const char *s, size_t size) {
+    insert(s, size);
+    return *this;
+}
+
+String &String::append(int32_t a) {
+    append(String::toString(a));
+    return *this;
+}
+
+String &String::append(int64_t a) {
+    append(String::toString(a));
+    return *this;
+}
+
+String &String::appendUnicode(uint32_t codepoint) {
+    int size = getUTF8Size(codepoint);
+    char s[size];
+    unicode2UTF8(s, codepoint);
+    this->append(s, size);
+    return *this;
+}
+
 ssize_t String::indexOf(const char *s) const {
-    return String::indexOf(data, s);
+    return String::indexOf(getCString(), s);
 }
 
 ssize_t String::indexOf(const String &string) const {
-    return indexOf(string.data);
+    return indexOf(getCString(), string.getCString());
 }
 
 ssize_t String::indexOf(const char *s, char c) {
@@ -116,7 +180,6 @@ ssize_t String::indexOf(const char *haystack, const char *needle) {
     }
     return -1;
 }
-
 
 ArrayList<String> String::split(const String &separator) const {
     return String::split(*this, separator);
@@ -149,8 +212,6 @@ ArrayList<String> String::split(const String &str, const String &separator) {
     return list;
 }
 
-String::~String() = default;
-
 String String::toString(int32_t a) {
     return Integer::toString(a);
 }
@@ -160,26 +221,23 @@ String String::toString(int64_t a) {
 }
 
 String String::toString(float a) {
-    //TODO float toString
-    char s[50] = {0};
-    sprintf(s, "%.7f", a);
-    return String(s);
+    // TODO
+    return String();
 }
 
 String String::toString(double a) {
-    //TODO double toString
-    char s[50] = {0};
-    sprintf(s, "%.23lf", a);
-    return String(s);
+    // TODO
+    return String();
 }
 
 void String::insert(size_t index, char c) {
-    checkSpaceAndResize(len + 2);
+    checkSpaceAndResize(prop->length + 2);
     Super::insert(index, c);
+    prop->data[prop->length] = '\0';
 }
 
 void String::insert(size_t index, const String &string) {
-    insert(index, string.data, string.len);
+    insert(index, string.getCString(), string.length());
 }
 
 String String::toString(int32_t i, int32_t radix) {
@@ -238,36 +296,24 @@ String String::toString(int64_t i, int32_t radix) {
     return String(buf + charPos, (65 - charPos));
 }
 
-String String::toString(char c) {
-    char s[1];
-    s[0] = c;
-    return String(s, 1);
+String String::toString(uint32_t i, int radix) {
+    // TODO
+    return String();
 }
 
-String::String(size_t initialCapacity) : Super::ArrayList(initialCapacity + 1) {
-    data[0] = '\0';
+String String::toString(uint64_t i, int radix) {
+    // TODO
+    return String();
+}
+
+String String::toString(char c) {
+    return String(&c, 1);
 }
 
 void String::clear() {
     Super::clear();
-    data[0] = '\0';
-}
-
-bool String::equals(const String &s) const {
-    if (length() != s.length()) return false;
-    return String::equal(data, s.data);
-}
-
-bool String::equal(const char *s1, const char *s2) {
-    for (size_t i = 0;; ++i) {
-        if (s1[i] != s2[i]) return false;
-        if (s1[i] == '\0' || s2[i] == '\0') break;
-    }
-    return true;
-}
-
-bool String::isNull() const {
-    return mIsNull;
+    checkSizeForTerminateCharAndResize();
+    prop->data[prop->length] = '\0';
 }
 
 String String::toUpperCase(const char *s) {
@@ -279,7 +325,7 @@ String String::toUpperCase(const String &s) {
     char b[len + 1];
     String r(len);
     for (size_t i = 0; i < len; ++i) {
-        b[i] = (char) toupper(s.data[i]);
+        b[i] = (char) toupper(s.prop->data[i]);
     }
     return String(b);
 }
@@ -293,13 +339,13 @@ String String::toLowerCase(const String &s) {
     char b[len + 1];
     String r(len);
     for (size_t i = 0; i < len; ++i) {
-        b[i] = (char) tolower(s.data[i]);
+        b[i] = (char) tolower(s.prop->data[i]);
     }
     return String(b);
 }
 
 char String::charAt(size_t pos) const {
-    return data[pos];
+    return prop->data[pos];
 }
 
 String String::substring(const char *s, size_t start, size_t end) {
@@ -323,19 +369,15 @@ String String::substr(size_t start, size_t length) const {
 }
 
 SharedPointer<char> String::toCharArray() const {
-    char *r = new char[dataSize];
-    for (size_t i = 0; i < dataSize; ++i) {
-        r[i] = data[i];
+    char *r = new char[prop->length];
+    for (size_t i = 0; i < prop->length; ++i) {
+        r[i] = prop->data[i];
     }
     return SP<char>(r);
 }
 
 String String::operator+(const String &s) const {
     return this->duplicate() += s;
-}
-
-String String::duplicate() const {
-    return String(this->data);
 }
 
 bool String::operator==(const char *s) const {
@@ -370,18 +412,18 @@ String &String::operator+=(char c) {
 
 ssize_t String::lastIndexOf(char c) const {
     for (ssize_t i = length() - 1; i >= 0; --i) {
-        if (data[i] == c) return i;
+        if (prop->data[i] == c) return i;
     }
     return -1;
 }
 
 char &String::operator[](size_t index) {
-    return data[index];
+    return prop->data[index];
 }
 
 ssize_t String::firstIndexOf(char c) const {
-    for (size_t i = 0; i < len; ++i) {
-        if (data[i] == c) return i;
+    for (size_t i = 0; i < prop->length; ++i) {
+        if (prop->data[i] == c) return i;
     }
     return -1;
 }
@@ -402,22 +444,6 @@ String &String::operator+=(int64_t a) {
     return this->append(a);
 }
 
-String &String::append(int64_t a) {
-    return this->append(String::toString(a));
-}
-
-String &String::append(int32_t a) {
-    return this->append(String::toString(a));
-}
-
-String &String::appendUnicode(uint32_t codepoint) {
-    int size = getUTF8Size(codepoint);
-    char s[size];
-    unicode2UTF8(s, codepoint);
-    this->append(s, size);
-    return *this;
-}
-
 String String::toUpperCase() const {
     return String::toUpperCase(*this);
 }
@@ -426,31 +452,23 @@ String String::toLowerCase() const {
     return String::toLowerCase(*this);
 }
 
-void String::insert(size_t index, const char *a, size_t size) {
-    checkSpaceAndResize(len + size + 1);
-    Super::insert(index, a, size);
-    data[len] = '\0';
+bool String::equals(const String &s) const {
+    if (length() != s.length()) return false;
+    return String::equal(prop->data, s.prop->data);
 }
 
-void String::insert(char a) {
-    checkSpaceAndResize(len + 2);
-    data[len++] = a;
-    data[len] = '\0';
+bool String::equal(const char *s1, const char *s2) {
+    for (size_t i = 0;; ++i) {
+        if (s1[i] != s2[i]) return false;
+        if (s1[i] == '\0' || s2[i] == '\0') break;
+    }
+    return true;
 }
 
-void String::insert(const char *a, size_t size) {
-    checkSpaceAndResize(len + size + 1);
-    ArrayList::insert(a, size);
-    data[len] = '\0';
+bool String::isNull() const {
+    return mInfo->isNull;
 }
 
-char String::remove(int index) {
-    char removed = ArrayList::remove(index);
-    data[len] = '\0';
-    return removed;
-}
-
-void String::remove(size_t start, size_t end) {
-    ArrayList::remove(start, end);
-    data[len] = '\0';
+String String::duplicate() const {
+    return String(getCString(), length());
 }
