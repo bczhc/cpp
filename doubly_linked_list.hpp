@@ -117,7 +117,7 @@ namespace bczhc {
             if (index == 0) insertFirst(a);
             else if (index == prop->length) insertLast(a);
             else {
-                auto prev = getNode(index - 1), *next = prev->next;
+                auto prev = getNode(index - 1), next = prev->next;
                 auto newNode = new Node(prev, a, next);
                 prev->next = newNode, next->prev = newNode;
                 ++prop->length;

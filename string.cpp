@@ -127,6 +127,13 @@ String &String::append(const String &string) {
     return *this;
 }
 
+String &String::append(const char *s) {
+    if (s == nullptr) {
+        return append("(null)", strlen("(null)"));
+    }
+    return append(s, strlen(s));
+}
+
 String &String::append(char c) {
     insert(c);
     return *this;
@@ -408,6 +415,10 @@ String String::operator+(char c) const {
 String &String::operator+=(char c) {
     this->append(c);
     return *this;
+}
+
+String &String::operator+=(const char *s) {
+    return this->append(s);
 }
 
 ssize_t String::lastIndexOf(char c) const {

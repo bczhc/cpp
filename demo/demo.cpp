@@ -21,20 +21,17 @@
 #include "../regex.hpp"
 #include "../io.hpp"
 #include <random>
-#include "../doubly_linked_list.hpp"
-#include "../queue.hpp"
-#include "../stack.hpp"
 
 using namespace std;
 using namespace bczhc;
 
 int main() {
-    SymbolTable<String, String> a;
-    for (int i = 0; i < 10; ++i) {
-        a.put(String::toString(i), String::toString(i));
+    String s;
+    auto start = getCurrentTimeMillis();
+    for (int i = 0; i < 10000000; ++i) {
+        s.append("a");
     }
-
-    cout << a.get("a4").getCString() << endl;
-
+    auto end = getCurrentTimeMillis();
+    cout << (end - start) << endl;
     return 0;
 }

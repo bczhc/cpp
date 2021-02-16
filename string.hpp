@@ -24,7 +24,7 @@ namespace bczhc {
 
         using Super = ArrayList<char>;
 
-        void checkSpaceAndResize(size_t newSize);;
+        void checkSpaceAndResize(size_t newSize);
 
         void mCopy(const String &s);
 
@@ -46,53 +46,55 @@ namespace bczhc {
 
 #pragma clang diagnostic pop
 
-        explicit String(size_t initialCapacity);;
+        explicit String(size_t initialCapacity);
 
         ~String();
 
-        [[nodiscard]] const char *getCString() const;;
+        [[nodiscard]] const char *getCString() const;
 
-        [[nodiscard]] size_t utf8Length() const;;
+        [[nodiscard]] size_t utf8Length() const;
 
         String &operator=(const String &string);
 
-        void mRelease() const;;
+        void mRelease() const;
 
-        String &operator=(const char *s);;
+        String &operator=(const char *s);
 
-        void insert(size_t index, const char *a, size_t size) override;;
+        void insert(size_t index, const char *a, size_t size) override;
 
-        void insert(char a) override;;
+        void insert(char a) override;
 
-        void insert(const char *a, size_t size) override;;
+        void insert(const char *a, size_t size) override;
 
-        char remove(int index) override;;
+        char remove(int index) override;
 
-        void remove(size_t start, size_t end) override;;
+        void remove(size_t start, size_t end) override;
 
-        String &append(const String &string);;
+        String &append(const String &string);
 
-        String &append(char c);;
+        String &append(const char *s);
 
-        String &append(const char *s, size_t size);;
+        String &append(char c);
 
-        String &append(int32_t a);;
+        String &append(const char *s, size_t size);
 
-        String &append(int64_t a);;
+        String &append(int32_t a);
 
-        String &appendUnicode(uint32_t codepoint);;
+        String &append(int64_t a);
 
-        ssize_t indexOf(const char *s) const;;
+        String &appendUnicode(uint32_t codepoint);
 
-        [[nodiscard]] ssize_t indexOf(const String &string) const;;
+        ssize_t indexOf(const char *s) const;
 
-        static ssize_t indexOf(const char *s, char c);;
+        [[nodiscard]] ssize_t indexOf(const String &string) const;
 
-        static ssize_t indexOf(const char *haystack, const char *needle);;
+        static ssize_t indexOf(const char *s, char c);
 
-        [[nodiscard]] ArrayList<String> split(const String &separator) const;;
+        static ssize_t indexOf(const char *haystack, const char *needle);
 
-        static ArrayList<String> split(const String &str, const String &separator);;
+        [[nodiscard]] ArrayList<String> split(const String &separator) const;
+
+        static ArrayList<String> split(const String &str, const String &separator);
 
         static String toString(int32_t a);
 
@@ -102,9 +104,9 @@ namespace bczhc {
 
         static String toString(double a);
 
-        void insert(size_t index, char c) override;;
+        void insert(size_t index, char c) override;
 
-        void insert(size_t index, const String &string);;
+        void insert(size_t index, const String &string);
 
         static String toString(int32_t i, int radix);
 
@@ -114,9 +116,9 @@ namespace bczhc {
 
         static String toString(uint64_t i, int radix);
 
-        static String toString(char c);;
+        static String toString(char c);
 
-        void clear() override;;
+        void clear() override;
 
         static String toUpperCase(const char *s);
 
@@ -163,6 +165,8 @@ namespace bczhc {
         String &operator+=(const String &s);
 
         String &operator+=(char c);
+
+        String &operator+=(const char *s);
 
         [[nodiscard]] ssize_t lastIndexOf(char c) const;
 
