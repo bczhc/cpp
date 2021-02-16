@@ -13,127 +13,75 @@ namespace bczhc {
     template<typename T>
     class Array {
     private:
-        size_t len = 0;
-        int *refCount = nullptr;
+        struct Properties {
+            size_t length = 0;
+            T *elements = nullptr;
+            int refCount = 0;
+        };
+
+        Properties *prop;
 
         void release() const {
-            if (--*refCount == -1) {
-                delete[] elements;
-                delete refCount;
+            if (--prop->refCount == -1) {
+                delete[] prop->elements;
+                delete prop;
             }
         }
 
     public:
-        T *elements = nullptr;
 
-        static Array<T> from(T *arr, int size) {
-            Array<T> r(size);
-            for (int i = 0; i < size; ++i) {
-                r[i] = arr[i];
+        Array() : Array<T>(0) {}
+
+        Array(size_t length) {
+            prop = new Properties;
+            if (length != 0) {
+                prop->elements = new T[length];
             }
-            return r;
+            prop->length = length;
         }
 
-        Array() : Array(0) {}
-
-        explicit Array(int size) {
-            // Won't allocate when size is zero
-            if (size != 0) {
-                elements = new T[size];
-            }
-            refCount = new int(0);
-            len = size;
-        }
-
-        Array(const Array<T> &arr) {
-            copy(arr);
-            ++(*refCount);
-        }
-
-        [[nodiscard]] int length() const {
-            return len;
+        Array(const Array<T> &a) {
+            this->prop = a.prop;
+            ++prop->refCount;
         }
 
         ~Array() {
             release();
         }
 
-        Array<T> &operator=(const Array<T> &arr) {
-            if (&arr == this) return *this;
+        size_t length() const {
+            return prop->length;
+        }
+
+        Array<T> &operator=(const Array<T> &a) {
             release();
-            copy(arr);
-            ++(*refCount);
+            prop = a.prop;
+            ++prop->refCount;
             return *this;
         }
 
-        void copy(const Array<T> &arr) {
-            len = arr.len;
-            elements = arr.elements;
-            refCount = arr.refCount;
+        T &operator[](size_t index) const {
+            return prop->elements[index];
         }
 
-        T &operator[](int i) const {
-            return this->elements[i];
+        T *getData() const {
+            return prop->elements;
         }
 
         bool operator==(const Array<T> &a) const {
-            if (a.length() != this->len) return false;
-            for (int i = 0; i < len; ++i) {
-                if (elements[i] != a[i]) return false;
+            if (this->length() != a.length()) return false;
+            for (int i = 0; i < a.length(); ++i) {
+                if ((*this)[i] != a[i]) return false;
             }
             return true;
         }
 
         bool operator!=(const Array<T> &a) const {
-            return !(a == *this);
+            return !((*this) == a);
         }
 
-        [[nodiscard]] String toString() const {
-            return Array<T>::toString(this->elements, this->len, 10);
-        }
-
-        [[nodiscard]] String toString(int radix) const {
-            return Array<T>::toString(this->elements, this->len, radix);
-        }
-
-        [[nodiscard]] String toString(int radix, const char *separator) const {
-            return Array<T>::toString(this->elements, this->len, radix, separator);
-        }
-
-        [[nodiscard]] static String toString(T *arr, size_t size, int radix) {
-            return toString(arr, size, radix, ", ");
-        }
-
-        [[nodiscard]] static String toString(T *arr, size_t size, int radix, const char *separator) {
-            String msg = "[";
-            for (int i = 0; i < size; ++i) {
-                msg += String::toString(arr[i], radix);
-                if (i != size - 1) {
-                    msg += separator;
-                }
-            }
-            msg += ']';
-            return msg;
-        }
-    };
-
-    template<typename T>
-    class SArray : public SP<Array<T>> {
-    public:
-        SArray() : SP<Array<T>>(new Array<T>()) {}
-
-        SArray(size_t size) : SP<Array<T>>(new Array<T>(size)) {}
-
-        T &operator[](size_t i) const {
-            return (*this->ptr)[i];
-        }
-
-        bool operator==(const SArray<T> &a) const {
-            return (*this->ptr) == *a.ptr;
-        }
-
-        static SArray<T> from(T *arr, int size) {
-            SArray<T> r(size);
+        static Array<T> from(T *arr, int size) {
+            Array<T> r(size);
             for (int i = 0; i < size; ++i) {
                 r[i] = arr[i];
             }

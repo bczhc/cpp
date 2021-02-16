@@ -69,3 +69,7 @@ NoSuchElementException::NoSuchElementException() = default;
 PCREException::PCREException(const char *msg) : Exception(msg) {}
 
 PCREException::PCREException(const String &msg) : Exception(msg) {}
+
+NoSuchElementException::NoSuchElementException(const char *msg) : Exception(msg) {}
+
+NoSuchElementException::NoSuchElementException(const String &msg) : Exception(msg) {}

@@ -6,112 +6,23 @@
 #define BCZHC_CPP_STACK_HPP
 
 #include "./iterator.hpp"
+#include "linked_list.hpp"
 
 using namespace bczhc;
 
 template<typename T>
-class Stack {
-private:
-    class Node {
-    public:
-        T data;
-        Node *next = nullptr;
-
-        Node(T data, Node *next) : data(data), next(next) {}
-
-        Node() = default;
-    };
-
-    Node *head = nullptr;
-    int len = 0;
-    int *refCount;
-
-    void copy(const Stack<T> &a) {
-        this->head = a.head;
-        this->len = a.len;
-        this->refCount = a.refCount;
-    }
-
-    void release() {
-        if (--*refCount == -1) {
-            clear();
-            delete head;
-            delete refCount;
-        }
-    }
-
+class Stack : LinkedList<T> {
 public:
-    Stack() {
-        refCount = new int(0);
-        head = new Node();
+    void push(T a) {
+        this->insertFirst(a);
     }
-
-    ~Stack() {
-        release();
-    }
-
-    void clear() {
-        len = 0;
-        Node *t = head->next, *prev;
-        while (t != nullptr) {
-            prev = t;
-            t = t->next;
-            delete prev;
-        }
-    }
-
-    bool isEmpty() { return len == 0; }
-
-    int size() { return len; }
 
     T pop() {
-        Node *first = head->next;
-        T r = first->data;
-        head->next = first->next;
-        delete first;
-        --len;
-        return r;
+        return this->removeFirst();
     }
 
-    void push(T a) {
-        Node *newNode = new Node(a, head->next);
-        head->next = newNode;
-        ++len;
-    }
-
-    class Iterator : public bczhc::Iterator<T> {
-    private:
-        Node *t;
-
-    public:
-        explicit Iterator(Node *head) : t(head) {}
-
-        bool hasNext() override {
-            return t->next != nullptr;
-        }
-
-        T next() override {
-            t = t->next;
-            return t->data;
-        }
-    };
-
-    Iterator getIterator() {
-        Iterator it(head);
-        return it;
-    }
-
-    Stack(const Stack<T> &a) {
-        copy(a);
-        ++*refCount;
-    }
-
-    Stack<T> &operator=(const Stack<T> &a) {
-        if (&a == this) return *this;
-        release();
-        copy(a);
-        ++*refCount;
-        return *this;
+    T peek() {
+        return this->getFirst();
     }
 };
 

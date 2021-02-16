@@ -32,7 +32,7 @@ String::String(const String &string) : Super(string) {
 }
 
 String::String(const char *s, size_t size) : Super(s == nullptr ? (strlen("(null)") + 1) : (size + 1)) {
-    copyData(s, prop->dataSize - 1);
+    copyData(s == nullptr ? "(null)" : s, prop->dataSize - 1);
     prop->length = prop->dataSize - 1;
     prop->data[prop->length] = '\0';
     mInfo = new Properties;

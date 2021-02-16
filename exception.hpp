@@ -83,6 +83,10 @@ namespace bczhc {
     class NoSuchElementException : public Exception {
     public:
         NoSuchElementException();
+
+        NoSuchElementException(const char *msg);
+
+        NoSuchElementException(const String &msg);
     };
 
     class PCREException: public Exception {

@@ -6,6 +6,7 @@
 #define BCZHC_CPP_LINKED_LIST_HPP
 
 #include "./iterator.hpp"
+#include "./exception.hpp"
 
 using namespace bczhc;
 
@@ -23,28 +24,26 @@ namespace bczhc {
             Node() = default;
         };
 
-        Node *head;
-        int len = 0;
-        int *refCount;
+        struct Properties {
+            Node *head = nullptr;
+            size_t length = 0;
+            int refCount = 0;
+        };
 
-        void copy(const LinkedList<T> &a) {
-            this->head = a.head;
-            this->len = a.len;
-            this->refCount = a.refCount;
-        }
+        Properties *prop = nullptr;
 
         void release() {
-            if (--*refCount == -1) {
+            if (--prop->refCount == -1) {
                 clear();
-                delete head;
-                delete refCount;
+                delete prop->head;
+                delete prop;
             }
         }
 
     public:
         LinkedList() {
-            refCount = new int(0);
-            head = new Node();
+            prop = new Properties;
+            prop->head = new Node;
         }
 
         ~LinkedList() {
@@ -52,8 +51,8 @@ namespace bczhc {
         }
 
         void clear() {
-            len = 0;
-            Node *t = head->next, *prev;
+            prop->length = 0;
+            Node *t = prop->head->next, *prev;
             while (t != nullptr) {
                 prev = t;
                 t = t->next;
@@ -61,12 +60,13 @@ namespace bczhc {
             }
         }
 
-        bool isEmpty() { return len == 0; }
+        bool isEmpty() { return prop->length == 0; }
 
-        int length() { return len; }
+        int length() { return prop->length; }
 
         T get(int index) {
-            Node *t = head;
+            if (index < 0 || index >= prop->length) throw IndexOutOfBoundsException();
+            Node *t = prop->head;
             for (int i = 0; i <= index; ++i) {
                 t = t->next;
             }
@@ -74,26 +74,28 @@ namespace bczhc {
         }
 
         void insert(T a) {
-            Node *t = head;
+            Node *t = prop->head;
             while (t->next != nullptr)
                 t = t->next;
             Node *newNode = new Node(a, nullptr);
             t->next = newNode;
-            ++len;
+            ++prop->length;
         }
 
         void insert(int index, T a) {
-            Node *t = head;
+            if (index < 0 || index > prop->length) throw IndexOutOfBoundsException();
+            Node *t = prop->head;
             for (int i = 0; i < index; ++i) {
                 t = t->next;
             }
             Node *newNode = new Node(a, t->next);
             t->next = newNode;
-            ++len;
+            ++prop->length;
         }
 
         T remove(int index) {
-            Node *t = head;
+            if (index < 0 || index >= prop->length) throw IndexOutOfBoundsException();
+            Node *t = prop->head;
             for (int i = 0; i < index; ++i) {
                 t = t->next;
             }
@@ -101,13 +103,33 @@ namespace bczhc {
             t->next = removedNode->next;
             T r = removedNode->data;
             delete removedNode;
-            --len;
+            --prop->length;
             return r;
         }
 
+        T getFirst() {
+            if (length() < 1) throw NoSuchElementException();
+            return prop->head->next->data;
+        }
+
+        void insertFirst(T a) {
+            auto newNode = new Node(a, prop->head->next);
+            prop->head->next = newNode;
+            ++prop->length;
+        }
+
+        T removeFirst() {
+            auto firstNode = prop->head->next;
+            prop->head->next = firstNode->next;
+            T t = firstNode->data;
+            delete firstNode;
+            --prop->length;
+            return t;
+        }
+
         int indexOf(T e) {
-            Node *t = head;
-            for (int i = 0; i < len; ++i) {
+            Node *t = prop->head;
+            for (int i = 0; i < prop->length; ++i) {
                 t = t->next;
                 if (t->data == e)
                     return i;
@@ -133,14 +155,14 @@ namespace bczhc {
         };
 
         Iterator getIterator() {
-            Iterator it(head);
+            Iterator it(prop->head);
             return it;
         }
 
     private:
         Node *reverse(Node *node) {
             if (node->next == nullptr) {
-                head->next = node;
+                prop->head->next = node;
                 return node;
             }
             Node *prev = reverse(node->next);
@@ -152,26 +174,26 @@ namespace bczhc {
         void reverse() {
             if (isEmpty())
                 return;
-            reverse(head->next)->next = nullptr;
+            reverse(prop->head->next)->next = nullptr;
         }
 
         T getMid() {
-            Node *slow = head->next, *fast = slow;
+            Node *slow = prop->head->next, *fast = slow;
             while (fast != nullptr && fast->next != nullptr)
                 slow = slow->next, fast = fast->next->next;
             return slow->data;
         }
 
         LinkedList(const LinkedList<T> &a) {
-            copy(a);
-            ++*refCount;
+            prop = a.prop;
+            ++prop->refCount;
         }
 
         LinkedList<T> &operator=(const LinkedList<T> &a) {
             if (&a == this) return *this;
             release();
-            copy(a);
-            ++*refCount;
+            prop = a.prop;
+            ++prop->refCount;
             return *this;
         }
     };

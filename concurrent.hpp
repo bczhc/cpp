@@ -130,7 +130,7 @@ namespace bczhc {
     };
 
     template<typename T>
-    struct Bean {
+    struct ConsumerBean {
         Consumer<T> *c;
         void *arg;
     };
@@ -141,7 +141,7 @@ namespace bczhc {
         static void consume(ArgType &arg) {}
 
         static void *call(void *arg) {
-            Bean<ArgType> &b = *(Bean<ArgType> *) arg;
+            auto &b = *(ConsumerBean<ArgType> *) arg;
             ((Consumer<ArgType> *) b.c)->accept(*(ArgType *) b.arg);
             delete &b;
             return nullptr;

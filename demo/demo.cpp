@@ -29,6 +29,12 @@ using namespace std;
 using namespace bczhc;
 
 int main() {
+    SymbolTable<String, String> a;
+    for (int i = 0; i < 10; ++i) {
+        a.put(String::toString(i), String::toString(i));
+    }
+
+    cout << a.get("a4").getCString() << endl;
 
     return 0;
 }

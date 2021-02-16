@@ -166,7 +166,7 @@ ReturnType sum(ElementType *arr, int start, int end) {
 
 template<typename ReturnType, typename ElementType>
 ReturnType sum(Array<ElementType> arr, int start, int end) {
-    return sum<ReturnType, ElementType>(arr.elements, start, end);
+    return sum<ReturnType, ElementType>(arr.getData(), start, end);
 }
 
 template<typename ReturnType, typename ElementType>
@@ -242,7 +242,7 @@ Code hex2bin(Code &code) {
             memset(t, 0xFF, size);
             sliceAssign(buf, buf.length(), buf.length(), t, size);
             // Copy data to the buffer
-            sliceAssign(buf, addr, addr + n, dat.elements + 4 * sizeof(uchar), dat.length() - 1 - 4);
+            sliceAssign(buf, addr, addr + n, dat.getData() + 4 * sizeof(uchar), dat.length() - 1 - 4);
         } else if (dat[3] == 1) {
             // EOF record
             if (n != 0) throw String("Line ") + String::toString(line) + ": Incorrect data length";
@@ -380,7 +380,7 @@ public:
         ArrayList<uchar> buf;
         while (buf.length() < size) {
             const Array<uchar> r = conn.read(size - buf.length());
-            buf.insert(buf.length(), r.elements, r.length());
+            buf.insert(buf.length(), r.getData(), r.length());
             //TODO debug msg
             if (buf.length() == 0) throw String("io error");
         }
@@ -510,7 +510,7 @@ public:
                 {0xE2, 0x76},
                 {0xE2, 0xF6}};
 
-        auto result = modelMap.get(model.elements[0]);
+        auto result = modelMap.get(model.getData()[0]);
         const char *prefix = result.s;
         int romratio = result.i;
         SymbolTableTupleBS *fixmap = result.st;
@@ -522,7 +522,7 @@ public:
         Tuple2B foundKey;
         bool broken = false;
         while (it.hasNext()) {
-            const SymbolTable<Tuple2B, Tuple2S>::Bean b = it.next();
+            const SymbolTable<Tuple2B, Tuple2S>::Pair b = it.next();
             if (b.key[0] <= model[1] && model[1] <= b.key[1]) {
                 broken = true;
                 foundVal = b.val, foundKey = b.key;
@@ -537,7 +537,7 @@ public:
 
         try {
             if (model.length() != 2) throw 1;
-            if (model.elements[0] != 0xF0 || model.elements[1] != 0x03) throw 1;
+            if (model[0] != 0xF0 || model[1] != 0x03) throw 1;
             localRomsize = 13;
         } catch (...) {
         }
@@ -734,7 +734,7 @@ public:
         buf.insert(0x46), buf.insert(0xB9), buf.insert(0x6A);
         int n = 1 + 2 + 1 + dat.length() + this->chkmode + 1;
         buf.insert(n >> 8), buf.insert(n & 0xFF), buf.insert(cmd);
-        buf.insert(buf.length(), dat.elements, dat.length());
+        buf.insert(buf.length(), dat.getData(), dat.length());
 
         int chksum = sum<int, uchar>(buf.getData(), 2, buf.length());
         if (this->chkmode > 1) {
