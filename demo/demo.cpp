@@ -26,12 +26,17 @@ using namespace std;
 using namespace bczhc;
 
 int main() {
-    String s;
-    auto start = getCurrentTimeMillis();
-    for (int i = 0; i < 10000000; ++i) {
-        s.append("a");
-    }
-    auto end = getCurrentTimeMillis();
-    cout << (end - start) << endl;
+    class R : public Runnable {
+    public:
+        void run() override {
+            cout << "h" << endl;
+            delete this;
+        }
+    };
+    ThreadPool *pool = Executors::newFixedThreadPool(1);
+    pool->execute(new R);
+    pool->waitAll();
+    pool->shutdown();
+    delete pool;
     return 0;
 }

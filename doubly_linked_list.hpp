@@ -164,6 +164,7 @@ namespace bczhc {
             auto lastNode = prop->tail->prev;
             lastNode->prev->next = prop->tail;
             prop->tail->prev = lastNode->prev;
+            --prop->length;
             T t = lastNode->data;
             delete lastNode;
             return t;
