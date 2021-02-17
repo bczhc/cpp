@@ -21,22 +21,45 @@
 #include "../regex.hpp"
 #include "../io.hpp"
 #include <random>
+#include <termios.h>
 
 using namespace std;
 using namespace bczhc;
 
+char scanKeyboard() {
+    char in;
+    int stdinFD = fileno(stdin);
+    struct termios new_settings{};
+    struct termios stored_settings{};
+    tcgetattr(stdinFD, &stored_settings);
+    new_settings = stored_settings;
+    new_settings.c_lflag &= ~(tcflag_t) ICANON;
+    new_settings.c_cc[VMIN] = 1;
+    tcsetattr(stdinFD, TCSANOW, &new_settings);
+    in = (char) getchar();
+    tcsetattr(stdinFD, TCSANOW, &stored_settings);
+    return in;
+}
+
 int main() {
-    class R : public Runnable {
-    public:
-        void run() override {
-            cout << "h" << endl;
-            delete this;
-        }
-    };
-    ThreadPool *pool = Executors::newFixedThreadPool(1);
-    pool->execute(new R);
-    pool->waitAll();
-    pool->shutdown();
-    delete pool;
+    DoublyLinkedList<const char*> a;
+    a.insert(a.length(),"1");
+    a.remove(0);
+    return 0;
+    termios options{}, oldOptions{};
+    tcgetattr(STDIN_FILENO, &oldOptions);
+    options = oldOptions;
+    options.c_lflag &= ~((tcflag_t) ICANON | (tcflag_t) ECHO);
+    options.c_cc[VMIN] = 1;
+    tcsetattr(STDIN_FILENO, TCSANOW, &options);
+
+    InputStream is(stdin);
+    char c;
+    while(true) {
+        is.read(&c, 1);
+        cout << (int) c << endl;
+    }
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldOptions);
     return 0;
 }

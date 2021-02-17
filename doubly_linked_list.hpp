@@ -133,6 +133,8 @@ namespace bczhc {
 
         T remove(size_t index) {
             if (index < 0 || index >= prop->length) throw IndexOutOfBoundsException();
+            if (index == 0) return removeFirst();
+            else if (index == prop->length - 1) return removeLast();
             auto removed = getNode(index);
             T r = removed->data;
             removed->prev->next = removed->next;

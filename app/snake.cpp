@@ -206,17 +206,16 @@ public:
 
 char scanKeyboard() {
     char in;
+    int stdinFD = fileno(stdin);
     struct termios new_settings{};
     struct termios stored_settings{};
-    tcgetattr(0, &stored_settings);
+    tcgetattr(stdinFD, &stored_settings);
     new_settings = stored_settings;
-    new_settings.c_lflag &= (~((tcflag_t) ICANON));
-    new_settings.c_cc[VTIME] = 0;
-    tcgetattr(0, &stored_settings);
+    new_settings.c_lflag &= ~((tcflag_t) ICANON | (tcflag_t) ECHO);
     new_settings.c_cc[VMIN] = 1;
-    tcsetattr(0, TCSANOW, &new_settings);
+    tcsetattr(stdinFD, TCSANOW, &new_settings);
     in = (char) getchar();
-    tcsetattr(0, TCSANOW, &stored_settings);
+    tcsetattr(stdinFD, TCSANOW, &stored_settings);
     return in;
 }
 
@@ -285,7 +284,6 @@ int main(int argc, char **argv) {
     char read = 0;
     while (!game.getGameoverStatus()) {
         read = scanKeyboard();
-        std::cout << (int) read << std::endl;
         switch (read) {
             case 'w':
             case 'W':
