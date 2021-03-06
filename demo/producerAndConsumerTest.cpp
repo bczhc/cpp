@@ -9,6 +9,14 @@ using Condetion = MutexLock::Condition;
 class Message {
 public:
     int a;
+
+    bool operator==(const Message &rhs) const {
+        return a == rhs.a;
+    }
+
+    bool operator!=(const Message &rhs) const {
+        return !(rhs == *this);
+    }
 };
 
 class BlockingQueue {
@@ -19,7 +27,7 @@ private:
 public:
     void put(Message message) {
         lock.lock();
-        queue.insert(message);
+        queue.add(message);
         lock.notify();
         lock.unlock();
     }

@@ -9,6 +9,7 @@ using namespace std;
 #include "serial.h"
 #include "stc_flash_lib.h"
 #include "../../linked_list.hpp"
+#include "../../array_list.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
@@ -110,21 +111,21 @@ Array<T> list2arr(ArrayList<T> &sl) {
 template<typename T>
 void repeatListInsert(ArrayList<T> &list, T value, int times) {
     for (int i = 0; i < times; ++i) {
-        list.insert(value);
+        list.add(value);
     }
 }
 
 template<typename T>
 void insertArrToList(ArrayList<T> &list, T *arr, int size) {
     for (int i = 0; i < size; ++i) {
-        list.insert((T) arr[i]);
+        list.add((T) arr[i]);
     }
 }
 
 template<typename T>
 void insertArrToList(ArrayList<T> &list, const Array<T> &arr) {
     for (int i = 0; i < arr.length(); ++i) {
-        list.insert((T) arr[i]);
+        list.add((T) arr[i]);
     }
 }
 
@@ -134,7 +135,7 @@ Code readToBytes(InputStream &in) {
     int readLen;
     while ((readLen = in.read(buf, 4096)) > 0) {
         for (int i = 0; i < readLen; ++i) {
-            b.insert(buf[i]);
+            b.add(buf[i]);
         }
     }
     return Code(list2arr<uchar>(b));
@@ -166,7 +167,7 @@ ReturnType sum(ElementType *arr, int start, int end) {
 
 template<typename ReturnType, typename ElementType>
 ReturnType sum(Array<ElementType> arr, int start, int end) {
-    return sum<ReturnType, ElementType>(arr.getData(), start, end);
+    return sum<ReturnType, ElementType>(arr.data(), start, end);
 }
 
 template<typename ReturnType, typename ElementType>
@@ -190,7 +191,7 @@ template<typename T>
 void sliceAssign(ArrayList<T> &list, int start, int end, const T *valueToAssign, int length) {
     checkAndSetBoundary(start, end, list.length());
     list.remove(start, end);
-    list.insert(start, valueToAssign, length);
+    list.addAll(start, valueToAssign, length);
 }
 
 Array<uchar> packUnsignedInt32BigEndian(uint32_t a) {
@@ -217,7 +218,7 @@ Code hex2bin(Code &code) {
         char c = code.val[j];
         if (c != '\n') lineStr.append(c);
         else {
-            lines.insert(lineStr);
+            lines.add(lineStr);
             lineStr = String();
         }
     }
@@ -242,7 +243,7 @@ Code hex2bin(Code &code) {
             memset(t, 0xFF, size);
             sliceAssign(buf, buf.length(), buf.length(), t, size);
             // Copy data to the buffer
-            sliceAssign(buf, addr, addr + n, dat.getData() + 4 * sizeof(uchar), dat.length() - 1 - 4);
+            sliceAssign(buf, addr, addr + n, dat.data() + 4 * sizeof(uchar), dat.length() - 1 - 4);
         } else if (dat[3] == 1) {
             // EOF record
             if (n != 0) throw String("Line ") + String::toString(line) + ": Incorrect data length";
@@ -337,7 +338,7 @@ Array<T> cutArray(const Array<T> &arr, int start, int end, int step = 1) {
     int len = arr.length();
     checkAndSetBoundary(start, end, len);
     for (int i = start; i < end; i += step) {
-        list.insert(arr[i]);
+        list.add(arr[i]);
     }
     return list2arr<T>(list);
 }
@@ -348,7 +349,7 @@ ArrayList<T> cutList(ArrayList<T> &list, int start, int end, int step = 1) {
     checkAndSetBoundary(start, end, len);
     ArrayList<T> r;
     for (int i = start; i < end; i += step) {
-        r.insert(list.get(i));
+        r.add(list.get(i));
     }
     return r;
 }
@@ -380,7 +381,7 @@ public:
         ArrayList<uchar> buf;
         while (buf.length() < size) {
             const Array<uchar> r = conn.read(size - buf.length());
-            buf.insert(buf.length(), r.getData(), r.length());
+            buf.addAll(buf.length(), r.data(), r.length());
             //TODO debug msg
             if (buf.length() == 0) throw String("io error");
         }
@@ -510,7 +511,7 @@ public:
                 {0xE2, 0x76},
                 {0xE2, 0xF6}};
 
-        auto result = modelMap.get(model.getData()[0]);
+        auto result = modelMap.get(model.data()[0]);
         const char *prefix = result.s;
         int romratio = result.i;
         SymbolTableTupleBS *fixmap = result.st;
@@ -731,16 +732,16 @@ public:
 
     void send(uchar cmd, const Array<uchar> &dat) const {
         ArrayList<uchar> buf;
-        buf.insert(0x46), buf.insert(0xB9), buf.insert(0x6A);
+        buf.add(0x46), buf.add(0xB9), buf.add(0x6A);
         int n = 1 + 2 + 1 + dat.length() + this->chkmode + 1;
-        buf.insert(n >> 8), buf.insert(n & 0xFF), buf.insert(cmd);
-        buf.insert(buf.length(), dat.getData(), dat.length());
+        buf.add(n >> 8), buf.add(n & 0xFF), buf.add(cmd);
+        buf.addAll(buf.length(), dat.data(), dat.length());
 
         int chksum = sum<int, uchar>(buf.getData(), 2, buf.length());
         if (this->chkmode > 1) {
-            buf.insert((chksum >> 8) & 0xFF);
+            buf.add((chksum >> 8) & 0xFF);
         }
-        buf.insert(chksum & 0xFF), buf.insert(0x16);
+        buf.add(chksum & 0xFF), buf.add(0x16);
         __conn_write(buf.getData(), buf.length());
     }
 
@@ -865,13 +866,13 @@ public:
             int len = ARR_SIZE(a);
             ArrayList<uchar> b(len);
             for (int i = 0; i < len; ++i) {
-                b.insert(a[i]);
+                b.add(a[i]);
             }
             for (int i = 0; i < 12; ++i) {
-                b.insert(0);
+                b.add(0);
             }
             for (int i = 0x80; i > 0x0D; --i) {
-                b.insert(i);
+                b.add(i);
             }
 
             const Array<uchar> c = list2arr<uchar>(b);
@@ -890,11 +891,11 @@ public:
         Array<uchar> &val = nonableCode.val;
         ArrayList<uchar> codeList(val.length());
         for (int i = 0; i < val.length(); ++i) {
-            codeList.insert(val[i]);
+            codeList.add(val[i]);
         }
         int repeatCount = 511 - (val.length() - 1) % 512;
         for (int i = 0; i < repeatCount; ++i) {
-            codeList.insert(0x00);
+            codeList.add(0x00);
         }
         Array<uchar> code = list2arr<uchar>(codeList);
 
@@ -905,11 +906,11 @@ public:
             int len = ARR_SIZE(a);
             ArrayList<uchar> b(len);
             for (int j = 0; j < len; ++j) {
-                b.insert(a[j]);
+                b.add(a[j]);
             }
             ArrayList<uchar> cut = cutList(codeList, i, i + 128);
             for (int j = 0; j < cut.length(); ++j) {
-                b.insert(cut[j]);
+                b.add(cut[j]);
             }
             const Array<uchar> &sent = list2arr<uchar>(b);
             send(0x00, sent);
@@ -958,10 +959,10 @@ public:
 
             auto cut = cutArray<uchar>(this->info, 2, 3);
             for (int i = 0; i < cut.length(); ++i) {
-                dat.insert(cut[i]);
+                dat.add(cut[i]);
             }
             for (int i = 0; i < 3; ++i) {
-                dat.insert(0xFF);
+                dat.add(0xFF);
             }
         } else if (this->protocol.val == PROTOCOL_12C5A) {
             if (!erase_eeprom.isNone) {

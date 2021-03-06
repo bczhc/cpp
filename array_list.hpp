@@ -7,121 +7,175 @@
 
 #include <cstddef>
 #include <sys/types.h>
+#include "collection.hpp"
+#include "list.hpp"
+#include "exception.hpp"
+
+using namespace bczhc;
 
 namespace bczhc {
     template<typename T>
-    class ArrayList {
+    class ArrayList : public List<T> {
     private:
-        void copy(const ArrayList<T> &a) {
-            this->prop = a.prop;
-        }
-
-    protected:
-        struct Properties {
-            size_t length = 0;
-            size_t dataSize = 0;
-            int refCount = 0;
-            T *data = nullptr;
-        };
-
-        Properties *prop = nullptr;
-
-        void release() {
-            if (--prop->refCount == -1) {
-                delete[] prop->data;
-                delete prop;
+        void copyElem(const T *a, size_t length) {
+            for (int i = 0; i < length; ++i) {
+                data[i] = a[i];
             }
         }
 
+        void copy(const ArrayList<T> &a, bool deleteOld = false) {
+            if (deleteOld) delete[] data;
+            this->len = a.len;
+            this->dataSize = this->len;
+            data = new T[this->dataSize];
+            copyElem(a.data, this->len);
+        }
+
+        size_t len = 0;
+        size_t dataSize = 0;
+        T *data = nullptr;
+
         void resize(size_t newSize) {
             T *newArr = new T[newSize];
-            for (size_t i = 0; i < prop->length; ++i)
-                newArr[i] = prop->data[i];
-            delete[] prop->data;
-            prop->data = newArr;
-            prop->dataSize = newSize;
+            for (size_t i = 0; i < len; ++i) {
+                newArr[i] = data[i];
+            }
+            delete[] data;
+            data = newArr;
+            dataSize = newSize;
         }
 
     public:
         explicit ArrayList(size_t capacity) {
-            prop = new Properties;
-            prop->data = new T[capacity];
-            prop->dataSize = capacity;
-            prop->length = 0;
+            dataSize = capacity;
+            data = new T[dataSize];
+            len = 0;
         }
 
         ArrayList() : ArrayList(15) {}
 
         ArrayList(const ArrayList<T> &a) {
             copy(a);
-            ++prop->refCount;
         }
 
         ~ArrayList() {
-            release();
+            delete[] data;
         }
 
-        virtual void clear() {
+        size_t length() const override {
+            return len;
+        }
+
+        bool isEmpty() const override {
+            return len == 0;
+        }
+
+        bool contains(const T &a) const override {
+            for (int i = 0; i < len; ++i) {
+                if (data[i] == a) return true;
+            }
+            return false;
+        }
+
+        class Iter : bczhc::Iterator<T> {
+        private:
+            size_t length;
+            size_t i = 0;
+            T *data;
+        public:
+            bool hasNext() override {
+                return i < length;
+            }
+
+            T next() override {
+                return this->data[i++];
+            }
+
+            Iter(T *data, size_t len) : data(data), length(len) {}
+        };
+
+        /*bczhc::Iterator<T> iterator() const override {
+            return Iter(data, len);
+        }*/
+
+        void add(const T &a) override {
+            if (len >= dataSize/* length + 1 > dataSize */)
+                resize(2 * dataSize);
+            data[len++] = a;
+        }
+
+        void clear() override {
             resize(15);
-            prop->length = 0;
+            len = 0;
         }
 
-        [[nodiscard]] bool isEmpty() const { return prop->length == 0; }
-
-        [[nodiscard]] int length() const { return prop->length; }
-
-        T get(int i) const { return prop->data[i]; }
-
-        virtual void insert(size_t index, T a) {
-            if (prop->length >= prop->dataSize/* length + 1 > dataSize */)
-                resize(prop->dataSize * 2);
-            for (size_t i = prop->length; i > index; --i)
-                prop->data[i] = prop->data[i - 1];
-            prop->data[index] = a;
-            ++prop->length;
+        T get(size_t index) const override {
+            if (index < 0 || index >= len) throw bczhc::IndexOutOfBoundsException();
+            return data[index];
         }
 
-        virtual void insert(size_t index, const T *a, size_t size) {
-            if (index < 0 || index > prop->length) return;
+        void set(size_t index, const T &a) const override {
+            if (index < 0 || index >= len) throw bczhc::IndexOutOfBoundsException();
+            data[index] = a;
+        }
+
+        void add(size_t index, const T &a) override {
+            if (index < 0 || index > len) throw bczhc::IndexOutOfBoundsException();
+            if (len >= dataSize/* length + 1 > dataSize */)
+                resize(dataSize * 2);
+            for (size_t i = len; i > index; --i)
+                data[i] = data[i - 1];
+            data[index] = a;
+            ++len;
+        }
+
+        T remove(size_t index) override {
+            if (index < 0 || index >= len) throw bczhc::IndexOutOfBoundsException();
+            T removed = data[index];
+            --len;
+            for (size_t i = index; i < len; ++i)
+                data[i] = data[i + 1];
+            if (len < dataSize / 4)
+                resize(dataSize / 2);
+            return removed;
+        }
+
+        ssize_t indexOf(const T &a) const override {
+            for (size_t i = 0; i < len; ++i) {
+                if (data[i] == a) return i;
+            }
+            return -1;
+        }
+
+        Iter getIterator() {
+            return Iter(data, len);
+        }
+
+        void addAll(size_t index, const T *a, size_t size) {
+            if (index < 0 || index > len) throw bczhc::IndexOutOfBoundsException();
             ssize_t t;
-            size_t newSize = prop->length + size;
-            if (newSize > prop->dataSize)
+            size_t newSize = len + size;
+            if (newSize > dataSize)
                 resize(newSize);
-            for (ssize_t i = prop->length - 1 + size; i > (ssize_t) index; --i) {
+            for (ssize_t i = len - 1 + size; i > (ssize_t) index; --i) {
                 t = i - size;
-                if (t >= 0) prop->data[i] = prop->data[t];
+                if (t >= 0) data[i] = data[t];
             }
             for (ssize_t i = index; i < (ssize_t) (index + size); ++i) {
-                prop->data[i] = a[i - index];
+                data[i] = a[i - index];
             }
-            prop->length += size;
+            len += size;
         }
 
-        virtual void insert(T a) {
-            if (prop->length >= prop->dataSize/* length + 1 > dataSize */)
-                resize(2 * prop->dataSize);
-            prop->data[prop->length++] = a;
-        }
-
-        virtual void insert(const T *a, size_t size) {
-            size_t newSize = prop->length + size;
-            if (newSize > prop->dataSize) {
+        void addAll(const T *a, size_t size) {
+            size_t newSize = len + size;
+            if (newSize > dataSize) {
                 resize(2 * newSize);
             }
             for (size_t i = 0; i < size; ++i) {
-                prop->data[prop->length + i] = a[i];
+                data[len + i] = a[i];
             }
-            prop->length += size;
-        }
-
-        virtual T remove(int index) {
-            if (prop->length < prop->dataSize / 4)
-                resize(prop->dataSize / 2);
-            T removed = prop->data[index];
-            --prop->length;
-            for (size_t i = index; i < prop->length; ++i)
-                prop->data[i] = prop->data[i + 1];
-            return removed;
+            len += size;
         }
 
         /**
@@ -129,43 +183,33 @@ namespace bczhc {
          * @param start
          * @param end
          */
-        virtual void remove(size_t start, size_t end) {
-            if (start < 0 || start >= prop->length || end > prop->length || end < start) return;
+        void remove(size_t start, size_t end) {
+            if (start < 0 || start >= len || end > len || end < start) return;
             size_t removedSize = end - start;
-            size_t t = prop->length - removedSize;
+            size_t t = len - removedSize;
             for (size_t i = start; i < t; ++i) {
-                prop->data[i] = prop->data[i + removedSize];
+                data[i] = data[i + removedSize];
             }
-            if (prop->length < prop->dataSize / 4) resize(prop->dataSize / 2);
-            prop->length -= removedSize;
-        }
-
-        ssize_t indexOf(T t) const {
-            for (size_t i = 0; i < prop->length; ++i) {
-                if (prop->data[i] == t)
-                    return i;
-            }
-            return -1;
+            if (len < dataSize / 4) resize(dataSize / 2);
+            len -= removedSize;
         }
 
         T &operator[](size_t i) const {
-            return prop->data[i];
+            return data[i];
         }
 
         ArrayList<T> &operator=(const ArrayList<T> &a) {
             if (&a == this) return *this;
-            release();
-            copy(a);
-            ++prop->refCount;
+            copy(a, true);
             return *this;
         }
 
         [[nodiscard]] size_t capacity() const {
-            return prop->dataSize;
+            return dataSize;
         }
 
         [[nodiscard]] T *&getData() {
-            return prop->data;
+            return data;
         }
     };
 }

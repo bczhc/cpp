@@ -1,7 +1,6 @@
 #ifndef BCZHC_STRING_HPP
 #define BCZHC_STRING_HPP
 
-#include "./array_list.hpp"
 #include <cctype>
 #include <cstddef>
 #include <cstdlib>
@@ -14,30 +13,27 @@
 using namespace bczhc;
 
 namespace bczhc {
-    class String : public ArrayList<char> {
+    template<typename T>
+    class ArrayList;
+
+    class String {
     private:
-        struct Properties {
-            bool isNull = false;
-        };
-
-        Properties *mInfo = nullptr;
-
-        using Super = ArrayList<char>;
-
-        void checkSpaceAndResize(size_t newSize);
-
-        void mCopy(const String &s);
+        bool mIsNull = false;
+        char *data = nullptr;
+        size_t stringSize = 0, dataSize = 0;
 
         void copyData(const char *s, size_t size);
 
-        void checkSizeForTerminateCharAndResize();
+        void copy(const String &s, bool deleteOld);
+
+        void resize(size_t newSize);
 
     public:
         String();
 
         String(const String &string);
 
-        String(const char *s, size_t size);
+        String(const char *s, size_t strSize);
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "google-explicit-constructor"
@@ -52,23 +48,21 @@ namespace bczhc {
 
         [[nodiscard]] const char *getCString() const;
 
+        [[nodiscard]] size_t length() const;
+
         [[nodiscard]] size_t utf8Length() const;
 
         String &operator=(const String &string);
 
-        void mRelease() const;
-
         String &operator=(const char *s);
 
-        void insert(size_t index, const char *a, size_t size) override;
+        void insert(size_t index, const char *a, size_t size);
 
-        void insert(char a) override;
+        void insert(size_t index, const String &string);
 
-        void insert(const char *a, size_t size) override;
+        char remove(int index);
 
-        char remove(int index) override;
-
-        void remove(size_t start, size_t end) override;
+        void remove(size_t start, size_t end);
 
         String &append(const String &string);
 
@@ -92,9 +86,9 @@ namespace bczhc {
 
         static ssize_t indexOf(const char *haystack, const char *needle);
 
-        [[nodiscard]] ArrayList<String> split(const String &separator) const;
+        [[nodiscard]] SP<ArrayList<String>> split(const String &separator) const;
 
-        static ArrayList<String> split(const String &str, const String &separator);
+        static SP<ArrayList<String>> split(const String &str, const String &separator);
 
         static String toString(int32_t a);
 
@@ -104,9 +98,7 @@ namespace bczhc {
 
         static String toString(double a);
 
-        void insert(size_t index, char c) override;
-
-        void insert(size_t index, const String &string);
+        void insert(size_t index, char c);
 
         static String toString(int32_t i, int radix);
 
@@ -118,9 +110,9 @@ namespace bczhc {
 
         static String toString(char c);
 
-        void clear() override;
+        void clear();
 
-        static String toUpperCase(const char *s);
+        static void toUpperCase(char *s);
 
         static String toUpperCase(const String &s);
 
@@ -193,8 +185,6 @@ namespace bczhc {
         String &operator+=(int32_t a);
 
         String &operator+=(int64_t a);
-
-        String duplicate() const;
     };
 }
 #endif//BCZHC_STRING_HPP

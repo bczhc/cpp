@@ -6,6 +6,7 @@
 #define BCZHC_ARRAY_ARRAY_HPP
 
 #include "./string.hpp"
+#include <cstdarg>
 
 using namespace bczhc;
 
@@ -13,19 +14,20 @@ namespace bczhc {
     template<typename T>
     class Array {
     private:
-        struct Properties {
-            size_t length = 0;
-            T *elements = nullptr;
-            int refCount = 0;
-        };
+        size_t len = 0;
+        T *elements = nullptr;
 
-        Properties *prop;
-
-        void release() const {
-            if (--prop->refCount == -1) {
-                delete[] prop->elements;
-                delete prop;
+        void copyElem(const T *a, size_t length) const {
+            for (size_t i = 0; i < length; ++i) {
+                elements[i] = a[i];
             }
+        }
+
+        void copy(const Array<T> &a, bool deleteOld = false) {
+            if (deleteOld) delete[] elements;
+            elements = new T[a.len];
+            this->len = a.len;
+            copyElem(a.elements, a.len);
         }
 
     public:
@@ -33,39 +35,36 @@ namespace bczhc {
         Array() : Array<T>(0) {}
 
         Array(size_t length) {
-            prop = new Properties;
             if (length != 0) {
-                prop->elements = new T[length];
+                elements = new T[length];
             }
-            prop->length = length;
+            len = length;
         }
 
         Array(const Array<T> &a) {
-            this->prop = a.prop;
-            ++prop->refCount;
+            copy(a);
         }
 
         ~Array() {
-            release();
+            delete[] elements;
         }
 
         size_t length() const {
-            return prop->length;
+            return len;
         }
 
         Array<T> &operator=(const Array<T> &a) {
-            release();
-            prop = a.prop;
-            ++prop->refCount;
+            if (&a == this) return *this;
+            copy(a, true);
             return *this;
         }
 
         T &operator[](size_t index) const {
-            return prop->elements[index];
+            return elements[index];
         }
 
-        T *getData() const {
-            return prop->elements;
+        T *data() const {
+            return elements;
         }
 
         bool operator==(const Array<T> &a) const {
@@ -115,6 +114,29 @@ namespace bczhc {
             msg += ']';
             return msg;
         }
+
+        template<size_t len_>
+        struct Elements {
+            T elem[len_];
+        };
+
+        template<size_t len_>
+        static Array<T> makeArray(const Elements<len_> &a) {
+            Array<T> r(len_);
+            for (int i = 0; i < len_; ++i) {
+                r[i] = a.elem[i];
+            }
+            return r;
+        }
+
+        template<size_t len_>
+        Array<T> &set(const Elements<len_> &a) {
+            delete[] elements;
+            elements = new T[len_];
+            copyElem(a.elem, len_);
+            return *this;
+        }
+
     };
 }
 

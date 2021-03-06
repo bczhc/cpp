@@ -22,6 +22,7 @@
 #include "../io.hpp"
 #include <random>
 #include <termios.h>
+#include <cstdarg>
 
 using namespace std;
 using namespace bczhc;
@@ -41,25 +42,20 @@ char scanKeyboard() {
     return in;
 }
 
+ArrayList<String> f() {
+    ArrayList<String> a;
+    a.add("asd");
+    return a;
+}
+
+String f2() {
+    String r = "asd";
+    return r;
+}
+
 int main() {
-    DoublyLinkedList<const char*> a;
-    a.insert(a.length(),"1");
-    a.remove(0);
-    return 0;
-    termios options{}, oldOptions{};
-    tcgetattr(STDIN_FILENO, &oldOptions);
-    options = oldOptions;
-    options.c_lflag &= ~((tcflag_t) ICANON | (tcflag_t) ECHO);
-    options.c_cc[VMIN] = 1;
-    tcsetattr(STDIN_FILENO, TCSANOW, &options);
-
-    InputStream is(stdin);
-    char c;
-    while(true) {
-        is.read(&c, 1);
-        cout << (int) c << endl;
-    }
-
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldOptions);
+    String lineStr;
+    lineStr = String();
+    lineStr.append('a');
     return 0;
 }
