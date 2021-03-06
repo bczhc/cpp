@@ -6,7 +6,7 @@
 namespace bczhc {
     struct SolvedUTF8Properties {
         int bytesLength;
-        int codepoint;
+        uint32_t codepoint;
     };
 
     int getUTF8BytesLength(uchar firstByte);

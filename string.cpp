@@ -93,8 +93,9 @@ String &String::operator=(const String &string) {
 }
 
 void String::insert(size_t index, const char *a, size_t size) {
-    stringSize += size;
-    if (stringSize + 1 > dataSize) dataSize = 2 * stringSize + 2, resize(dataSize);
+    size_t newSize = stringSize + size;
+    if (newSize >= dataSize) resize(2 * newSize + 2);
+    stringSize = newSize;
     for (size_t i = stringSize; i >= index + size; --i) {
         data[i] = data[i - size];
     }
@@ -264,13 +265,59 @@ void String::insert(size_t index, char c) {
 }
 
 String String::toString(int32_t i, int radix) {
-    // TODO
-    return String();
+    if (radix < 2 || radix > 36)
+        radix = 10;
+
+    /* Use the faster version */
+    if (radix == 10) {
+        return String::toString(i);
+    }
+
+    char buf[33];
+    bool negative = (i < 0);
+    int32_t charPos = 32;
+
+    if (!negative) {
+        i = -i;
+    }
+
+    while (i <= -radix) {
+        buf[charPos--] = Integer::digits[-(i % radix)];
+        i = i / radix;
+    }
+    buf[charPos] = Integer::digits[-i];
+
+    if (negative) {
+        buf[--charPos] = '-';
+    }
+
+    return String(buf + charPos, (33 - charPos));
 }
 
 String String::toString(int64_t i, int radix) {
-    // TODO
-    return String();
+    if (radix < 2 || radix > 36)
+        radix = 10;
+    if (radix == 10)
+        return toString(i);
+    char buf[65];
+    int32_t charPos = 64;
+    bool negative = (i < 0);
+
+    if (!negative) {
+        i = -i;
+    }
+
+    while (i <= -radix) {
+        buf[charPos--] = Integer::digits[(int32_t) (-(i % radix))];
+        i = i / radix;
+    }
+    buf[charPos] = Integer::digits[(int32_t) (-i)];
+
+    if (negative) {
+        buf[--charPos] = '-';
+    }
+
+    return String(buf + charPos, (65 - charPos));
 }
 
 String String::toString(uint32_t i, int radix) {
@@ -402,7 +449,7 @@ ssize_t String::lastIndexOf(char c) const {
     return -1;
 }
 
-char &String::operator[](size_t index) {
+char &String::operator[](size_t index) const {
     return data[index];
 }
 

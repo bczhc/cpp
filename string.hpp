@@ -164,7 +164,7 @@ namespace bczhc {
 
         [[nodiscard]] ssize_t firstIndexOf(char c) const;
 
-        char &operator[](size_t index);
+        char &operator[](size_t index) const;
 
         friend String operator+(const char *s, const String &o) {
             return String(s) + o;

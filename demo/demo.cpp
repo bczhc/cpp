@@ -54,8 +54,5 @@ String f2() {
 }
 
 int main() {
-    String lineStr;
-    lineStr = String();
-    lineStr.append('a');
     return 0;
 }
