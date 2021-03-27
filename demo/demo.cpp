@@ -23,36 +23,27 @@
 #include <random>
 #include <termios.h>
 #include <cstdarg>
+#include <sys/sysinfo.h>
+#include <fcntl.h>
 
 using namespace std;
 using namespace bczhc;
 
-char scanKeyboard() {
-    char in;
-    int stdinFD = fileno(stdin);
-    struct termios new_settings{};
-    struct termios stored_settings{};
-    tcgetattr(stdinFD, &stored_settings);
-    new_settings = stored_settings;
-    new_settings.c_lflag &= ~(tcflag_t) ICANON;
-    new_settings.c_cc[VMIN] = 1;
-    tcsetattr(stdinFD, TCSANOW, &new_settings);
-    in = (char) getchar();
-    tcsetattr(stdinFD, TCSANOW, &stored_settings);
-    return in;
-}
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        cout << "Usage: Command" << endl;
+        return 0;
+    }
+    FILE *fp;
+    if ((fp = fopen(argv[1], "rb")) == nullptr) {
+        return 1;
+    }
 
-ArrayList<String> f() {
-    ArrayList<String> a;
-    a.add("asd");
-    return a;
-}
+    int i1 = fseeko64(fp, 0L, SEEK_END);
+    cout << i1 << endl;
+    long i = ftell(fp);
+    cout << i << endl;
 
-String f2() {
-    String r = "asd";
-    return r;
-}
-
-int main() {
+    fclose(fp);
     return 0;
 }

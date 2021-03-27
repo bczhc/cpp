@@ -6,6 +6,7 @@
 #include "../utils.hpp"
 #include "../io.hpp"
 #include <iostream>
+#include "../array_list.hpp"
 
 using namespace bczhc;
 using namespace std;
@@ -54,9 +55,13 @@ int main(int argc, char **argv) {
         cout << "Usage: Command (e|d)>" << endl;
         return 0;
     }
+    if (String::equal(argv[1], "t")) {
+
+        return 0;
+    }
     InputStream is(stdin);
     String s;
-    int readLen = 0;
+    int readLen;
     char buf[40960];
     while((readLen = is.read(buf, 40960)) > 0) {
         s.append(buf, readLen);
