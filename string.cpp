@@ -349,10 +349,10 @@ void String::toUpperCase(char *s) {
 String String::toUpperCase(const String &s) {
     size_t len = s.stringSize;
     char b[len + 1];
-    String r(len);
     for (size_t i = 0; i < len; ++i) {
         b[i] = (char) toupper(s.data[i]);
     }
+    b[len] = '\0';
     return String(b);
 }
 
@@ -363,10 +363,10 @@ String String::toLowerCase(const char *s) {
 String String::toLowerCase(const String &s) {
     size_t len = s.stringSize;
     char b[len + 1];
-    String r(len);
     for (size_t i = 0; i < len; ++i) {
         b[i] = (char) tolower(s.data[i]);
     }
+    b[len] = '\0';
     return String(b);
 }
 
@@ -501,3 +501,21 @@ bool String::isNull() const {
     return mIsNull;
 }
 
+String String::replace(const String& pattern, const String &text) const {
+    size_t startPos = 0;
+    const char *patternCStr = pattern.getCString();
+    size_t patternLen = pattern.length();
+    ArrayList<size_t> indices;
+    while (startPos < this->stringSize) {
+        ssize_t index = indexOf(data + startPos, patternCStr);
+        indices.add(index + startPos);
+        startPos += patternLen + index;
+        if (index == -1) break;
+    }
+    "a cd fg";
+    return "";
+}
+
+String &String::remove(size_t startPos, ssize_t removalSize) {
+    return *this;
+}

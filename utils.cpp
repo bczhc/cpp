@@ -462,7 +462,7 @@ int64_t bczhc::getCurrentTimeMillis() {
     return t.tv_sec * 1000 + t.tv_usec / 1000;
 }
 
-Endianness bczhc::getEndianness() {
+Endianness bczhc::getEndianness() noexcept {
     int16_t a = 0x0102;
     if (*((int8_t *) &a) == 0x02) return Endianness::LITTLE;
     return Endianness::BIG;

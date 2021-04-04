@@ -66,5 +66,6 @@ add_executable(
 
 add_executable(zero-width-codec app/zero_width_codec.cpp)
 add_executable(file-size app/file_size.cpp)
+add_executable(utf-converter app/utf_converter.cpp)
 
 add_compile_definitions("${MACRO_DEFINITIONS}")

@@ -71,7 +71,7 @@ namespace bczhc {
         static constexpr int32_t MAX_RADIX = 36;
     };
 
-    Endianness getEndianness();
+    Endianness getEndianness() noexcept;
 
     int64_t getCurrentTimeMillis();
 

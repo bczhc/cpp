@@ -185,6 +185,10 @@ namespace bczhc {
         String &operator+=(int32_t a);
 
         String &operator+=(int64_t a);
+
+        String replace(const String &pattern, const String &text) const;
+
+        String &remove(size_t startPos, ssize_t removalSize);
     };
 }
 #endif//BCZHC_STRING_HPP

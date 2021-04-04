@@ -29,21 +29,11 @@
 using namespace std;
 using namespace bczhc;
 
+int16_t a = 0x1234;
+
+static Endianness endianness = *(int8_t *) &a == 0x12 ? Endianness::BIG : Endianness::LITTLE;
+static bool b = endianness == Endianness::LITTLE;
+
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        cout << "Usage: Command" << endl;
-        return 0;
-    }
-    FILE *fp;
-    if ((fp = fopen(argv[1], "rb")) == nullptr) {
-        return 1;
-    }
-
-    int i1 = fseeko64(fp, 0L, SEEK_END);
-    cout << i1 << endl;
-    long i = ftell(fp);
-    cout << i << endl;
-
-    fclose(fp);
     return 0;
 }
