@@ -17,6 +17,7 @@ void String::copy(const String &s, bool deleteOld) {
     copyData(s.data, s.stringSize);
     stringSize = s.stringSize;
     data[stringSize] = '\0';
+    mIsNull = s.mIsNull;
 }
 
 void String::resize(size_t newSize) {
@@ -37,7 +38,10 @@ String::String(const String &string) : String(string.data, string.stringSize) {
 }
 
 String::String(const char *s, size_t strSize) : String(s == nullptr ? strlen("(null)") : strSize) {
-    if (s == nullptr) s = "(null)";
+    if (s == nullptr) {
+        s = "(null)";
+        mIsNull = true;
+    }
     copyData(s, strSize);
     stringSize = strSize;
     data[stringSize] = '\0';
@@ -76,7 +80,11 @@ size_t String::utf8Length() const {
 }
 
 String &String::operator=(const char *s) {
-    if (s == nullptr) s = "(null)";
+    if (s == nullptr) {
+        s = "(null)";
+        mIsNull = true;
+    } else mIsNull = false;
+
     delete[] data;
     size_t size0 = strlen(s) + 1;
     data = new char[size0];
@@ -501,7 +509,7 @@ bool String::isNull() const {
     return mIsNull;
 }
 
-String String::replace(const String& pattern, const String &text) const {
+String String::replace(const String &pattern, const String &text) const {
     size_t startPos = 0;
     const char *patternCStr = pattern.getCString();
     size_t patternLen = pattern.length();

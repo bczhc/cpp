@@ -9,6 +9,7 @@
 #include <cstdint>
 #include "../utils.hpp"
 #include <cassert>
+#include <csignal>
 
 using namespace bczhc;
 
@@ -28,102 +29,158 @@ void putUnicode2utf32(uint32_t codepoint, Endianness endianness);
 
 void handleUtf8Input(UnicodeConverter converter, Endianness toEndianness);
 
+void signalHandler(int signal) {
+    if (signal == SIGINT) {
+        fflush(stdout);
+        fclose(stdout);
+    }
+}
+
 int main(int argc, char **argv) {
     const String selfFilename = File::getFileName(argv[0]);
-    String formatMsg = "A from-stdin-to-stdout UTF converter.\nUsage: %s <from> <to>\n       %s (--help | -h)\n\nfrom, to: [utf[-]](8|16be|16le|32be|32le)";
-    size_t newHelpMsgSize = formatMsg.length() - 2 + selfFilename.length() + 1;
+    String formatMsg = "A from-stdin-to-stdout UTF converter.\nUsage: %s [option] <from> <to>\n       %s (--help | -h)\n       %s --info\n\nOptions:\n  -b <size>, --buffer-size <size>  IO buffer size, in bytes.\n  -i <path>, --input <path>  Input file instead of stdin.\n  -o <path>, --output <path>  Output file instead of stdout.\n\nPositional arguments:\nfrom, to: [utf[-]](8|16be|16le|32be|32le)\n";
+    size_t newHelpMsgSize = formatMsg.length() - 2 * 3 + selfFilename.length() * 3 + 1;
     char helpMsg[newHelpMsgSize];
-    sprintf(helpMsg, formatMsg.getCString(), selfFilename.getCString(), selfFilename.getCString());
+    const char *fn = selfFilename.getCString();
+    sprintf(helpMsg, formatMsg.getCString(), fn, fn, fn);
     helpMsg[newHelpMsgSize - 1] = '\0';
 
     if (argc == 1) {
-        puts(helpMsg), putchar('\n');
+        puts(helpMsg);
         return 0;
     }
 
     if (argc == 2) {
-        if (String::equal(argv[1], "-h") || String::equal(argv[1], "--help")) {
-            puts(helpMsg), putchar('\n');
+        String argv1 = argv[1];
+        if (argv1.equals("-h") || argv1.equals("--help")) {
+            puts(helpMsg);
             return 0;
+        } else if (argv1.equals("--info")) {
+            puts("Written by bczhc (https://github.com/bczhc).\n...\n");
         } else {
             fprintf(stderr, "Unknown option: %s\n", argv[1]);
             return 1;
         }
     }
-    if (argc == 3) {
-        String from = String::toLowerCase(argv[1]), to = String::toLowerCase(argv[2]);
-        UnicodeConverter converter;
-        Endianness toEndianness{};
 
-        if (to.equals("utf8") || to.equals("utf-8")) {
-            converter = putUnicode2utf8;
-        } else if (to.equals("utf16be") || to.equals("utf-16be")) {
-            converter = putUnicode2utf16;
-            toEndianness = Endianness::BIG;
-        } else if (to.equals("utf16le") || to.equals("utf-16le")) {
-            converter = putUnicode2utf16;
-            toEndianness = Endianness::LITTLE;
-        } else if (to.equals("utf32be") || to.equals("utf-32be")) {
-            converter = putUnicode2utf32;
-            toEndianness = Endianness::BIG;
-        } else if (to.equals("utf32le") || to.equals("utf-32le")) {
-            converter = putUnicode2utf32;
-            toEndianness = Endianness::LITTLE;
-        } else {
-            fprintf(stderr, "Unknown <to> encode: %s\n", argv[2]);
+    int64_t bufferSize = 8192;
+    // null means stdin
+    String inputFilePath = nullptr;
+    // null means stdout
+    String outputFilePath = nullptr;
+
+    if (argc > 3) {
+        for (int i = 1; i < argc - 2; i += 2) {
+            String option = argv[i];
+            if (option.charAt(0) != '-' && !option.substr(0, 2).equals("--")) {
+                fprintf(stderr, "Unknown option: %s\n", option.getCString());
+                return 1;
+            }
+            if (i + 1 >= argc) {
+                fprintf(stderr, "Invalid arguments count.\n");
+                return 1;
+            }
+            String arg = argv[i + 1];
+
+            if (option.equals("-b") || option.equals("--buffer-size")) {
+                try {
+                    bufferSize = Long::parseLong(arg);
+                } catch (const NumberFormatException &e) {
+                    fprintf(stderr, "%s\n", e.what());
+                    return 1;
+                }
+            } else if (option.equals("-i") || option.equals("--input")) {
+                inputFilePath = arg;
+            } else if (option.equals("-o") || option.equals("--output")) {
+                outputFilePath = arg;
+            } else {
+                fprintf(stderr, "Unknown option: %s\n", option.getCString());
+                return 1;
+            }
+        }
+    }
+
+    signal(SIGINT, signalHandler);
+
+    if (!inputFilePath.isNull()) {
+        freopen64(inputFilePath.getCString(), "rb", stdin);
+    }
+    if (!outputFilePath.isNull()) {
+        freopen64(outputFilePath.getCString(), "wb", stdout);
+    }
+
+    String from = String::toLowerCase(argv[argc - 2]), to = String::toLowerCase(argv[argc - 1]);
+    UnicodeConverter converter;
+    Endianness toEndianness{};
+
+    if (to.equals("utf8") || to.equals("utf-8")) {
+        converter = putUnicode2utf8;
+    } else if (to.equals("utf16be") || to.equals("utf-16be")) {
+        converter = putUnicode2utf16;
+        toEndianness = Endianness::BIG;
+    } else if (to.equals("utf16le") || to.equals("utf-16le")) {
+        converter = putUnicode2utf16;
+        toEndianness = Endianness::LITTLE;
+    } else if (to.equals("utf32be") || to.equals("utf-32be")) {
+        converter = putUnicode2utf32;
+        toEndianness = Endianness::BIG;
+    } else if (to.equals("utf32le") || to.equals("utf-32le")) {
+        converter = putUnicode2utf32;
+        toEndianness = Endianness::LITTLE;
+    } else {
+        fprintf(stderr, "Unknown <to> encode: %s\n", argv[2]);
+        return 1;
+    }
+
+    if (from.equals("utf8") || from.equals("utf-8")) {
+        handleUtf8Input(converter, toEndianness);
+    } else {
+        const char *unknownFromOptionFormat = "Unknown <from> option: %s\n";
+        if (from.length() != 7 && from.length() != 8) {
+            fprintf(stderr, unknownFromOptionFormat, argv[1]);
+            return 1;
+        }
+        if (!from.substr(0, 3).equals("utf")) {
+            fprintf(stderr, unknownFromOptionFormat, argv[1]);
+            return 1;
+        }
+        char c = from.charAt(3);
+        if (c != '-' && c != '1' && c != '3') {
+            fprintf(stderr, unknownFromOptionFormat, argv[1]);
             return 1;
         }
 
-        if (from.equals("utf8") || from.equals("utf-8")) {
-            handleUtf8Input(converter, toEndianness);
+        String mid2, end2;
+        if (c == '-') {
+            mid2 = from.substr(4, 2);
+            end2 = from.substr(6, 2);
         } else {
-            const char *unknownFromOptionFormat = "Unknown <from> option: %s\n";
-            if (from.length() != 7 && from.length() != 8) {
-                fprintf(stderr, unknownFromOptionFormat, argv[1]);
-                return 1;
-            }
-            if (!from.substr(0, 3).equals("utf")) {
-                fprintf(stderr, unknownFromOptionFormat, argv[1]);
-                return 1;
-            }
-            char c = from.charAt(3);
-            if (c != '-' && c != '1' && c != '3') {
-                fprintf(stderr, unknownFromOptionFormat, argv[1]);
-                return 1;
-            }
+            mid2 = from.substr(3, 2);
+            end2 = from.substr(5, 2);
+        }
 
-            String mid2, end2;
-            if (c == '-') {
-                mid2 = from.substr(4, 2);
-                end2 = from.substr(6, 2);
-            } else {
-                mid2 = from.substr(3, 2);
-                end2 = from.substr(5, 2);
-            }
-
-            if (mid2.equals("16")) {
-                if (end2.equals("be")) {
-                    // utf-16be
-                    handleUtf16Input(converter, Endianness::BIG, toEndianness);
-                } else if (end2.equals("le")) {
-                    handleUtf16Input(converter, Endianness::LITTLE, toEndianness);
-                } else {
-                    fprintf(stderr, unknownFromOptionFormat, argv[1]);
-                    return 1;
-                }
-            } else if (mid2.equals("32")) {
-                if (end2.equals("be")) {
-                    handleUtf32Input(converter, Endianness::BIG, toEndianness);
-                } else if (end2.equals("le")) {
-                    handleUtf32Input(converter, Endianness::LITTLE, toEndianness);
-                } else {
-                    fprintf(stderr, unknownFromOptionFormat, argv[1]);
-                    return 1;
-                }
+        if (mid2.equals("16")) {
+            if (end2.equals("be")) {
+                // utf-16be
+                handleUtf16Input(converter, Endianness::BIG, toEndianness);
+            } else if (end2.equals("le")) {
+                handleUtf16Input(converter, Endianness::LITTLE, toEndianness);
             } else {
                 fprintf(stderr, unknownFromOptionFormat, argv[1]);
                 return 1;
             }
+        } else if (mid2.equals("32")) {
+            if (end2.equals("be")) {
+                handleUtf32Input(converter, Endianness::BIG, toEndianness);
+            } else if (end2.equals("le")) {
+                handleUtf32Input(converter, Endianness::LITTLE, toEndianness);
+            } else {
+                fprintf(stderr, unknownFromOptionFormat, argv[1]);
+                return 1;
+            }
+        } else {
+            fprintf(stderr, unknownFromOptionFormat, argv[1]);
+            return 1;
         }
     }
     return 0;
