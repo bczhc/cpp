@@ -186,6 +186,14 @@ void Sqlite3::Statement::bindBlob(int row, const char *bytes, int size, void (*d
     }
 }
 
+int Sqlite3::Statement::getIndexByColumnName(const char *c) const {
+    int size = sqlite3_column_count(this->stmt);
+    for (int i = 0; i < size; ++i) {
+        if (String::equal(c, sqlite3_column_name(this->stmt, i))) return i;
+    }
+    throw SqliteException("not found column by name", -1);
+}
+
 bool Sqlite3::Cursor::step() const {
     return stmt.stepRow() == SQLITE_ROW;
 }

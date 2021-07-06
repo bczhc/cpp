@@ -88,13 +88,7 @@ namespace bczhc {
              * @param c column name
              * @return index, the leftmost value is 0
              */
-            int getIndexByColumnName(const char *c) {
-                int size = sqlite3_column_count(this->stmt);
-                for (int i = 0; i < size; ++i) {
-                    if (String::equal(c, sqlite3_column_name(this->stmt, i))) return i;
-                }
-                throw SqliteException("not found column by name", -1);
-            }
+            int getIndexByColumnName(const char *c) const;
         };
 
     private:

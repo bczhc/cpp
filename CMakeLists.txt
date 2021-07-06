@@ -27,6 +27,7 @@ add_executable(
         demo-cpp
         demo/demo.cpp
         third_party/crypto-algorithms/sha256.c
+        app/charactersStatistics/CountCharacters.cpp
 )
 add_executable(fourier-seriesTest demo/fourierSeriesTest.cpp)
 add_executable(sqlite3-to-JSON demo/sqlite3ToJSON.cpp)
