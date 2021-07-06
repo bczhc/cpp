@@ -39,6 +39,8 @@ int main(int argc, char **argv) {
     struct Bean {
         int32_t date;
         size_t len;
+        size_t unique_len;
+        double use_rate;
     };
 
     vector<Bean> vec;
@@ -46,23 +48,35 @@ int main(int argc, char **argv) {
     while (cursor.step()) {
         CharacterCounter counter;
         int32_t date = cursor.getInt(0);
-        const char *content = cursor.getText(1);
-        counter.countCharacters(content, -1);
-        unsigned long len = counter.data->size();
-        vec.push_back(Bean{date, len});
+        String content(cursor.getText(1));
+        counter.countCharacters(content.getCString(), (int) content.length());
+        unsigned long unique_len = counter.data->size();
+        vec.push_back(
+                Bean{
+                        date,
+                        content.utf8Length(),
+                        unique_len,
+                        static_cast<double>(unique_len) / static_cast<double>(content.utf8Length())
+                }
+        );
     }
 
     statement.release();
     db.close();
 
-    auto comparer = [](const Bean& o1, const Bean& o2){
-        return o1.len < o2.len;
+    auto comparer = [](const Bean &o1, const Bean &o2) {
+        double d = o1.use_rate - o2.use_rate;
+        return d < 0;
     };
 
     sort(vec.begin(), vec.end(), comparer);
 
     for (const auto &item : vec) {
-        cout << item.date << ' ' << item.len << endl;
+        cout << item.date << ' ' << item.unique_len << " : " << item.len << " = "
+             << (static_cast<double>(item.unique_len) /
+                 static_cast<double>(item.len) * 100)
+             << '%' << endl;
     }
+
     return 0;
 }
