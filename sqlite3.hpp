@@ -28,6 +28,11 @@ namespace bczhc {
             Statement &stmt;
 
         public:
+            struct BlobResult {
+                int size;
+                const uchar *data;
+            };
+
             explicit Cursor(Sqlite3::Statement &stmt);
 
             void reset() const;
@@ -42,7 +47,7 @@ namespace bczhc {
 
             const char *getText(int column) const;
 
-            const uchar *getBlob(int column) const;
+            BlobResult getBlob(int column) const;
         };
 
         class Statement {

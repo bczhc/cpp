@@ -197,8 +197,13 @@ void Sqlite3::Cursor::reset() const {
 Sqlite3::Cursor::Cursor(Sqlite3::Statement &stmt) : stmt(stmt) {
 }
 
-const uchar *Sqlite3::Cursor::getBlob(int column) const {
-    return (const uchar *) sqlite3_column_blob(stmt.stmt, column);
+Sqlite3::Cursor::BlobResult Sqlite3::Cursor::getBlob(int column) const {
+    int size = sqlite3_column_bytes(stmt.stmt, column);
+    auto data = (const uchar *) sqlite3_column_blob(stmt.stmt, column);
+    return BlobResult {
+            .size = size,
+            .data = data
+    };
 }
 
 const char *Sqlite3::Cursor::getText(int column) const {
