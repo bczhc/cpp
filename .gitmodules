@@ -1,9 +1,9 @@
 [submodule "third_party/sqlite3-single-c"]
 	path = third_party/sqlite3-single-c
-	url = https://hub.fastgit.org/bczhc/sqlite3-single-c.git
+	url = https://github.com/bczhc/sqlite3-single-c.git
 [submodule "third_party/json-single-header"]
 	path = third_party/json-single-header
-	url = https://hub.fastgit.org/bczhc/single-json-header.git
+	url = https://github.com/bczhc/single-json-header.git
 [submodule "third_party/crypto-algorithms"]
 	path = third_party/crypto-algorithms
-	url = https://hub.fastgit.org/lcn2/crypto-algorithms
+	url = https://github.com/lcn2/crypto-algorithms
