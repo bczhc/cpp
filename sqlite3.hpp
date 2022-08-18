@@ -134,6 +134,8 @@ namespace bczhc {
 
         void key(const String &key) const;
 
+        void rekey(const String& key) const;
+
         bool checkIfCorrupt();
 
         Statement compileStatement(const char *sql) const;

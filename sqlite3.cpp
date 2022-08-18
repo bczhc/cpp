@@ -107,6 +107,12 @@ void Sqlite3::key(const String &key) const {
         throw makeException(this->db, "sqlite3_key failed", i);
     }
 }
+void Sqlite3::rekey(const String &key) const {
+    int r = sqlite3_rekey(this->db, key.getCString(), (int) key.length());
+    if (r != 0) {
+        throw makeException(this->db, "sqlite3_rekey failed", r);
+    }
+}
 
 void Sqlite3::Statement::step() const {
     int r = sqlite3_step(this->stmt);
