@@ -132,6 +132,8 @@ namespace bczhc {
 
         void exec(const char *cmd, SqliteCallback &callback, void *arg) const;
 
+        void key(const String &key) const;
+
         bool checkIfCorrupt();
 
         Statement compileStatement(const char *sql) const;

@@ -41,25 +41,22 @@ function(confLib)
     )
 
     #sqlite3
-    find_package(SQLite3)
-    if (SQLite3_FOUND)
-        include_directories("${SQLite3_INCLUDE_DIRS}")
-        set(SQLITE3_LIB "${SQLite3_LIBRARIES}")
-    else ()
-        message(STATUS "Not found sqlite3, use local sqlite3 library.")
-        include_directories(third_party/sqlite3-single-c)
-        set(SQLITE3_LIB sqlite3)
+    message(STATUS "use local sqlite3 library")
+    include_directories(third_party/sqlite3-single-c)
+    set(SQLITE3_LIB sqlite3-local)
 
-        find_library(DL_LIB dl REQUIRED)
-        set(sqlite3Src third_party/sqlite3-single-c/sqlite3.c)
-        add_library(sqlite3 SHARED "${sqlite3Src}")
-        target_link_libraries(sqlite3 "${DL_LIB}")
-        add_library(sqlite3Static STATIC ${sqlite3Src})
-        target_link_libraries(sqlite3Static "${DL_LIB}")
-        set_target_properties(sqlite3Static PROPERTIES OUTPUT_NAME sqlite3)
-    endif ()
+    find_library(DL_LIB dl REQUIRED)
+    set(sqlite3Src third_party/sqlite3-single-c/sqlite3.c)
+    add_library(sqlite3-local SHARED "${sqlite3Src}")
+    target_link_libraries(sqlite3-local "${DL_LIB}")
+    add_library(sqlite3Static STATIC ${sqlite3Src})
+    target_link_libraries(sqlite3Static "${DL_LIB}")
+    set_target_properties(sqlite3Static PROPERTIES OUTPUT_NAME sqlite3-local)
     list(APPEND zhcLibLinkingLibs "${SQLITE3_LIB}")
 
+    # OpenSSL
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(sqlite3-local ${OPENSSL_LIBRARIES})
 
     #pthread
     find_package(Threads REQUIRED)

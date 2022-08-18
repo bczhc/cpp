@@ -31,52 +31,22 @@
 using namespace std;
 using namespace bczhc;
 
-int main(int argc, char **argv) {
-    Sqlite3 db("/home/bczhc/private-repo/diary/private/diary.db");
-    Sqlite3::Statement statement = db.compileStatement("SELECT \"date\", content FROM diary;");
-    Sqlite3::Cursor cursor = statement.getCursor();
+int main() {
+    Sqlite3 db("db");
+    db.key("1234");
+    db.exec("create table if not exists a(a)");
+    db.exec("insert into a values(123)");
 
-    struct Bean {
-        int32_t date;
-        size_t len;
-        size_t unique_len;
-        double use_rate;
-    };
-
-    vector<Bean> vec;
-
-    while (cursor.step()) {
-        CharacterCounter counter;
-        int32_t date = cursor.getInt(0);
-        String content(cursor.getText(1));
-        counter.countCharacters(content.getCString(), (int) content.length());
-        unsigned long unique_len = counter.data->size();
-        vec.push_back(
-                Bean{
-                        date,
-                        content.utf8Length(),
-                        unique_len,
-                        static_cast<double>(unique_len) / static_cast<double>(content.utf8Length())
-                }
-        );
+    auto stmt = db.compileStatement("SELECT a FROM a");
+    auto c = stmt.getCursor();
+    while (c.step()) {
+        auto i = c.getInt(0);
+        cout << i << endl;
     }
 
-    statement.release();
+    stmt.release();
+
     db.close();
-
-    auto comparer = [](const Bean &o1, const Bean &o2) {
-        double d = o1.use_rate - o2.use_rate;
-        return d < 0;
-    };
-
-    sort(vec.begin(), vec.end(), comparer);
-
-    for (const auto &item : vec) {
-        cout << item.date << ' ' << item.unique_len << " : " << item.len << " = "
-             << (static_cast<double>(item.unique_len) /
-                 static_cast<double>(item.len) * 100)
-             << '%' << endl;
-    }
 
     return 0;
 }

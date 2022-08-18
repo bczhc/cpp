@@ -101,6 +101,13 @@ const char *Sqlite3::getErrorMsg() const {
     return sqlite3_errmsg(this->db);
 }
 
+void Sqlite3::key(const String &key) const {
+    int i = sqlite3_key(this->db, key.getCString(), (int) key.length());
+    if (i != 0) {
+        throw makeException(this->db, "sqlite3_key failed", i);
+    }
+}
+
 void Sqlite3::Statement::step() const {
     int r = sqlite3_step(this->stmt);
     if (r != SQLITE_DONE) {
