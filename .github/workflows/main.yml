@@ -26,6 +26,6 @@ jobs:
       - name: clone third party
         run: git submodule update --init --recursive
       - name: build
-        run: ./build.sh
+        run: ./build.sh && docker build -t build .
       - name: test
         run: ./build/test
