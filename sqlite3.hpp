@@ -37,17 +37,17 @@ namespace bczhc {
 
             void reset() const;
 
-            bool step() const;
+            [[nodiscard]] bool step() const;
 
-            int32_t getInt(int column) const;
+            [[nodiscard]] int32_t getInt(int column) const;
 
-            int64_t getLong(int column) const;
+            [[nodiscard]] int64_t getLong(int column) const;
 
-            double getDouble(int column) const;
+            [[nodiscard]] double getDouble(int column) const;
 
-            const char *getText(int column) const;
+            [[nodiscard]] const char *getText(int column) const;
 
-            BlobResult getBlob(int column) const;
+            [[nodiscard]] BlobResult getBlob(int column) const;
         };
 
         class Statement {
@@ -60,7 +60,7 @@ namespace bczhc {
 
             void step() const;
 
-            Statement(sqlite3_stmt *stmt);
+            explicit Statement(sqlite3_stmt *stmt);
 
             Statement(const Sqlite3::Statement &stat);
 
@@ -82,7 +82,7 @@ namespace bczhc {
 
             void release();
 
-            int stepRow() const;
+            [[nodiscard]] bool stepRow() const;
 
             void clearBinding() const;
 
@@ -119,14 +119,14 @@ namespace bczhc {
 
         static String makeExceptionString(sqlite3 *db, const String &mainStatement, int errorCode);
 
-        SqliteException makeException(const String &mainStatement, int errorCode) const;
+        [[nodiscard]] SqliteException makeException(const String &mainStatement, int errorCode) const;
 
         static SqliteException makeException(sqlite3 *db, const String &mainStatement, int errorCode);
 
     public:
         sqlite3 *db = nullptr;
 
-        Sqlite3(const char *path);
+        explicit Sqlite3(const char *path);
 
         void close();
 
@@ -148,7 +148,7 @@ namespace bczhc {
 
         Sqlite3(const Sqlite3 &a);
 
-        const char *getErrorMsg() const;
+        [[nodiscard]] const char *getErrorMsg() const;
     };
 }
 

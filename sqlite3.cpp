@@ -1,6 +1,6 @@
-#include <cstdint>
 #include "sqlite3.hpp"
 #include "string.hpp"
+#include <cstdint>
 
 using namespace bczhc;
 
@@ -11,11 +11,11 @@ String Sqlite3::makeExceptionString(sqlite3 *db, const String &mainStatement, in
 }
 
 SqliteException Sqlite3::makeException(sqlite3 *db, const String &mainStatement, int errorCode) {
-    return SqliteException(makeExceptionString(db, mainStatement, errorCode), errorCode);
+    return {makeExceptionString(db, mainStatement, errorCode), errorCode};
 }
 
 SqliteException Sqlite3::makeException(const String &mainStatement, int errorCode) const {
-    return SqliteException(makeExceptionString(this->db, mainStatement, errorCode), errorCode);
+    return {makeExceptionString(this->db, mainStatement, errorCode), errorCode};
 }
 
 void Sqlite3::close() {
@@ -240,7 +240,7 @@ bool Sqlite3::Statement::isReleased() const {
 }
 
 bool Sqlite3::Cursor::step() const {
-    return stmt.stepRow() == SQLITE_ROW;
+    return stmt.stepRow();
 }
 
 void Sqlite3::Cursor::reset() const {
