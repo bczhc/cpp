@@ -115,6 +115,7 @@ void Sqlite3::rekey(const String &key) const {
 }
 
 void Sqlite3::Statement::step() const {
+    checkIfReleased();
     int r = sqlite3_step(this->stmt);
     if (r != SQLITE_DONE) {
         throw makeException(this->db, "stepping failed", r);
@@ -124,6 +125,7 @@ void Sqlite3::Statement::step() const {
 Sqlite3::Statement::Statement(sqlite3_stmt *stmt) : stmt(stmt), db(sqlite3_db_handle(stmt)) {}
 
 void Sqlite3::Statement::bind(int row, int32_t i) const {
+    checkIfReleased();
     int r = sqlite3_bind_int(stmt, row, i);
     if (r) {
         throw makeException(this->db, "binding failed", r);
@@ -131,6 +133,7 @@ void Sqlite3::Statement::bind(int row, int32_t i) const {
 }
 
 void Sqlite3::Statement::reset() const {
+    checkIfReleased();
     int r = sqlite3_reset(stmt);
     if (r) {
         throw makeException(this->db, "reset failed", r);
@@ -138,6 +141,7 @@ void Sqlite3::Statement::reset() const {
 }
 
 void Sqlite3::Statement::bind(int row, int64_t a) const {
+    checkIfReleased();
     int r = sqlite3_bind_int64(stmt, row, (sqlite3_int64) a);
     if (r) {
         throw makeException(this->db, "binding failed", r);
@@ -145,6 +149,7 @@ void Sqlite3::Statement::bind(int row, int64_t a) const {
 }
 
 void Sqlite3::Statement::bind(int row, double a) const {
+    checkIfReleased();
     int r = sqlite3_bind_double(stmt, row, a);
     if (r) {
         throw makeException(this->db, "binding failed", r);
@@ -152,17 +157,20 @@ void Sqlite3::Statement::bind(int row, double a) const {
 }
 
 void Sqlite3::Statement::bindNull(int row) const {
+    checkIfReleased();
     int r = sqlite3_bind_null(stmt, row);
     if (r) {
         throw makeException(this->db, "binding failed", r);
     }
 }
 
-void Sqlite3::Statement::release() const {
+void Sqlite3::Statement::release() {
+    checkIfReleased();
     int r = sqlite3_finalize(this->stmt);
     if (r) {
         throw makeException(this->db, "release failed", r);
     }
+    this->released = true;
 }
 
 Sqlite3::Statement::Statement(const Sqlite3::Statement &stat) {
@@ -170,11 +178,16 @@ Sqlite3::Statement::Statement(const Sqlite3::Statement &stat) {
     this->db = sqlite3_db_handle(stat.stmt);
 }
 
-int Sqlite3::Statement::stepRow() const {
-    return sqlite3_step(this->stmt);
+bool Sqlite3::Statement::stepRow() const {
+    checkIfReleased();
+    int r = sqlite3_step(this->stmt);
+    if (r == SQLITE_ROW) { return true; }
+    if (r == SQLITE_DONE) { return false; }
+    throw makeException(this->db, "step failed", r);
 }
 
 void Sqlite3::Statement::clearBinding() const {
+    checkIfReleased();
     int status = sqlite3_clear_bindings(this->stmt);
     if (status != SQLITE_OK) {
         throw makeException(this->db, "clearing failed", status);
@@ -186,6 +199,7 @@ void Sqlite3::Statement::bindText(int row, const char *s, void (*destructCallbac
 }
 
 void Sqlite3::Statement::bindText(int row, const char *s, int size, void (*destructCallback)(void *)) const {
+    checkIfReleased();
     int r = sqlite3_bind_text(stmt, row, s, size, destructCallback);
     if (r) {
         throw makeException(this->db, "binding failed", r);
@@ -193,6 +207,7 @@ void Sqlite3::Statement::bindText(int row, const char *s, int size, void (*destr
 }
 
 void Sqlite3::Statement::bindBlob(int row, const char *bytes, int size, void (*destructCallback)(void *)) const {
+    checkIfReleased();
     int r = sqlite3_bind_blob(stmt, row, bytes, size, destructCallback);
     if (r) {
         throw makeException(this->db, "binding failed", r);
@@ -200,11 +215,28 @@ void Sqlite3::Statement::bindBlob(int row, const char *bytes, int size, void (*d
 }
 
 int Sqlite3::Statement::getIndexByColumnName(const char *c) const {
+    checkIfReleased();
     int size = sqlite3_column_count(this->stmt);
     for (int i = 0; i < size; ++i) {
         if (String::equal(c, sqlite3_column_name(this->stmt, i))) return i;
     }
     throw SqliteException("not found column by name", -1);
+}
+
+void Sqlite3::Statement::checkIfReleased() const {
+    if (released) {
+        throw SqliteException("Already released");
+    }
+}
+
+Sqlite3::Cursor Sqlite3::Statement::getCursor() {
+    checkIfReleased();
+    Cursor c(*this);
+    return c;
+}
+
+bool Sqlite3::Statement::isReleased() const {
+    return this->released;
 }
 
 bool Sqlite3::Cursor::step() const {

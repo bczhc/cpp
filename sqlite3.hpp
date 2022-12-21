@@ -51,6 +51,9 @@ namespace bczhc {
         };
 
         class Statement {
+        private:
+            bool released = false;
+
         public:
             sqlite3_stmt *stmt;
             sqlite3 *db;
@@ -77,16 +80,17 @@ namespace bczhc {
 
             void bindNull(int row) const;
 
-            void release() const;
+            void release();
 
             int stepRow() const;
 
             void clearBinding() const;
 
-            Cursor getCursor() {
-                Cursor c(*this);
-                return c;
-            }
+            void checkIfReleased() const;
+
+            [[nodiscard]] bool isReleased() const;
+
+            Cursor getCursor();
 
             /**
              *

@@ -62,11 +62,13 @@ namespace bczhc {
 
     class SqliteException : public Exception {
     public:
-        int returnCode;
+        int returnCode{};
 
         SqliteException(const char *msg, int returnCode);
 
         SqliteException(const String &msg, int returnCode);
+
+        explicit SqliteException(const String &msg);
 
         explicit SqliteException(int returnCode) : returnCode(returnCode) {}
     };
